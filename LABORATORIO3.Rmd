@@ -1,0 +1,85 @@
+---
+title: "Laboratorio 3"
+date: "`r Sys.Date()`"
+output:
+  rmdformats::readthedown:
+    highlight: kate
+    toc_depth: 3
+    embed_fonts: true
+    use_bookdown: false
+    pandoc_args: Null 
+---
+
+
+```{r setup, include=FALSE}
+library(knitr)
+library(rmdformats)
+
+## Global options
+options(max.print="75")
+opts_chunk$set(echo=FALSE,
+	             cache=TRUE,
+               prompt=FALSE,
+               tidy=TRUE,
+               comment=NA,
+               message=FALSE,
+               warning=FALSE)
+opts_knit$set(width=75)
+```
+
+# Instrucciones
+
+
+- El laboratorio consiste en un trabajo en equipo en el cual se implementen los conceptos desarrollados en clase y la profundización de los mismos. 
+- El objetivo general es: Aplicar el método de Árbol binomial en instrumentos financieros de renta variable. 
+- Debe desarrollar el modelo para el cálculo, con una programación eficiente y ordenada en RStudio que incluya lo siguiente: 
+    - El modelo para el árbol binomial. 
+    - El modelo para la valoración del derivado.
+    - Un análisis de resultados obtenidos. 
+    - Debe entregar el código que incluya una breve explicación de la funcionalidad del mismo.
+    
+- En trabajo escrito RMarkdown deberá incluir lo siguiente: 
+    - Párrafo introductorio donde comenta el trabajo realizado. 
+    - Marco teórico que fundamente el laboratorio, según lo visto en clase y profundizaciones de contenidos.
+    - Metodología utilizada en el laboratorio. 
+    - Una sección (o capítulo) de descripción de los datos históricos a utilizar, donde se describan las principales características de las variables relevantes. 
+    - Una sección (o capítulo)  con el análisis del árbol binomial y su implementación para valorar un derivado financiero. 
+    - Una sección (o capítulo)  que incluya resultados. 
+    - Una sección (o capítulo)  en el cual realice conclusiones
+    - Refencias bibliográficas.
+- Para llevar a cabo el ejercicio, se le proponen las siguientes preguntas de investigación. Elija la que más le guste o bien, puede proponer una nueva pregunta de investigación.
+    
+    
+    
+    
+# Sugerencia 1
+
+¿Cómo el precio de las acciones de alguna empresa nacional observadas con cierta frecuencia se pueden utilizar para determinar el precio que tendrá una opción de venta o de compra en el futuro, si el subyacente es la acción observada?
+
+* Buscar datos el activo subyacente. 
+* Implementar el modelo de árbol binomial para predecir los precios futuros del subyacente.
+* Utilizar la modelación anterior para determinar el precio que debe tener la opción de venta (o compra), utilizando un modelo adecuado de valoración.
+
+# Sugerencia 2
+
+¿Cómo afecta la posibilidad de incumplimiento a la opción de compra de un bono a 10 años de la Compañía ABC que es exigible en cualquier momento después de cinco años? El modelo crediticio y la opción no son separables porque se impactan entre sí. 
+
+# Sugerencia 3
+
+¿Cómo utilizar el árbol binomial para estimar un rango para la inflación a seis meses en Costa Rica?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
