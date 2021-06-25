@@ -80,6 +80,6 @@ opts_knit$set(width=75)
 
 
 
+Marco teórico, curva soberana
+Metodologia, periodo y que datos
 
-Que va con la compu de David
-    
