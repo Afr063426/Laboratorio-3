@@ -14,7 +14,10 @@ output:
 ```{r setup, include=FALSE}
 library(knitr)
 library(rmdformats)
-
+library(kableExtra)
+library(tidyverse)
+##Importante instalar lo que sigue acontinuacion, que está comentado
+#devtools::install_github("juba/rmdformats")
 ## Global options
 options(max.print="75")
 opts_chunk$set(echo=FALSE,
@@ -73,11 +76,21 @@ opts_knit$set(width=75)
 
 
 
+# Marco teórico
 
+En primera instancia se mostrará la notación que se mantendrá a los largo del trabajo.
+```{r, include=FALSE}
+notacion<-c("$t_j$","$t_0$","$t_f$","$\\tau$","$n$","$h_n$","$S(t_j),S_{j}$","$p_n$","$1-p_n$","$u_n$","$d_n$")
+significado<-c("Tiempo $j$","Tiempo inicial","Tiempo final","$t_f-t_0$","Cantidad de periodos en el que se divide $[t_f,t_0]$","Largo de cada periodo en el se divide $[t_f,t_0]$, espeficamente el largo es $\frac{\\tau}{n}$","Precio de la acci\'on en el tiempo j","Probabilidad de que el precio de la acción aumente de un periodo a otro.","Probabilidad de que el precio de la acción disminuya de un periodo a otro.","Aumento que tiene el precio de la acción de un periodo a otro","Disminución que tiene el precio de la acción de un periodo a otro")
+tablaNotacion<-data.frame(Notacion=notacion,Significado=significado)
+tablaNotacion%>%kbl()%>%kable_material()
+```
 
+\par Se procede a explicar lo que son los árboles binomiales, esto se realizará siguiendo la idea del libro de _An introduction to Mathematical Finance with Application_. Partiendo de estos se tiene que los árboles binomiales en el caso de las acciones, permiten visualizar el comportamiento que tiene que tiene una acción, es decir cómo su precio aumenta y disminuya. Estos árboles se pueden elaborar de la cantidad $n$ que se quiera, diviendo el intervalo de tiempo $[t_0,t_f]$ en $n$ periodos del mismo largo $h_n$.
 
+\par A estos se le llaman binomiales ya que, el precio aumenta o disminuye en una proporcion $u_n$ o $d_n$ respectivamente en cada periodo y estas proporciones depende de la cantidad de periodos en las que se divida el intervalo de tiempo. Así mismo el aumento o disminución del precio está ligado a una probabilidad $p_n$ que es la probabilidad de aumentar un periodo o $1-p_n$ la probabilidad de disminuir en un periodo y que támbién está ligado con la cantidad de periodos en el que se divida el intervalo de tiempo. La siguiente figura muestra un árbol binomial de $n$ periodos.
 
-
+\par Ahora 
 
 
 
