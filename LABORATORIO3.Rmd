@@ -79,18 +79,30 @@ opts_knit$set(width=75)
 # Marco teórico
 
 En primera instancia se mostrará la notación que se mantendrá a los largo del trabajo.
-```{r, include=FALSE}
+```{r}
 notacion<-c("$t_j$","$t_0$","$t_f$","$\\tau$","$n$","$h_n$","$S(t_j),S_{j}$","$p_n$","$1-p_n$","$u_n$","$d_n$")
-significado<-c("Tiempo $j$","Tiempo inicial","Tiempo final","$t_f-t_0$","Cantidad de periodos en el que se divide $[t_f,t_0]$","Largo de cada periodo en el se divide $[t_f,t_0]$, espeficamente el largo es $\frac{\\tau}{n}$","Precio de la acci\'on en el tiempo j","Probabilidad de que el precio de la acción aumente de un periodo a otro.","Probabilidad de que el precio de la acción disminuya de un periodo a otro.","Aumento que tiene el precio de la acción de un periodo a otro","Disminución que tiene el precio de la acción de un periodo a otro")
+significado<-c("Tiempo $j$","Tiempo inicial","Tiempo final","$t_f-t_0$","Cantidad de periodos en el que se divide $[t_f,t_0]$","Largo de cada periodo en el se divide $[t_f,t_0]$, espeficamente el largo es $\\frac{\\tau}{n}$","Precio de la acci\'on en el tiempo j","Probabilidad de que el precio de la acción aumente de un periodo a otro.","Probabilidad de que el precio de la acción disminuya de un periodo a otro.","Proporción en que aumenta el precio del activo de un periodo a otro","Proporción en que disminuye el precio de la activo de un periodo a otro")
 tablaNotacion<-data.frame(Notacion=notacion,Significado=significado)
 tablaNotacion%>%kbl()%>%kable_material()
 ```
+Existen distintos métodos para la valoración de opciones entre ellos los que se basan en métodos numéricos como lo expone Marín (2009) existen el de Monte Carlo, diferencias finitas, árboles binomiales y trinomiales. A lo largo de este trabajo se trabajará la valoración de las opciones bajo el modelo de árboles binomiales. Los modelos básados en métodos numéricos a diferencia de otros poseen la ventaja de de que su implementación computacionalmente es más simple y eficiente que el desarrollo de soluciones analíticas para la valoración de las opciones basado en el comportamiento del activo subyacente.
 
-\par Se procede a explicar lo que son los árboles binomiales, esto se realizará siguiendo la idea del libro de _An introduction to Mathematical Finance with Application_. Partiendo de estos se tiene que los árboles binomiales en el caso de las acciones, permiten visualizar el comportamiento que tiene que tiene una acción, es decir cómo su precio aumenta y disminuya. Estos árboles se pueden elaborar de la cantidad $n$ que se quiera, diviendo el intervalo de tiempo $[t_0,t_f]$ en $n$ periodos del mismo largo $h_n$.
+Se procede a explicar lo que son los árboles binomiales, así como su construcción. De acuerdo al texto _An introduction to Mathematical Finance with Application_, los árboles binomiales muestran los posibles precios futuros de un activo basado en el conocimiento del precio actual del activo subyacente. Para este modelo se parte de un intervalo $[t_0,t_f]$, este intervalo es subdivido en $n$ subintervalos del mismo largo llamados pasos de tiempo, así se obtienen los intervalos $[t_0,t_1],[t_1,t_2],...,[t_{n-1},t_{n}]$ donde
+\[
+0\leq t_0,\quad t_1=t_0+h_n,\quad t_2=t_0+2h_n,\quad...,\quad t_{n-1}=t_0+(n-1)h_n,\quad t_n=t_0+nh_n=t_f
+\]
+Gráficamente un árbol binomial.
+Para poder trabajar con árboles binomiales es necesario hacer algunas asunciones.
 
-\par A estos se le llaman binomiales ya que, el precio aumenta o disminuye en una proporcion $u_n$ o $d_n$ respectivamente en cada periodo y estas proporciones depende de la cantidad de periodos en las que se divida el intervalo de tiempo. Así mismo el aumento o disminución del precio está ligado a una probabilidad $p_n$ que es la probabilidad de aumentar un periodo o $1-p_n$ la probabilidad de disminuir en un periodo y que támbién está ligado con la cantidad de periodos en el que se divida el intervalo de tiempo. La siguiente figura muestra un árbol binomial de $n$ periodos.
+## Asunciones para trabajar con árboles binomiales
+* Propiedad de recombinación: Si el precio aumenta en un paso y en el siguiente disminuye entonces se obtiene el precio que se tenía antes de que se hiceran ambos pasos, esto es $S_ju_nd_n=S_jd_nu_n$ con $j\leq n-2$. A partir de esta propiedad se obtiene que la cantidad posible de precios que tiene el activo en el tiempo $t_n$. Se cumple que la forma en que aumenta el precio de una forma totalmente aleatoria cumpliendo
 
-\par Ahora 
+\[
+S(t_j)=S_0u_n^{N_{u,j}}u_n^{1-N_{u,j}}
+\]
+
+Donde $N_{u,j}$ es la variable aletoria cantidad de aumentos hasta el periodo $j$ partiendo del periodo $0$.
+
 
 
 Marco teórico, curva soberana
