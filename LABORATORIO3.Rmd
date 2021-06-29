@@ -17,6 +17,9 @@ library(rmdformats)
 library(kableExtra)
 library(tidyverse)
 library(readxl)
+
+
+
 ##Importante instalar lo que sigue acontinuacion, que está comentado
 #devtools::install_github("juba/rmdformats")
 ## Global options
@@ -184,4 +187,5 @@ Curva_soberana
 
 Marco teórico, curva soberana
 Metodologia, periodo y que datos
+No sé
 
