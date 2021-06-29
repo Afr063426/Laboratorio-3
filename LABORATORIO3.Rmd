@@ -16,6 +16,7 @@ library(knitr)
 library(rmdformats)
 library(kableExtra)
 library(tidyverse)
+library(readxl)
 ##Importante instalar lo que sigue acontinuacion, que está comentado
 #devtools::install_github("juba/rmdformats")
 ## Global options
@@ -102,6 +103,70 @@ S(t_j)=S_0u_n^{N_{u,j}}u_n^{1-N_{u,j}}
 \]
 
 Donde $N_{u,j}$ es la variable aletoria cantidad de aumentos hasta el periodo $j$ partiendo del periodo $0$.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Analisis de datos
+
+```{r}
+Precios<- read_csv("Datos históricos INCa.csv")
+Curva_soberana <- read_excel("Curva soberana.xlsx")
+Precios$Fecha<-as.Date(Precios$Fecha,format="%d.%m.%Y")
+Curva_soberana<-Curva_soberana[2:12]
+
+
+
+
+Precios%>%ggplot(aes(x=Fecha, y =Último))+
+  geom_line()+
+  labs(y = "Precios",x = "Tiempo" ,caption = "Fuente: Elaboración propia, con datos del ....")+theme_minimal()+theme(legend.position="bottom",plot.caption=element_text(hjust=0))
+
+
+Curva_soberana%>%kbl()%>%kable_material()
+
+
+
+
+```
+
+Se va a trabajar con los datos de la curva soberana obtenidos de la página del Banco Central de Costa Rica, los mismos son establecidos para la semana del 23 de junio del año 2021 al 29 de junio de año 2021. Se tiene que las observaciones son:
+
+
+
+
 
 
 
