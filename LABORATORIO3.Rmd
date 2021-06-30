@@ -83,8 +83,8 @@ opts_knit$set(width=75)
 
 En primera instancia se mostrará la notación que se mantendrá a los largo del trabajo.
 ```{r}
-notacion<-c("$t_j$","$t_0$","$t_f$","$\\tau$","$n$","$h_n$","$S(t_j),S_{j}$","$p_n$","$1-p_n$","$u_n$","$d_n$","$q$", "$D(t_j,t_j)=qS_{j-1}h_n$")
-significado<-c("Tiempo $j$","Tiempo inicial","Tiempo final","$t_f-t_0$","Cantidad de periodos en el que se divide $[t_f,t_0]$","Largo de cada periodo en el se divide $[t_f,t_0]$, espeficamente el largo es $\\frac{\\tau}{n}$","Precio de la acci\'on en el tiempo j","Probabilidad de que el precio de la acción aumente de un periodo a otro.","Probabilidad de que el precio de la acción disminuya de un periodo a otro.","Proporción en que aumenta el precio del activo de un periodo a otro","Proporción en que disminuye el precio de la activo de un periodo a otro","Proporcion de dividendo","Monto pagado de dividen el momento $j$")
+notacion<-c("$t_j$","$t_0$","$t_f$","$\\tau$","$n$","$h_n$","$S(t_j),S_{j}$","$p_n$","$1-p_n$","$u_n$","$d_n$","$q$", "$D(t_j,t_j)=qS_{j-1}h_n$","$r$","$K$","$C_j$")
+significado<-c("Tiempo $j$","Tiempo inicial","Tiempo final","$t_f-t_0$","Cantidad de periodos en el que se divide $[t_f,t_0]$","Largo de cada periodo en el se divide $[t_f,t_0]$, espeficamente el largo es $\\frac{\\tau}{n}$","Precio de la acci\'on en el tiempo j","Probabilidad de que el precio de la acción aumente de un periodo a otro.","Probabilidad de que el precio de la acción disminuya de un periodo a otro.","Proporción en que aumenta el precio del activo de un periodo a otro","Proporción en que disminuye el precio de la activo de un periodo a otro","Proporcion de dividendo","Monto pagado de dividen el momento $j$","Tasa libre de riesgo","Precio de ejercicio","Precio de la opción en $j$")
 tablaNotacion<-data.frame(Notacion=notacion,Significado=significado)
 tablaNotacion%>%kbl()%>%kable_material()
 ```
@@ -192,19 +192,30 @@ Como los retornos logaritmicos están i.i.d entonces se cumple que la varianza d
 \[
 \text{Var}\left(ln\frac{S_n}{S_0}\right)=n\text{Var}\left(\frac{S_1}{S_0}\right)
 \]
-Se asume que $\sigma^2_n\to \sigma_2>0$ cuando $n\to \infty$. Esto se le llama la volatilidad del precio de la seguridad. Ahora los inversores pueden ser más o menos aversos al riesgo, en la siguiente subsección se explora el caso de los inversores con riesgo neutral.
-
-
-## Inversores con riesgo neutral
-
-Para el caso de los inversores con riesgo neutral se cumplen las siguientes ecuaciones para $n$ lo suficientemente grande.
+Se asume que $\sigma^2_n\to \sigma_2>0$ cuando $n\to \infty$. Esto se le llama la volatilidad del precio de la seguridad. Ahora los inversores pueden ser más o menos aversos al riesgo. Para el caso de los inversores con riesgo neutral se cumplen las siguientes ecuaciones para $n$ lo suficientemente grande.
 \[
-u_n\approx e^{\sigma\sqrt{h_n}},\quad u_n\approx e^{\sigma\sqrt{h_n}}
+u_n\approx e^{\sigma\sqrt{h_n}},\quad d_n\approx e^{'\sigma\sqrt{h_n}}, \quad p_n\frac{e^{(r-q)h_n}-d_n}{u_n-d_n}
 \]
 
+## Opciones
 
+Las opciones son un contrato entre dos partes, en el cual uno de los involucrados tiene la posibilidad de no ejercer el contrato cuando este no le sea favorable. En este caso al vendedor de la opción se le llama escritor que se dice toma la posición corta, mientras el comprador se dice que toma la posición larga. Las opciones a trabajar son las de compra y las de venta.
 
+Tal y como lo destacan Boudreault y Renaud () una opcion de compra da el derecho de obtener en un momento establecido mediante entre las partes un activo a un precio establecido $K$ llamado precio de ejercicio. Al momento $S_T$ donde $T$ es el momento de establecido donde se puede ejercer el derecho hay dos posibilidades
 
+1. $S_T>K$ en este caso se dice que la opción está en el dinero, ya que en este caso es conveniente ejercer el derecho.
+2. $S_T<K$ en este caso se dice que la opción está fuera del dinero, ya que no es razonable ejercer el derecho, ya que se estaría comprando algo de menor valor.
+
+Los flujos de dinero en el caso de la posición larga vienen dados por 
+
+```{r}
+tiempoLongCall<-c("Momento $t_0$","Momento $T$")
+SmenorK<-c("$-C_0$","$0$")
+SmayorK<-c("$-C_0$","$S_T-k$")
+tablaLongCall<-data.frame("Tiempo/Escenario"=tiempoLongCall,"$S_T$ < $K$"=SmenorK,"$S_T$ > $K$"=SmayorK)
+tablaLongCall%>%kbl()%>%kable_material()
+
+```
 
 
 
