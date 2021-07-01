@@ -216,11 +216,48 @@ tablaLongCall<-data.frame("Tiempo/Escenario"=tiempoLongCall,"$S_T$ < $K$"=Smenor
 tablaLongCall%>%kbl()%>%kable_material()
 
 ```
+## Precio de las opciones
 
+Ahora surge la duda cuál debería ser el precio que debería tener una opción. Las opciones tienen una larga historias, pero el cómo establecer el precio tuvo un gran cambio en el año 1973 cuando Black y Scholes presentaron un modelo con el cuál se lograba obtener un precio de equilibrio para las opciones. Esta subsección se centrará en el cómo se estable el precio de una opción, sin embargo con una matemática menos avanzada que con el modelo establecido por Black y Scholes, y basado en el uso de árboles binomiales presentados en una de las subsecciones anteriores.
 
+El precio que tendrán la opción será establecido de acuerdo a los distintos precios que puede llegar a tener el activo subyacente después de $n$ pasos de tiempo, de tal forma que no haya una oportunidad de arbitraje con esta. Para el caso de una opción de compra tal y como lo establece Cox (1979) se tiene que su valor se basará en la diferencia que habrá entre el precio del activo subyacente y el precio de ejercicio. Así para el caso de un árbol binomial de un periodo se cumple que en el caso de que el precio aumente $C_u=\max\{0,uS_0-K\}$ y en el caso de que dismuya $C_d=\max\{0,dS_0-K\}$, ya que si el precio del activo es menor que el precio de ejercicio la opción está fuera del dinero. 
 
+Ahora se cumple que la probalidad de que el precio aumente es igual a $p$ mientras que la probailidad de que este dismuya es igual $1-p$, de acuerdo a Cox basado en que se tiene un portafolio en el cual se encuentra el activo subyacente y una seguridad libre de riesgo el precio de la opción para evitar cualquier oportunidad de arbitraje es
 
+\[
+C=\frac{pC_u+(1-p)C_d}{1+r}
+\]
 
+Ahora para el caso de se tenga un árbol binomial de dos periodos entonces el valor de la opción después de dos pasos es si el activo subyacente aumenta dos veces su precio entonces $C_{uu}=\max\{0,u^2S-k\}$, en el caso de dos diminuciones $C_{dd}=\max\{0,d^2S-k\}$ y por la propiedad de recombinación el precio del activo subyacente es igual si aumenta y posteriormente disminuye o si primeramente dismuye y posteriormente aumenta entonces $C_{du}=C_{ud}=\max\{0,udS-k\}$. 
+\textbf{grafico}
+
+Bajo esto se tiene que en el periodo $t_1$ la opción tiene los siguientes precios 
+
+\[
+\begin{split}
+&C_u=\frac{pC_{uu}+(1-p)C_{ud}}{1+r}\\
+&C_d=\frac{(1-p)C_{dd}+pC_{du}}{1+r}\\
+\end{split}
+\]
+Ahora entonces basado en lo visto para el caso de un periodo y esto se cumple que 
+\[
+C=\frac{p^2C_{uu}+2p(1-p)^2C_{ud}+(1-p)^2C_{dd}}{(1+r)^2}
+\]
+
+De forma recursiva entonces se puede concluir que para un árbol de $n$ periodos
+\[
+C=\sum_{i=0}^{n}\left(\frac{n!}{i!(n-j)!}p^{i}(1-p)^{n-i}\max\{0,u^jd^{n-j}S_0-K\}\right)
+\]
+
+Ahora el cálculo se puede volver más eficiente encontrando $a\in \{0,1,2,\dots ,n\}$ tal que
+\[
+u^{a}d^{n-a}S_0-K>0
+\]
+
+Que manipulando algebraicamente da como resultado $a>\frac{K}{S_0d^n\ln{\frac{u}{d}}}$. Entonces encontrando $a$ que cumpla con estas dos condiciones se puede establecer
+\[
+C=\sum_{i=a}^{n}\left(\frac{n!}{i!(n-j)!}p^{i}(1-p)^{n-i}u^jd^{n-j}S_0-K\}\right)
+\]
 
 
 
