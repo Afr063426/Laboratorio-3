@@ -376,6 +376,8 @@ C=\sum_{i=a}^{n}\left(\frac{n!}{i!(n-i)!}p^{i}(1-p)^{n-i}u^id^{n-i}S_0-K\}\right
 
 # Analisis de datos
 ```{r}
+
+
 Precios<- read_csv("Datos históricos INCa.csv")
 Curva_soberana <- read_excel("Curva soberana.xlsx")
 Precios$Fecha<-as.Date(Precios$Fecha,format="%d.%m.%Y")
@@ -396,6 +398,8 @@ Precios%>%ggplot(aes(x=Fecha, y =Último))+
 
 ```
 
+Como se aprecia en el grafico el precio de las acciones se mantienen estables por intervalos de tiempo, para luego sufir un cambio repentino durante los el pediodo de 2019 y gran parte del 2020 
+
 Se va a trabajar con los datos de la curva soberana obtenidos de la página del Banco Central de Costa Rica, los mismos son establecidos para la semana del 23 de junio del año 2021 al 29 de junio de año 2021. Se tiene que las observaciones son:
 
 ```{r}
@@ -405,7 +409,7 @@ Curva_soberana%>%kbl()%>%kable_material()
 Aplicando el modelo de Nelson y Siegel, se puede obtener una curva continua, la cual se representa en el siguiente grafico:
 ```{r}
 #### Se calculan los parametros
-Curva_soberana
+
 
 
 # t<-c(0,0,0,0.05)
