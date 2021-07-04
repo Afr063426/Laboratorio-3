@@ -81,13 +81,37 @@ arbolBinarioM<-function(n,hn,volatilidad,S_0){
   }
   return(arbol)
 }
-### Función de parámetros
+
+### Función de parámetros en esta función se programará la probabilidad de aumentos, el aumento por paso, el valor mínimo de aumentos que debe haber para que la opción se ejecute
+## K es el precio de ejercicio
+## S_0 el precio actual
+## n es el numero de pasos
+## hn el largo de los pasos
+## La volatilidad en el periodo es la varianza calculada mediante los datos que se tengan
+## r es la tasa libre de riesgo en el periodo
+## q es el porcentaje de dividendo que se paga sobre la acción
+## Estas variables con esta notación se mantiene para las siguientes funciones
+parametros<-function(K,S_0,n,hn,volatilidad,r,q){
+  u<-exp(volatilidad*sqrt(hn)) ## Este es el aumento en cada paso
+  p<-(exp((r-q)*hn)-d)/(u-d) ## Esta es la probabilidad del aumento
+  a<-ceiling(K/(S_0*d^n*log(u^2)))  ## Esta es la cantidad minima de aumentos
+  return(c(a,p,u))
+}
 
 
 
+### Se procede a programar la forma en que se calculan los precios de las opciones, caso call europea
+precioC<-function(K,S_0,n,hn,volatilidad,r,q){
+  parametros<-parametros(K,S_0,n,hn,volatilidad)
+  sum(choose(n,c(parametros[1]:n))*parametros[2]^(c(parametros[1]:n))*(1-parametros[2])^(n-c(parametros[1]:n))*parametros[3]^(c(parametros[1]:n))*(1/parametros[3])^(n-(c(parametros[1]:n)))*S_0-K) ### Formula para precio de de las opciones de compra
+}
 
-### Se procede a programar la forma en que se calculan los precios de las opciones
 
+### De forma análoga se programa el precio de una put option europea
+precioP<-function(K,S_0,n,hn,volatilidad,r,q){
+  parametros<-parametros(K,S_0,n,hn,volatilidad,r,q)
+  sum(choose(n,c(0:(parametros[1]-1)))*parametros[2]^(c(0:(parametros[1]-1)))*(1-parametros[2])^(n-c(0:(parametros[1]-1)))*parametros[3]^(c(0:(parametros[1]-1)))*(1/parametros[3])^(n-c(0:(parametros[1]-1)))*S_0-K)### Formula para precio de de las opciones de venta
+}
 ```
 
 
@@ -307,7 +331,7 @@ C=\frac{p^2C_{uu}+2p(1-p)^2C_{ud}+(1-p)^2C_{dd}}{(1+r)^2}
 
 De forma recursiva entonces se puede concluir que para un árbol de $n$ periodos
 \[
-C=\sum_{i=0}^{n}\left(\frac{n!}{i!(n-j)!}p^{i}(1-p)^{n-i}\max\{0,u^jd^{n-j}S_0-K\}\right)
+C=\sum_{i=0}^{n}\left(\frac{n!}{i!(n-i)!}p^{i}(1-p)^{n-i}\max\{0,u^id^{n-i}S_0-K\}\right)
 \]
 
 Ahora el cálculo se puede volver más eficiente encontrando $a\in \{0,1,2,\dots ,n\}$ tal que
@@ -317,7 +341,7 @@ u^{a}d^{n-a}S_0-K>0
 
 Que manipulando algebraicamente da como resultado $a>\frac{K}{S_0d^n\ln{\frac{u}{d}}}$. Entonces encontrando $a$ que cumpla con estas dos condiciones se puede establecer
 \[
-C=\sum_{i=a}^{n}\left(\frac{n!}{i!(n-j)!}p^{i}(1-p)^{n-i}u^jd^{n-j}S_0-K\}\right)
+C=\sum_{i=a}^{n}\left(\frac{n!}{i!(n-i)!}p^{i}(1-p)^{n-i}u^id^{n-i}S_0-K\}\right)
 \]
 
 
