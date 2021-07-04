@@ -33,6 +33,67 @@ opts_chunk$set(echo=FALSE,
 opts_knit$set(width=75)
 ```
 
+
+```{r}
+### Se programarán en esta sección las mayoría de cuestiones necesarias para la elaboración
+## del proyecto
+
+### Primero se procede a programar la curva paramétrica del modelo de Svensson para interpolar
+## la curva soberana basado en los datos que se tienen BCCR
+
+### Modelo de Svensson programado como función
+svensson<-function(beta,tiempo){
+  beta[1]+beta[2]*((1-exp(-tiempo/beta[5]))/(tiempo/(beta[5])))+beta[3]*((1-exp(-tiempo/beta[5]))/(tiempo/beta[5])-exp(-tiempo/beta[5]))+beta[4]*((1-exp(-tiempo/beta[6]))/(tiempo/beta[6])-exp(-tiempo/beta[6]))
+}
+### Se procede a programar la función que mediante interpolación aproxima las tasas a partir de las
+## con las que se cuenta
+
+
+fitSvensson<-function(beta,tiempo,tasas){
+  fn<-function(beta,tiempo,tasas){
+    sum((tasas-svensson(beta,tiempo))^2) ### Suma de resta de cuadrados
+  }
+  optim(beta,   ### Se optimizan la suma de resta de cuadrados para tener el menor error posible
+        fn,
+        method = "L-BFGS-B",
+        lower=rep(-20,6),
+        upper = rep(-20,6)
+        )
+}
+
+
+### Se procede a programar el árbol binomial, para este lo que se le introducirá a la función será el la volatilidad en el periodo junto con la cantidad de pasos que se quieren hacer y el largo de cada paso. La volatilidad, es determinada de forma separada. Se va hacer que la función retorne el árbol en forma de matriz, si el paso a parece a la derecha es el aumento si a parece a la izquierda del padre es porque disminuye, tambien se le pasa el precio S_0
+
+arbolBinarioM<-function(n,hn,volatilidad,S_0){
+  u<-exp(volatilidad*sqrt(hn))
+  d<-exp(-volatilidad*sqrt(hn))
+  ### La cantidad de columnas de la matriz es n+1 ya que hay n+1 precios posibles en el paso final
+  ### La cantidad de filas van a ser n+1 ya que son los n pasos y el precio incial
+  arbol<-matrix(nrow=n+1,ncol = 2*n+1)
+  arbol[1,n+1]<-S_0
+  for(i in 1:n){
+    for(j in 1:(2*n+1)){
+      if(!is.na(arbol[i,j])){
+        arbol[i+1,j-1]<-arbol[i,j]*d
+        arbol[i+1,j+1]<-arbol[i,j]*u
+      }
+    }
+  }
+  return(arbol)
+}
+### Función de parámetros
+
+
+
+
+### Se procede a programar la forma en que se calculan los precios de las opciones
+
+```
+
+
+
+
+
 # Instrucciones
 
 
@@ -277,10 +338,15 @@ C=\sum_{i=a}^{n}\left(\frac{n!}{i!(n-j)!}p^{i}(1-p)^{n-i}u^jd^{n-j}S_0-K\}\right
 
 
 
-
+# Metodología
 
 # Analisis de datos
 
+# Análisis del árbol e implementación
+
+# Resultados
+
+#Conclusión
 ```{r}
 Precios<- read_csv("Datos históricos INCa.csv")
 Curva_soberana <- read_excel("Curva soberana.xlsx")
