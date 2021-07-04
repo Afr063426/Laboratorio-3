@@ -117,7 +117,7 @@ precioP<-function(K,S_0,n,hn,volatilidad,r,q){
 ```{r}
 # Se procede a manipular los datos de tal forma que sean más fáciles de manejar
 ## Primero se trabaja con las tasas elaboradas por el banco central de Costa Rica
-tasasBCCR<-
+tasasBCCR<-read_xlsx("Curva soberana.xlsx")
 
 ### Primero se genera una tabla con los días no bursatiles en Costa Rica de acuerdo a la bolsa nacional de valores en el año 2021
 fecha<-as.Date(c("01/01/2021","01/04/2021","02/04/2021","03/05/2021","26/07/2021","02/08/2021","13/09/2021","29/11/2021","25/12/2021","31/12/2021"),format="%d/%m/%Y")
