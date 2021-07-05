@@ -17,6 +17,7 @@ library(rmdformats)
 library(kableExtra)
 library(tidyverse)
 library(readxl)
+library(ggplot2)
 ##install.packages('magick') para dibujos tikz
 ##install.packages('pdftools')
 #tinytex::install_tinytex()
@@ -55,7 +56,7 @@ Precios$Último<-as.numeric(Precios$Último)
 
 Montos <- read_excel("Montos.xlsx")
 Montos$FechaDePago<-as.Date(Montos$FechaDePago,format="%Y.%m.%d")
-
+Montos<-Montos[15:17,1:4]
 ## Primero se trabaja con las tasas elaboradas por el banco central de Costa Rica
 ### Estos eran las tasas vigentes de la semana del 23 de junio del 2021 hasta el 29 de junio del 2021
 tasasBCCR<-read_xlsx("Curva soberana.xlsx")
@@ -67,8 +68,8 @@ fecha<-as.Date(c("01/01/2021","01/04/2021","02/04/2021","03/05/2021","26/07/2021
 descripcion<-c("Año Nuevo","Jueves Santo", "Viernes Santo","Día del Trabajador","Anexión del partido de Nicoya","Día de la Virgen de Los Ángeles","Independecia","Día de la Abolición del Ejercitos","Día de Navidad","Feriado Banco Central")
 tablaConDiaNB<-data.frame(Fecha=fecha,Descripción=descripcion)
 tablaKableConDiaNB<-tablaConDiaNB%>%kbl()%>%kable_material()
-### Momentaneo
-tablaKableConDiaNB
+
+
 
 ```
 
@@ -448,14 +449,12 @@ Ahora sin embargo hasta este punto se ha trabajado de forma discreta y no se ha 
 # Analisis de datos
 ```{r}
 
-
-
-
-Precios%>%ggplot(aes(x=Fecha, y =Último))+
+ggplot(Precios,aes(x=Fecha, y =Último))+
   geom_line()+
+  geom_point(aes(x =Montos$FechaDePago[1], y=Último[Fecha==Montos$FechaDePago[1]]), size =1,color="blue" )+
+  geom_point(aes(x =Montos$FechaDePago[2], y=Último[Fecha==Montos$FechaDePago[2]]), size =1,color="blue" )+
+  geom_point(aes(x =Montos$FechaDePago[3], y=Último[Fecha==Montos$FechaDePago[3]]), size =1,color="blue" )+
   labs(y = "Precios",x = "Tiempo" ,caption = "Fuente: Elaboración propia, con datos del ....")+theme_minimal()+theme(legend.position="bottom",plot.caption=element_text(hjust=0))
-
-
 
 
 
@@ -481,6 +480,7 @@ Agregar titulos fecha de madurancion y tasas
 
 ```{r}
 tasasBCCR%>%kbl()%>%kable_material()
+tablaKableConDiaNB
 ```
 
 Aplicando el modelo de $Sevenson$ (cita del documento), se puede obtener una curva continua, la cual se representa en el siguiente grafico:
