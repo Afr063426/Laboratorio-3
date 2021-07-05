@@ -17,9 +17,10 @@ library(rmdformats)
 library(kableExtra)
 library(tidyverse)
 library(readxl)
-
-
-
+##install.packages('magick') para dibujos tikz
+##install.packages('pdftools')
+library(pdftools)
+library(magick)
 ##Importante instalar lo que sigue acontinuacion, que está comentado
 ## Global options
 options(max.print="75")
@@ -101,9 +102,9 @@ parametros<-function(K,S_0,n,hn,volatilidad,r,q){
 
 
 ### Se procede a programar la forma en que se calculan los precios de las opciones, caso call europea
-precioC<-function(K,S_0,n,hn,volatilidad,r,q){
-  parametros<-parametros(K,S_0,n,hn,volatilidad)
-  sum(choose(n,c(parametros[1]:n))*parametros[2]^(c(parametros[1]:n))*(1-parametros[2])^(n-c(parametros[1]:n))*parametros[3]^(c(parametros[1]:n))*(1/parametros[3])^(n-(c(parametros[1]:n)))*S_0-K) ### Formula para precio de de las opciones de compra
+precioC<-function(K,S_0,n,hn,volatilidad,r,q,t,d){
+  parametros<-parametros(K,S_0,n,hn,volatilidad,(1+r)^d-1,q)
+  sum(choose(n,c(parametros[1]:n))*parametros[2]^(c(parametros[1]:n))*(1-parametros[2])^(n-c(parametros[1]:n))*parametros[3]^(c(parametros[1]:n))*(1/parametros[3])^(n-(c(parametros[1]:n)))*S_0-K)/(1+r)^(t) ### Formula para precio de de las opciones de compra
 }
 
 
@@ -126,6 +127,8 @@ fecha<-as.Date(c("01/01/2021","01/04/2021","02/04/2021","03/05/2021","26/07/2021
 descripcion<-c("Año Nuevo","Jueves Santo", "Viernes Santo","Día del Trabajador","Anexión del partido de Nicoya","Día de la Virgen de Los Ángeles","Independecia","Día de la Abolición del Ejercitos","Día de Navidad","Feriado Banco Central")
 tablaConDiaNB<-data.frame(Fecha=fecha,Descripción=descripcion)
 tablaKableConDiaNB<-tablaConDiaNB%>%kbl()%>%kable_material()
+### Momentaneo
+tablaKableConDiaNB
 ```
 
 
@@ -192,6 +195,34 @@ Se procede a explicar lo que son los árboles binomiales, así como su construcc
 0\leq t_0,\quad t_1=t_0+h_n,\quad t_2=t_0+2h_n,\quad...,\quad t_{n-1}=t_0+(n-1)h_n,\quad t_n=t_0+nh_n=t_f
 \]
 Gráficamente un árbol binomial.
+
+
+```{tikz, fig.cap = "Árbol Binomial de Dos Pasos", fig.ext = 'png'}
+\usetikzlibrary{arrows}
+\usetikzlibrary{trees}
+\usetikzlibrary{matrix}
+  \begin{tikzpicture}[>=stealth,sloped]
+    \matrix (tree) [%
+      matrix of nodes,
+      minimum size=1cm,
+      column sep=3.5cm,
+      row sep=1cm,
+    ]
+    {
+          &   & $S_0u_2^2$ \\
+          & $S_0u_2$ &   \\
+      $S_0$ &   & $S_0u_2d_2$ \\
+          & $S_0d_2$ &   \\
+          &   & $S_0d^2$ \\
+    };
+    \draw[->] (tree-3-1) -- (tree-2-2) node [midway,above] {$p$};
+    \draw[->] (tree-3-1) -- (tree-4-2) node [midway,below] {$(1-p)$};
+    \draw[->] (tree-2-2) -- (tree-1-3) node [midway,above] {$P^2$};
+    \draw[->] (tree-2-2) -- (tree-3-3) node [midway,below] {$(1-p)p$};
+    \draw[->] (tree-4-2) -- (tree-3-3) node [midway,above] {$(1-p)p$};
+    \draw[->] (tree-4-2) -- (tree-5-3) node [midway,below] {$(1-p)^2$};
+  \end{tikzpicture}
+```
 Para poder trabajar con árboles binomiales es necesario hacer algunas asunciones.
 
 ## Asunciones para trabajar con árboles binomiales
@@ -203,7 +234,7 @@ S(t_j)=S_0u_n^{N_{u,j}}u_n^{1-N_{u,j}}
 
 Donde $N_{u,j}$ es la variable aletoria cantidad de aumentos hasta el periodo $j$ partiendo del periodo $0$.
 
-* Retorno bruto, ganancia de capital y retorno logaritmico: Para cada paso de tiempo $[t_{j-1},t_{j}]$, donde $j=1,\dots,n$, el aumento o disminución del precio del activo es retorno bruto $\frac{S_j}{S_{j-1}}$. Cada uno de estos retornos es asumido independiente e identicamente distribuido (i.i.d), de hecho se asumen variables aleatorias con distribución de Bernoulli. 
+* Retorno bruto, ganancia de capital y retorno logaritmico: Para cada paso de tiempo $[t_{j-1},t_{j}]$, donde $j=1,\dots,n$, el aumento o disminución del precio del activo es el retorno bruto $\frac{S_j}{S_{j-1}}$. Cada uno de estos retornos es asumido independiente e identicamente distribuido (i.i.d.), de hecho se asumen variables aleatorias con distribución de Bernoulli. 
 
 \[
 \frac{S_j}{S_{j-1}}=\begin{cases}
@@ -212,7 +243,8 @@ d_n & \text{con probabilidad $1-p_n$}
 \end{cases}
 \]
 
-La ganancias de capital son igual a $\mathbf{R_j}=\frac{S_j}{S_{j-1}}$ con $j=1,...,n$, que también son variables aleatorias i.i.d y son independientes. así mismo los retornos logarítmicos que son $\frac{\ln S_j}{\ln S_{j-1}}$ con $j=1,...,n$.
+La ganancias de capital son igual a $\mathbf{R_j}=\frac{S_j}{S_{j-1}}-1$ con $j=1,...,n$, que también son variables aleatorias i.i.d. y son independientes.
+Así mismo los retornos logarítmicos que son $\ln\frac{ S_j}{ S_{j-1}}$ con $j=1,...,n$.
 
 \[
 \ln\frac{S_j}{S_{j-1}}=\begin{cases}
@@ -220,25 +252,23 @@ La ganancias de capital son igual a $\mathbf{R_j}=\frac{S_j}{S_{j-1}}$ con $j=1,
 \ln{d_n} & \text{con probabilidad $1-p_n$}
 \end{cases}
 \]
-El retorno logarítmico entre el periodo $t_0$ y $t_f$ es igual a
-\[
-\ln\frac{S_j}{S_{j-1}}=\ln\frac{S_1}{S_{0}}+\ln\frac{S_2}{S_{1}}+\cdots +\ln\frac{S_n}{S_{n-1}}
-\] 
+
 * La tripleta $p_n,u_n,d_n$: Estas cantidades dependen del tamaño $h_n$, de paso de tiempo.
+
 * Medida de la probabilidad: La probabilidad de que un camino de precios ocurra es obtenido mediante la multiplicación de las probabilidades a lo largo del camino. Esto es si $N_u$ es la variable aleatoria número de aumentos de la seguridad desde $t_0$ hasta $t_f$, está variables binomial. Si $\Omega_n$ es el espacio muestral los caminos de precios desde $t_f$ hasta $t_f$ entonces si $\omega_n$ entonces
 
 \[
 \mathbb{P}(w_n)=p_n^{N_u(\omega_n)}(1-p_n)^{N_u(\omega_n)}
 \]
 
-Ahora bajo el supuesto de que de los caminos de precio son independientes entonces se cumple que la probabilidad de tener un determinado precio en el momento $t_f$
+Ahora bajo el supuesto de que de los caminos de precio son independientes, entonces se cumple que la probabilidad de tener un determinado precio en el momento $t_f$
 
 \[
-\mathbb{P}(S(t_n)=S_0)=\binom{n}{i}p^{i}(1-p_n)^{n-i}
+\mathbb{P}(S(t_n)=S_0u_n^id_n^{n-i})=\binom{n}{i}p^{i}(1-p_n)^{n-i}
 \]
-
 Notese que se a trabajado hasta el momento de manera discreta.
-* Se supone el activo paga un dividendo constante, continuo y proporcional: De tal forma que
+
+* Se supone el activo paga un dividendo constante, continuo y proporcional al precio final de todo el tiempo, desde $t_0$ hasta $t_f$: De tal forma que
 
 \[
 D(t_{j-1},t_{j})=qS_{j-1}h_n, \quad j=1,2,..,n
@@ -253,25 +283,24 @@ Con estas asunciones, se procede a exponer el modelo de Cox-Ross-Rubinstein (CRR
 
 ## Árbol de Cox-Ross-Rubinstein 
 
-El árbol binomial CRR cumple todas las suposiciones que se hicieron en la actrior subsección, este permite determinar $u_n,d_n$ y $p_n$ en términos de periodos de largo $h_n$ para un $n$ suficientemente largo.
+El árbol binomial CRR cumple todas las suposiciones que se hicieron en la anterior subsección, este permite determinar $u_n,d_n$ y $p_n$ en términos de periodos de largo $h_n$ para un $n$ suficientemente largo.
 
-Para este modelo hace falta tomar algunas suposiciones más a parte de las anteriores.
+Para este modelo hace falta tomar algunas suposiciones más, aparte de las anteriores.
 
 * Casi seguramente caminos muestrales de precios continuos: Los caminos muestrales de precios son continuos cuando $n\to\infty$.
-* Condición de recombinación: $u_nd_n=1$
 * Retornos esperados: Los retornos esperado convergen a una constante $m$
 
 \[
-\frac{\mathbb{E}(t_0,t_1)}{h_n}\to m, \qquad n\to \infty
+\frac{\mathbb{E}(R(t_0,t_1))}{h_n}\to m, \qquad n\to \infty
 \]
 
-Ahora de esto se puede notar que también
+Ahora se destaca que el retorno se puede obtener mediante la ganancia de capital y la proporcion de dividendo $qh_j$ esto es $R(t_0,t_1)=\mathbf{R}_1+qhn$ entonces
 
 \[
-\frac{\mathbb{E}(\mathbf{R_1})}{h_n}=\frac{\mathbb{E}(R(t_0,t_1))}{h_n}\to m-q
+\frac{\mathbb{E}(\mathbf{R_1})}{h_n}=\frac{\mathbb{E}(R(t_0,t_1)-q)}{h_n}\to m-q
 \]
 
-$m$ y $q$ se asumen dados.
+$m$ y $q$ se asumen dados y de tal forma que $m$ corresponde a la tasa libre de riesgo o de retorno esperado.
 
 * La constante $\sigma$: Si se define $\sigma^2_n$ la varianza de los retornos logarítmicos por cada paso entonces
 
@@ -285,11 +314,11 @@ Donde la varianza por la forma en que se distribuyen los retornos logarítmicos 
 \sigma_n^2h_n=p_n(1-p_n)\left[\ln\frac{S_1}{S_0}\right]
 \]
 
-Como los retornos logaritmicos están i.i.d entonces se cumple que la varianza del retorno en el intervalo $[t_0,t_f]$ es $n$ veces la varianza de cada paso de tiempo
+Como los retornos logaritmicos están i.i.d. entonces se cumple que la varianza del retorno en el intervalo $[t_0,t_f]$ es $n$ veces la varianza de cada paso de tiempo
 \[
 \text{Var}\left(ln\frac{S_n}{S_0}\right)=n\text{Var}\left(\frac{S_1}{S_0}\right)
 \]
-Se asume que $\sigma^2_n\to \sigma_2>0$ cuando $n\to \infty$. Esto se le llama la volatilidad del precio de la seguridad. Ahora los inversores pueden ser más o menos aversos al riesgo. Para el caso de los inversores con riesgo neutral se cumplen las siguientes ecuaciones para $n$ lo suficientemente grande.
+Se asume que $\sigma^2_n\to \sigma_2>0$ cuando $n\to \infty$. Esto se le llama la volatilidad del precio de la seguridad. Ahora los inversores pueden ser más o menos adversos al riesgo. Para el caso de los inversores con riesgo neutral se cumplen las siguientes ecuaciones para $n$ lo suficientemente grande.
 \[
 u_n\approx e^{\sigma\sqrt{h_n}},\quad d_n\approx e^{'\sigma\sqrt{h_n}}, \quad p_n\frac{e^{(r-q)h_n}-d_n}{u_n-d_n}
 \]
@@ -298,10 +327,10 @@ u_n\approx e^{\sigma\sqrt{h_n}},\quad d_n\approx e^{'\sigma\sqrt{h_n}}, \quad p_
 
 Las opciones son un contrato entre dos partes, en el cual uno de los involucrados tiene la posibilidad de no ejercer el contrato cuando este no le sea favorable. En este caso al vendedor de la opción se le llama escritor que se dice toma la posición corta, mientras el comprador se dice que toma la posición larga. Las opciones a trabajar son las de compra y las de venta.
 
-Tal y como lo destacan Boudreault y Renaud () una opcion de compra da el derecho de obtener en un momento establecido mediante entre las partes un activo a un precio establecido $K$ llamado precio de ejercicio. Al momento $S_T$ donde $T$ es el momento de establecido donde se puede ejercer el derecho hay dos posibilidades
+Tal y como lo destacan Boudreault y Renaud () una opcion de compra da el derecho de obtener en un momento establecido entre las partes un activo a un precio establecido $K$ llamado precio de ejercicio, al precio $S_T$ donde $T$ es el momento de establecido donde se puede ejercer el derecho hay dos posibilidades.
 
 1. $S_T>K$ en este caso se dice que la opción está en el dinero, ya que en este caso es conveniente ejercer el derecho.
-2. $S_T<K$ en este caso se dice que la opción está fuera del dinero, ya que no es razonable ejercer el derecho, ya que se estaría comprando algo de menor valor.
+2. $S_T\leq K$ en este caso se dice que la opción está fuera del dinero, ya que no es razonable ejercer el derecho, ya que se estaría comprando algo de menor valor o del mismo valor al establecido como el de ejercicio, en cuyo caso se va establecer el poseedor del derecho decide no ejercer la opción.
 
 Los flujos de dinero en el caso de la posición larga vienen dados por 
 
@@ -309,9 +338,20 @@ Los flujos de dinero en el caso de la posición larga vienen dados por
 tiempoLongCall<-c("Momento $t_0$","Momento $T$")
 SmenorK<-c("$-C_0$","$0$")
 SmayorK<-c("$-C_0$","$S_T-k$")
-tablaLongCall<-data.frame("Tiempo/Escenario"=tiempoLongCall,"$S_T$ < $K$"=SmenorK,"$S_T$ > $K$"=SmayorK)
+tablaLongCall<-data.frame("Tiempo/Escenario"=tiempoLongCall,"$S_T< K$"=SmenorK,"$S_T \\geq K$"=SmayorK)
 tablaLongCall%>%kbl()%>%kable_material()
+```
 
+Las opciones se pueden emplear en distintas circunstancias entre las motivaciones para escribir o comprar una opción están la especulación o el cubrirse algún riesgo. De tal forma que se pueden establecer distintas estrategias de compra y venta de opciones combinado con otros instrumentos de inversión de tal forma que se puedan replicar portafolios. Un aspecto importantes es que se puede concluir que las posibilidades con opciones existen, sin embargo rápidamente los mercados financieros hacen que esa oportunidad que existía hacia algunos instantes desaparezcan.
+
+De una forma análoga se puede establecer que las opciones de venta las cuales son un derecho de poder vender un activo a un precio establecido por ambas partes y que como el caso de las opciones de compra es llamado precio de ejercicio $K$ en este caso contrario al caso de las opciones de compra el derecho es ejercido cuando el precio de $S_T$ es menor que el precio de ejercicio y si es mayor o igual no es ejercido. Los flujo en el caso de la posición larga vienen dados por
+
+```{r}
+tiempoLongCall<-c("Momento $t_0$","Momento $T$")
+SmenorK<-c("$-C_0$","$K-S_T$")
+SmayorK<-c("$-C_0$","$0$")
+tablaLongCall<-data.frame("Tiempo/Escenario"=tiempoLongCall,"$S_T\\leq K$"=SmenorK,"$S_T$ > $K$"=SmayorK)
+tablaLongCall%>%kbl()%>%kable_material()
 ```
 ## Precio de las opciones
 
@@ -325,7 +365,7 @@ Ahora se cumple que la probalidad de que el precio aumente es igual a $p$ mientr
 C=\frac{pC_u+(1-p)C_d}{1+r}
 \]
 
-Ahora para el caso de se tenga un árbol binomial de dos periodos entonces el valor de la opción después de dos pasos es si el activo subyacente aumenta dos veces su precio entonces $C_{uu}=\max\{0,u^2S-k\}$, en el caso de dos diminuciones $C_{dd}=\max\{0,d^2S-k\}$ y por la propiedad de recombinación el precio del activo subyacente es igual si aumenta y posteriormente disminuye o si primeramente dismuye y posteriormente aumenta entonces $C_{du}=C_{ud}=\max\{0,udS-k\}$. 
+Ahora para el caso de se tenga un árbol binomial de dos periodos entonces el valor de la opción después de dos pasos es si el activo subyacente aumenta dos veces su precio entonces $C_{uu}=\max\{0,u^2S-k\}$, en el caso de dos disminuciones $C_{dd}=\max\{0,d^2S-k\}$ y por la propiedad de recombinación el precio del activo subyacente es igual si aumenta y posteriormente disminuye o si primeramente dismuye y posteriormente aumenta entonces $C_{du}=C_{ud}=\max\{0,udS-k\}$. 
 \textbf{grafico}
 
 Bajo esto se tiene que en el periodo $t_1$ la opción tiene los siguientes precios 
@@ -343,7 +383,7 @@ C=\frac{p^2C_{uu}+2p(1-p)^2C_{ud}+(1-p)^2C_{dd}}{(1+r)^2}
 
 De forma recursiva entonces se puede concluir que para un árbol de $n$ periodos
 \[
-C=\sum_{i=0}^{n}\left(\frac{n!}{i!(n-i)!}p^{i}(1-p)^{n-i}\max\{0,u^id^{n-i}S_0-K\}\right)
+C=\frac{\sum_{i=0}^{n}\left(\frac{n!}{i!(n-i)!}p^{i}(1-p)^{n-i}\max\{0,u^id^{n-i}S_0-K\}\right)}{(1+r)^{\tau}}
 \]
 
 Ahora el cálculo se puede volver más eficiente encontrando $a\in \{0,1,2,\dots ,n\}$ tal que
@@ -353,12 +393,16 @@ u^{a}d^{n-a}S_0-K>0
 
 Que manipulando algebraicamente da como resultado $a>\frac{K}{S_0d^n\ln{\frac{u}{d}}}$. Entonces encontrando $a$ que cumpla con estas dos condiciones se puede establecer
 \[
-C=\sum_{i=a}^{n}\left(\frac{n!}{i!(n-i)!}p^{i}(1-p)^{n-i}u^id^{n-i}S_0-K\}\right)
+C=\frac{\sum_{i=a}^{n}\left(\frac{n!}{i!(n-i)!}p^{i}(1-p)^{n-i}u^id^{n-i}S_0-K\}\right)}{(1+r)^{\tau}}
 \]
 
+De forma análoga se puede establecer para el caso de las opciones de venta el precio de la opción de venta $P$ es igual a
 
+\[
+P=\frac{\sum_{i=0}^{a-1}\left(\frac{n!}{i!(n-i)!}p^{i}(1-p)^{n-i}u^id^{n-i}S_0-K\}\right)}{(1+r)^{\tau}}
+\]
 
-
+Ahora sin embargo hasta este punto se ha trabajado de forma discreta y no se ha dado el salto hacia el caso continuo al menos en esta sección, y es cierto que se ha hablado del árbol 
 
 
 
@@ -419,7 +463,42 @@ Curva_soberana
 # Análisis del árbol e implementación
 
 # Resultados
+Se presentan obtenidos al aplicar el modelo para el precio de las opciones a 3, 6 meses y a un año empleando como precio de ejercicio el precio con el que se cuenta para el activo subyacente y basado en la cantidad de días bursátiles a partir del día miércoles 30 de junio del 2021.
 
+```{r}
+## La cantidad de días hábiles se va tomar como la cantidad de pasos que se van a hacer
+## Recuerde que las opciones que se van a calcular son para el tipo europeo
+### Cantidad de días bursátiles a partir del 30 de junio hasta el primero de octubre del 2021
+### En este caso se usará como tasa libre de riesgo la brindada por la curva soberana, note que para que no hayan oportunidades de riesgo se debería cumplir d<1+r<u donde r es la tasa libre de riesgo de un periodo
+#nTrimestral<-as.Date("01/10/2021",format="%d/%m/%Y")-as.Date("30/06/2021",format="%d/%m/%Y")-length((tablaConDiaNB%>%filter(Fecha>=as.Date("01/10/2021",format="%d/%m/%Y")))$Fecha)
+### Cantidad de días bursátiles a partir del 30 de junio hasta el dos de enero del 2021 (Teniendo en cuenta del 1 de enero) 
+#nSemestral<-as.Date("02/01/2022",format="%d/%m/%Y")-as.Date("30/06/2021",format="%d/%m/%Y")-length((tablaConDiaNB%>%filter(Fecha>=as.Date("01/10/2021",format="%d/%m/%Y")))$Fecha)-1
+### Cantidad de días bursátiles a partir del 30 de junio hasta el 30 de junio del 2021 (tomando como punto de referencia los días no bursátiles del presente año)
+#nAnual<-as.Date("30/06/2022",format="%d/%m/%Y")-as.Date("30/06/2021",format="%d/%m/%Y")-length((tablaConDiaNB%>%filter(Fecha>=as.Date("01/10/2021",format="%d/%m/%Y")))$Fecha)-4
+### Anteriormente se determinó la volatilidad diaria entonces se usará esta ya que se está usando la cantidad días como la cantidad de pasos
+#sigma<-0.06 ### A la espera
+### Se trabaja de forma anualizada por lo que se tiene que los valores hn correspondientes son
+## Tres meses equivalen a un cuarto del año
+#hnTrimetral<-0.25/as.numeric(nTrimestral)
+## Seis meses equivalen medio año por lo que
+#hnSemestral<-0.5/as.numeric(nSemestral)
+## Un año equivale a 1
+#hnAnual<-1/as.numeric(nAnual)
+### Tasas libres de riesgo en cada periodo anualizados
+
+### El precio de ejercicio con el que vamos a escribir las opciones es el último con el que se cuenta
+#K<-Precios$Último[length(Precios$Último)]
+
+### Opciones put y call para el caso de trimestral
+#precioC(K,K,nTrimestral,hnTrimetral,sigma)
+#precioP(K,K,nTrimestral,hnTrimetral,sigma)
+### Opciones put y call para el  caso semestral
+#precioC(K,K,nSemestral,hnSemestral,sigma)
+#precioP(K,K,nSemestral,hnSemestral,sigma)
+### Opciones put y call para el caso anual
+#precioC(K,K,nAnual,hnAnual,sigma)
+#precioP(K,K,nAnual,hnAnual,sigma)
+```
 #Conclusión
 
 Marco teórico, curva soberana
