@@ -541,6 +541,7 @@ ggplot(Precios,aes(x=Fecha, y =Último))+
 
 ```
 
+Cabe destacar que los puntos azules indican la fecha del pago de dividendos o en su defecto la fecha más próxima de la cual se tenga registro del precio de la acción. Como es observable el pago de los dividendos no representan un cambio en el precio de las acciones, teniendo estas un comportamiento de estabilidad durante algunos meses para luego sufrir un cambio brusco.  
 
 Se pueden apreciar su pico de caída a finales del año 2019 he inicios del 2020, esto producto de la especulación en los mercados y la venta de activos, para la obtención de dinero líquido, causado por la pandemia del COVID-19 y su afectación en los mercados. 
 
