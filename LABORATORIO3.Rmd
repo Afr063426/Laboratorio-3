@@ -545,9 +545,18 @@ Para poder realizar un mejor cálculo de la opción se van a utilizar únicament
 
 ```{r}
 
-ggplot(Precios,aes(x=Fecha, y =Último))+
+Precios<-Precios[Precios$Fecha>=as.Date("01.01.2021",format="%d.%m.%Y"),]
+
+Precios %>%ggplot(aes(x=Fecha, y =Último))+
   geom_line()+
+  geom_point(aes(x =Montos$FechaDePago[5], y=Último[Fecha==Montos$FechaDePago[5]]), size =1,color="blue" )+
   labs(y = "Precios",x = "Tiempo" ,caption = "Fuente: Elaboración propia, con datos del ....")+theme_minimal()+theme(legend.position="bottom",plot.caption=element_text(hjust=0))
+
+
+
+##
+Promedio<-mean(Precios$Último)
+rendimiento<-Promedio/(Montos$DiviendoPorAcción[5]+Montos$DiviendoPorAcción[4])
 
 ```
 
