@@ -526,7 +526,7 @@ Esto permite componer de forma continua, que es similar a lo que pretenden los a
 
 # Analisis de datos
 
-Los datos de los precios del activo subyacente a analizar, en este caso acciones,  son provenientes de la empresa Holcim Costa Rica, suministrados por el sitio web Investing.com y comparados con los suministrados por la misma empresa en los periodos que se registraron, pues los mismos no contaban con un registro tan periódico como los del sitio web. Los mismos se pueden apreciar en el siguiente grafico:\\
+Los datos de los precios del activo subyacente a analizar, en este caso acciones,  son provenientes de la empresa Holcim Costa Rica, suministrados por el sitio web Investing.com y comparados con los suministrados por la misma empresa en los periodos que se registraron, pues los mismos no contaban con un registro tan periódico como los del sitio web.
 
 ```{r}
 
@@ -543,22 +543,11 @@ ggplot(Precios,aes(x=Fecha, y =Último))+
 
 ```
 
-Cabe destacar que los puntos azules indican la fecha del pago de dividendos o en su defecto la fecha más próxima de la cual se tenga registro del precio de la acción. Como es observable el pago de los dividendos no representan un cambio en el precio de las acciones, teniendo estas un comportamiento de estabilidad durante algunos meses para luego sufrir un cambio brusco.  
-
-Se pueden apreciar su pico de caída a finales del año 2019 he inicios del 2020, esto producto de la especulación en los mercados y la venta de activos, para la obtención de dinero líquido, causado por la pandemia del COVID-19 y su afectación en los mercados. 
+Como se aprecia en el grafico el precio de las acciones se mantiene estable por intervalos de tiempo, para luego sufir un cambio repentino durante los el pediodo de 2019 y gran parte del 2020 
 
 
-Para poder realizar un mejor cálculo de la opción se van a utilizar únicamente los dados obtenidos a partir del 2021, puesto que los datos anteriores presentan mucha volatilidad, comportamiento que no se ha presentado en el último año. Se presenta los datos con que se va a trabajar:
 
-```{r}
-
-ggplot(Precios,aes(x=Fecha, y =Último))+
-  geom_line()+
-  labs(y = "Precios",x = "Tiempo" ,caption = "Fuente: Elaboración propia, con datos del ....")+theme_minimal()+theme(legend.position="bottom",plot.caption=element_text(hjust=0))
-
-```
-
-
+Para un mejor cálculo de la opción se va a trabajar desde febrero+-
 
 Los días no busrsatiles en CR, son tales
 
@@ -567,10 +556,11 @@ sacar
 
 Se va a trabajar con los datos de la curva soberana obtenidos de la página del Banco Central de Costa Rica, los mismos son establecidos para la semana del 23 de junio del año 2021 al 29 de junio de año 2021. Se tiene que las observaciones son: 
 
-Agregar titulos fecha de madurancion y tasas 
+Agregar titulos fecha de madurancion y tasas
 
-Se tiene que las acciones se cotizan en la bolsa de valores de Costa Rica, por lo que se tiene que tener presenta los días hábiles con los que se cuentan para las transacciones, teniendo así la siguiente table con los días feriados:\\
+
 ```{r}
+tasasBCCR%>%kbl()%>%kable_material()
 tablaKableConDiaNB
 ```
 
@@ -586,15 +576,13 @@ tasasBCCR$TasaRendimiento<-tasasBCCR$TasaRendimiento/100
 b<-c(0,0,0,0,0.005,0.005)
 parametrosFitSvensson<-fitSvensson(b,tasasBCCR$Maduration,tasasBCCR$TasaRendimiento)
 parametrosModelo<-unlist(parametrosFitSvensson[1])
-
-tasasBCCR%>%kbl()%>%kable_material()
 ```
 
 
 
 # Análisis del árbol e implementación
 
-
+El árbole
 
 # Resultados
 Se presentan obtenidos al aplicar el modelo para el precio de las opciones a 3, 6 meses y 1 año empleando como precio de ejercicio el precio del 30 de junio del 2021.
@@ -650,9 +638,10 @@ Los precios respectivos para las opciones se resument en la siguiente tabla
 resultados%>%kbl(col.names = c("Tiempo","Opción","Precio"))%>%kable_material()
 ```
 
-#Conclusión
+# Conclusión
 
 
+# Bilibliografía
 
 
 Metodologia, periodo y que datos
