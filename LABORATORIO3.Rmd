@@ -518,9 +518,7 @@ Ahora con lo anteriormente presentado se en la siguiente sección se verá la me
 Esto permite componer de forma continua, que es similar a lo que pretenden los agente que suceda con el precio de su acción. Se procede a desarrollar la metología.
 
 # Metodología
-
 Para el siguiente trabajo, se utiliza el programa RStudio para generar un documento RMarkdown, los cuales operan con el lenguaje de programación R. Además, mediante distintos sitios web se recuperaron datos de acciones de empresas, así como la curva soberana del Banco Central de Costa Rica.
-
 # Analisis de datos
 
 
