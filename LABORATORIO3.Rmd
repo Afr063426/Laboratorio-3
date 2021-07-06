@@ -199,7 +199,6 @@ precioP<-function(K,S_0,n,hn,volatilidad,r,q,t){
 
 
 
-# Introducción
 
 
 
@@ -519,8 +518,7 @@ Esto permite componer de forma continua, que es similar a lo que pretenden los a
 
 # Metodología
 
-Para el siguiente trabajo, se utiliza el programa RStudio para generar un documento RMarkdown, los cuales operan con el lenguaje de programación R. Además, mediante distintos sitios web se recuperaron datos de acciones de empresas, así como la curva soberana del Banco Central de Costa Rica. Asimismo, con los datos anteriores se realizaron gráficos para interpretar relacionar los números con el trabajo. También se efectúa un análisis con la información obtenida y el modelo binomial para calcular las opciones de compra y afirmar si habría sido beneficionsa la inversión o no.
-
+Prueba 1
 
 # Analisis de datos
 
@@ -560,22 +558,14 @@ Precios %>%ggplot(aes(x=Fecha, y =Último))+
   labs(y = "Precios",x = "Tiempo" ,caption = "Fuente: Elaboración propia, con datos del ....")+theme_minimal()+theme(legend.position="bottom",plot.caption=element_text(hjust=0))
 
 
-
 ##
 Promedio<-mean(Precios$Último)
 rendimiento<-Promedio/(Montos$DiviendoPorAcción[5]+Montos$DiviendoPorAcción[4])
-
-
-
 ```
-
-
-
+Se tiene que tener presente que la Bolsa Nacional de Valores de Costa Rica únicamente trabaja en días hábiles por lo que se tiene que tener presente los días feriados en Costa Rica, los cuales son:
 
 ```{r}
-
-
-
+tablaKableConDiaNB
 ```
 
 
@@ -589,21 +579,11 @@ tasasBCCR%>%kbl()%>%kable_material()
 tasasBCCR<-tasasBCCR[-1]
 
 ```
-A los anteriores datos se les aplico, según la 
-
-
-
-
-```{r}
-tablaKableConDiaNB
-```
-
-Aplicando el modelo de $Sevenson$ (cita del documento), se puede obtener una curva continua, la cual se representa en el siguiente grafico:
-
+A los anteriores datos se les aplico el modelo de paramétrico de Svensson, esto siguiendo la Nota Metodología Curva de Rendimiento Soberana De Costa Rica, emitida por el Banco Central de Costa Rica, obteniendo así la siguiente curva: 
 
 ```{r}
 #### Se calculan los parametros
-tasasBCCR<-tasasBCCR[1:(ncol(tasasBCCR)-1)]
+
 tasasBCCR<-tasasBCCR%>%gather("Maduration","TasaRendimiento",1:ncol(tasasBCCR))
 tasasBCCR$Maduration<-(grepl("d",tasasBCCR$Maduration)*1/365+grepl("m",tasasBCCR$Maduration)*1/12+grepl("año",tasasBCCR$Maduration))*as.numeric(substring(tasasBCCR$Maduration,1,2))
 tasasBCCR$TasaRendimiento<-tasasBCCR$TasaRendimiento/100
@@ -611,24 +591,26 @@ b<-c(0,0,0,0,0.005,0.005)
 parametrosFitSvensson<-fitSvensson(b,tasasBCCR$Maduration,tasasBCCR$TasaRendimiento)
 parametrosModelo<-unlist(parametrosFitSvensson[1])
 
-```
-
-```{r}
 
 CurvaSven<-c(seq(1/4,10,1/4))
 CurvaSven<-cbind("Fecha de maduración"= CurvaSven,"Rendimientos"=svensson(parametrosModelo, seq(1/4,10,1/4)))
 CurvaSven<-as.data.frame(CurvaSven)
 
-
-
-```
-
-```{r}
-  ggplot()+
+ggplot()+
   geom_line(aes(x=CurvaSven$`Fecha de maduración`, y = CurvaSven$Rendimientos))+
   geom_point(aes(x =tasasBCCR$Maduration, y=tasasBCCR$TasaRendimiento), size =1,color="blue" )+
-  labs(y = "Rendimientos",x = "Fecha de maduración" ,caption = "Fuente: Elaboración propia, con datos del ....")+theme_minimal()+theme(legend.position="bottom",plot.caption=element_text(hjust=0))
+  labs(y = "Rendimientos",x = "Fecha de maduración" ,caption = "Fuente: Elaboración propia, con datos del Banco Central de Costa Rica")+theme_minimal()+theme(legend.position="bottom",plot.caption=element_text(hjust=0))
 ```
+
+
+
+
+
+
+
+
+
+
 
 
 # Análisis del árbol e implementación
