@@ -69,9 +69,6 @@ fecha<-as.Date(c("01/01/2021","01/04/2021","02/04/2021","03/05/2021","26/07/2021
 descripcion<-c("Año Nuevo","Jueves Santo", "Viernes Santo","Día del Trabajador","Anexión del partido de Nicoya","Día de la Virgen de Los Ángeles","Independecia","Día de la Abolición del Ejercitos","Día de Navidad","Feriado Banco Central")
 tablaConDiaNB<-data.frame(Fecha=fecha,Descripción=descripcion)
 tablaKableConDiaNB<-tablaConDiaNB%>%kbl()%>%kable_material()
-
-
-
 ```
 
 
