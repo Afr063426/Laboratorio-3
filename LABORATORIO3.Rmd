@@ -138,24 +138,25 @@ arbolBinarioM<-function(n,hn,volatilidad,S_0){
 parametros<-function(K,S_0,n,hn,volatilidad,r,q){
   u<-exp(volatilidad*sqrt(hn)) ## Este es el aumento en cada paso
   d<-1/u
-  p<-(exp((r-q)*hn)-d)/(u-d) ## Esta es la probabilidad del aumento
-  a<-ceiling(K/(S_0*d^n*log(u^2)))  ## Esta es la cantidad minima de aumentos
+  p<-(exp((r-q)*hn)-d)/(u-1/u) ## Esta es la probabilidad del aumento
+  a<-ceiling(log(K/(S_0*1/u^n))/log(u^2))  ## Esta es la cantidad minima de aumentos
   return(c(a,p,u))
 }
 
 
 
 ### Se procede a programar la forma en que se calculan los precios de las opciones, caso call europea
-precioC<-function(K,S_0,n,hn,volatilidad,r,q,t,d){
+precioC<-function(K,S_0,n,hn,volatilidad,r,q,t){
   parametros<-parametros(K,S_0,n,hn,volatilidad,r,q)
-  sum(choose(n,c(parametros[1]:n))*parametros[2]^(c(parametros[1]:n))*(1-parametros[2])^(n-c(parametros[1]:n))*parametros[3]^(c(parametros[1]:n))*(1/parametros[3])^(n-(c(parametros[1]:n)))*S_0-K)*exp(-t*r) ### Formula para precio de de las opciones de compra
+  sum(choose(n,c(parametros[1]:n))*parametros[2]^(c(parametros[1]:n))*(1-parametros[2])^(n-c(parametros[1]:n))*(parametros[3]^(parametros[1]:n)*(1/parametros[3])^(n-c(parametros[1]:n))*S_0-K))*exp(-t*r) ### Formula para precio de de las opciones de compra
 }
 
 
 ### De forma análoga se programa el precio de una put option europea
-precioP<-function(K,S_0,n,hn,volatilidad,r,q){
+precioP<-function(K,S_0,n,hn,volatilidad,r,q,t){
   parametros<-parametros(K,S_0,n,hn,volatilidad,r,q)
-  sum(choose(n,c(0:(parametros[1]-1)))*parametros[2]^(c(0:(parametros[1]-1)))*(1-parametros[2])^(n-c(0:(parametros[1]-1)))*parametros[3]^(c(0:(parametros[1]-1)))*(1/parametros[3])^(n-c(0:(parametros[1]-1)))*S_0-K)### Formula para precio de de las opciones de venta
+  parametros[1]<-n-parametros[1]
+  sum(choose(n,c(0:parametros[1]))*parametros[2]^(0:parametros[1])*(1-parametros[2])^(n-c(0:parametros[1]))*(K-parametros[3]^(0:parametros[1])*(1/parametros[3])^(n-c(0:parametros[1]))*S_0))*exp(-t*r) ### Formula para precio de de las opciones de compra
 }
 ```
 
@@ -212,11 +213,12 @@ precioP<-function(K,S_0,n,hn,volatilidad,r,q){
 # Marco teórico
 
 En primera instancia se mostrará la notación que se mantendrá a los largo del trabajo.
+
 ```{r}
 notacion<-c("$t_j$","$t_0$","$t_f$","$\\tau$","$n$","$h_n$","$S(t_j),S_{j}$","$p_n$","$1-p_n$","$u_n$","$d_n$","$q$", "$D(t_j,t_j)=qS_{j-1}h_n$","$r$","$K$","$C_j$")
 significado<-c("Tiempo $j$","Tiempo inicial","Tiempo final","$t_f-t_0$","Cantidad de periodos en el que se divide $[t_f,t_0]$","Largo de cada periodo en el se divide $[t_f,t_0]$, espeficamente el largo es $\\frac{\\tau}{n}$","Precio de la acci\'on en el tiempo j","Probabilidad de que el precio de la acción aumente de un periodo a otro.","Probabilidad de que el precio de la acción disminuya de un periodo a otro.","Proporción en que aumenta el precio del activo de un periodo a otro","Proporción en que disminuye el precio de la activo de un periodo a otro","Proporcion de dividendo","Monto pagado de dividen el momento $j$","Tasa libre de riesgo","Precio de ejercicio","Precio de la opción en $j$")
 tablaNotacion<-data.frame(Notacion=notacion,Significado=significado)
-tablaNotacion%>%kbl()%>%kable_material()
+tablaNotacion%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)
 ```
 Existen distintos métodos para la valoración de opciones entre ellos los que se basan en métodos numéricos como lo expone Marín (2009) existen el de Monte Carlo, diferencias finitas, árboles binomiales y trinomiales. A lo largo de este trabajo se trabajará la valoración de las opciones bajo el modelo de árboles binomiales. Los modelos básados en métodos numéricos a diferencia de otros poseen la ventaja de de que su implementación computacionalmente es más simple y eficiente que el desarrollo de soluciones analíticas para la valoración de las opciones basado en el comportamiento del activo subyacente.
 
@@ -414,7 +416,8 @@ Note que para la primera lista de ecuaciones se emplea implícitamente el valor 
 r=m
 \]
 
-En las siguiente subsección se procede a presentar lo que son las c
+En las siguiente subsección se procede a presentar lo que son las opciones.
+
 ## Opciones
 
 Las opciones son un contrato entre dos partes, en el cual uno de los involucrados tiene la posibilidad de no ejercer el contrato cuando este no le sea favorable. En este caso al vendedor de la opción se le llama escritor que se dice toma la posición corta, mientras el comprador se dice que toma la posición larga. Las opciones a trabajar son las de compra y las de venta.
@@ -434,7 +437,11 @@ tablaLongCall<-data.frame("Tiempo/Escenario"=tiempoLongCall,"$S_T< K$"=SmenorK,"
 tablaLongCall%>%kbl()%>%kable_material()
 ```
 
-Las opciones se pueden emplear en distintas circunstancias entre las motivaciones para escribir o comprar una opción están la especulación o el cubrirse algún riesgo. De tal forma que se pueden establecer distintas estrategias de compra y venta de opciones combinado con otros instrumentos de inversión de tal forma que se puedan replicar portafolios. Un aspecto importantes es que se puede concluir que las posibilidades con opciones existen, sin embargo rápidamente los mercados financieros hacen que esa oportunidad que existía hacia algunos instantes desaparezcan.
+Las opciones se pueden emplear en distintas circunstancias entre las motivaciones para escribir o comprar una opción están la especulación o el cubrirse algún riesgo. De tal forma que se pueden establecer distintas estrategias de compra y venta de opciones combinado con otros instrumentos de inversión de tal forma que se puedan replicar portafolios. Un aspecto importantes es que se puede concluir que las posibilidades con opciones existen, sin embargo rápidamente los mercados financieros hacen que esa oportunidad que existía hacia algunos instantes desaparezcan. Además existen los distintos tipos de como lo son:
+
+* Opción europea: Solo puede ser ejercida en la fecha de vencimiento establecida entre ambas partes
+* Opción americana: Puede ser ejercida durante todo el periodo que tenga el derivado hasta la fecha de maduración.
+* Opciones exóticas: Existen otras opciones como lo son la asiática, opción al pasado y la opción de intercambio.
 
 De una forma análoga se puede establecer que las opciones de venta las cuales son un derecho de poder vender un activo a un precio establecido por ambas partes y que como el caso de las opciones de compra es llamado precio de ejercicio $K$ en este caso contrario al caso de las opciones de compra el derecho es ejercido cuando el precio de $S_T$ es menor que el precio de ejercicio y si es mayor o igual no es ejercido. Los flujo en el caso de la posición larga vienen dados por
 
@@ -449,7 +456,7 @@ tablaLongCall%>%kbl()%>%kable_material()
 
 Ahora surge la duda cuál debería ser el precio que debería tener una opción. Las opciones tienen una larga historias, pero el cómo establecer el precio tuvo un gran cambio en el año 1973 cuando Black y Scholes presentaron un modelo con el cuál se lograba obtener un precio de equilibrio para las opciones. Esta subsección se centrará en el cómo se estable el precio de una opción, sin embargo con una matemática menos avanzada que con el modelo establecido por Black y Scholes, y basado en el uso de árboles binomiales presentados en una de las subsecciones anteriores.
 
-El precio que tendrán la opción será establecido de acuerdo a los distintos precios que puede llegar a tener el activo subyacente después de $n$ pasos de tiempo, de tal forma que no haya una oportunidad de arbitraje con esta. Para el caso de una opción de compra tal y como lo establece Cox (1979) se tiene que su valor se basará en la diferencia que habrá entre el precio del activo subyacente y el precio de ejercicio. Así para el caso de un árbol binomial de un periodo se cumple que en el caso de que el precio aumente $C_u=\max\{0,uS_0-K\}$ y en el caso de que dismuya $C_d=\max\{0,dS_0-K\}$, ya que si el precio del activo es menor que el precio de ejercicio la opción está fuera del dinero. 
+El precio que tendrán la opción será establecido de acuerdo a los distintos precios que puede llegar a tener el activo subyacente después de $n$ pasos de tiempo, de tal forma que no haya una oportunidad de arbitraje con esta. Para el caso de una opción de compra a la europea tal y como lo establece Cox (1979) se tiene que su valor se basará en la diferencia que habrá entre el precio del activo subyacente y el precio de ejercicio. Así para el caso de un árbol binomial de un periodo se cumple que en el caso de que el precio aumente $C_u=\max\{0,uS_0-K\}$ y en el caso de que dismuya $C_d=\max\{0,dS_0-K\}$, ya que si el precio del activo es menor que el precio de ejercicio la opción está fuera del dinero. 
 
 Ahora se cumple que la probalidad de que el precio aumente es igual a $p$ mientras que la probailidad de que este dismuya es igual $1-p$, de acuerdo a Cox basado en que se tiene un portafolio en el cual se encuentra el activo subyacente y una seguridad libre de riesgo el precio de la opción para evitar cualquier oportunidad de arbitraje es
 
@@ -596,6 +603,8 @@ tasasBCCR%>%kbl()%>%kable_material()
 
 # Análisis del árbol e implementación
 
+
+
 # Resultados
 Se presentan obtenidos al aplicar el modelo para el precio de las opciones a 3, 6 meses y 1 año empleando como precio de ejercicio el precio del 30 de junio del 2021.
 
@@ -611,6 +620,7 @@ nSemestral<-as.numeric(as.Date("02/01/2022",format="%d/%m/%Y")-as.Date("30/06/20
 nAnual<-as.numeric(as.Date("30/06/2022",format="%d/%m/%Y")-as.Date("30/06/2021",format="%d/%m/%Y")-length((tablaConDiaNB%>%filter(Fecha>=as.Date("01/10/2021",format="%d/%m/%Y")))$Fecha)-4)
 ### Anteriormente se determinó la volatilidad diaria entonces se usará esta ya que se está usando la cantidad días como la cantidad de pasos
 sigma<-0.06 ### A la espera
+q<- ## A la espera de dividendos anuales
 ### Se trabaja de forma anualizada por lo que se tiene que los valores hn correspondientes son
 ## Tres meses equivalen a un cuarto del año
 hnTrimetral<-0.4/as.numeric(nTrimestral)
@@ -623,20 +633,35 @@ K<-Precios$Último[length(Precios$Último)]
 
 ## Se procede a calcular los valores de u,p, a con la función programa anteriomente y haciendo uso del modelo de Svensson con los parámetros calculados y la volatilidad calculada anteriormente
 valoresTrimestral<-parametros(K,K,nTrimestral,hnTrimetral,sigma,svensson(parametrosModelo,1/4),0)
-
+valoresSemestral<-parametros(K,K,nSemestral,hnTrimetral,sigma,svensson(parametrosModelo,1/2),0)
+valoresAnual<-parametros(K,K,nAnual,hnTrimetral,sigma,svensson(parametrosModelo,1),0)
 ### Opciones put y call para el caso de trimestral
-precioC(K,K,nTrimestral,hnTrimetral,sigma)
-precioP(K,K,nTrimestral,hnTrimetral,sigma)
+precioOpcionCTrimestral<-precioC(K,K,nTrimestral,hnTrimetral,sigma,svensson(parametrosModelo,1/4),1/4,0)
+precioOpcionPTrimestral<-precioP(K,K,nTrimestral,hnTrimetral,sigma,svensson(parametrosModelo,1/4),1/4,0)
 ### Opciones put y call para el  caso semestral
-precioC(K,K,nSemestral,hnSemestral,sigma)
-precioP(K,K,nSemestral,hnSemestral,sigma)
+precioOpcionCSemestral<-precioC(K,K,nTrimestral,hnTrimetral,sigma,svensson(parametrosModelo,1/2),1/2,0)
+precioOpcionPSemestral<-precioP(K,K,nTrimestral,hnTrimetral,sigma,svensson(parametrosModelo,1/2),1/2,0)
 ### Opciones put y call para el caso anual
-precioC(K,K,nAnual,hnAnual,sigma)
-precioP(K,K,nAnual,hnAnual,sigma)
+precioOpcionCAnual<-precioC(K,K,nTrimestral,hnTrimetral,sigma,svensson(parametrosModelo,1),1,0)
+precioOpcionPAnual<-precioP(K,K,nTrimestral,hnTrimetral,sigma,svensson(parametrosModelo,1),1,0)
+resultados<-data.frame(Tiempo=rep(c("Tres meses","Seis Meses","Un año"),2),"Opción"=c(rep('Compra',3),rep('Venta',3)),"Precio"=c(precioOpcionCTrimestral,precioOpcionCSemestral,precioOpcionCAnual,precioOpcionPTrimestral,precioOpcionPSemestral,precioOpcionPAnual))
 ```
+Primero los valores obtenidos para $a$, $p$ y $u$ son para el caso a tres meses `r valoresTrimestral`, a seis meses `r valoresSemestral` y a un año `r valoresAnual`. El árbol para el caso trimestral se tiene que el árbol es el siguiente
+
+```{r}
+arbolrTri<-t(arbolBinarioM(nTrimestral,hnTrimetral,sigma,K))
+arbolrTri[is.na(arbolrTri)]=""
+arbolrTri%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)%>%scroll_box(width = "100%",height = "500px")
+```
+
+Los precios respectivos para las opciones se resument en la siguiente tabla
+```{r}
+resultados%>%kbl(col.names = c("Tiempo","Opción","Precio"))%>%kable_material()
+```
+
 #Conclusión
 
-Marco teórico, curva soberana
+
 
 
 Metodologia, periodo y que datos
