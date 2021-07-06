@@ -17,13 +17,14 @@ library(rmdformats)
 library(kableExtra)
 library(tidyverse)
 library(readxl)
+
 library(ggplot2)
+
 ##install.packages('magick') para dibujos tikz
 ##install.packages('pdftools')
 #tinytex::install_tinytex()
 library(pdftools)
 library(magick)
-##Importante instalar lo que sigue acontinuacion, que está comentado
 ## Global options
 options(max.print="75")
 opts_chunk$set(echo=FALSE,
@@ -292,16 +293,15 @@ Ahora bajo el supuesto de que de los caminos de precio son independientes, enton
 \[
 \mathbb{P}(S(t_n)=S_0u_n^id_n^{n-i})=\binom{n}{i}p^{i}(1-p_n)^{n-i}
 \]
-Notese que se a trabajado hasta el momento de manera discreta.
+Lo que muestra que los precios están distribuido de forma binomial.
 
-* Se supone el activo paga un dividendo constante, continuo y proporcional al precio final de todo el tiempo, desde $t_0$ hasta $t_f$: De tal forma que
+* Se supone el activo paga un dividendo constante, continuo y proporcional al precio final de todo el tiempo $[t_0,t_f]$, de tal forma que
 
 \[
 D(t_{j-1},t_{j})=qS_{j-1}h_n, \quad j=1,2,..,n
 \]
 
 * La tasa de retorno total es: Por paso de tiempo 
-
 \[
 R(t_{j-1},t_j)=\frac{S_j-S_{j-1}+D(t_{j-1},t_{j})}{S_{j-1}}=\mathbf{R_j}+qh_n
 \]
@@ -320,14 +320,34 @@ Para este modelo hace falta tomar algunas suposiciones más, aparte de las anter
 \frac{\mathbb{E}(R(t_0,t_1))}{h_n}\to m, \qquad n\to \infty
 \]
 
-Ahora se destaca que el retorno se puede obtener mediante la ganancia de capital y la proporcion de dividendo $qh_j$ esto es $R(t_0,t_1)=\mathbf{R}_1+qhn$ entonces
-
+Ahora se destaca que el retorno se puede obtener mediante la ganancia de capital y la proporción de dividendo $qh_j$ esto es $R(t_0,t_1)=\mathbf{R}_1+qh_n$ entonces
+m
 \[
 \frac{\mathbb{E}(\mathbf{R_1})}{h_n}=\frac{\mathbb{E}(R(t_0,t_1)-q)}{h_n}\to m-q
 \]
 
-$m$ y $q$ se asumen dados y de tal forma que $m$ corresponde a la tasa libre de riesgo o de retorno esperado.
+$m$ y $q$ se asumen dados y de tal forma que $m$ corresponde al retorno esperado.
 
+* La constante $\mu_{RW}$:  Se define la $\mu_n$ como el retorno logaritmico de cada paso:
+
+\[
+\mu_n=\frac{1}{h_n}\mathbb{E}\left(\ln\left(\frac{S_1}{S_0}\right)\right)
+\]
+Que explícitamente por como se asumieron se distribuyen los retornos logarítmicos da como resultado
+\[
+\mu_nh_n=p_n\ln u_n+(1-p_n)\ln{d_n}
+\]
+Como los retornos logarítimicos  en cada paso están identicamente distribuidos, entonces el retorno logarítmicos sobre todo el intervalo $[t_0,t_f]$ es igual a 
+
+\[
+\mathbb{E}\left(\ln\left(\frac{S_n}{S_0}\right)\right)=n\mathbb{E}\left(\ln\left(\frac{S_1}{S_0}\right)\right)=\mu_n\tau
+\]
+
+Ahora se asume que $\mu_n$ converge a una constante
+\[
+\mu_n\to\mu_{RW}, \quad n\to \infty
+\]
+A esta constante se le llama drift.
 * La constante $\sigma$: Si se define $\sigma^2_n$ la varianza de los retornos logarítmicos por cada paso entonces
 
 \[
@@ -344,11 +364,30 @@ Como los retornos logaritmicos están i.i.d. entonces se cumple que la varianza 
 \[
 \text{Var}\left(ln\frac{S_n}{S_0}\right)=n\text{Var}\left(\frac{S_1}{S_0}\right)
 \]
-Se asume que $\sigma^2_n\to \sigma_2>0$ cuando $n\to \infty$. Esto se le llama la volatilidad del precio de la seguridad. Ahora los inversores pueden ser más o menos adversos al riesgo. Para el caso de los inversores con riesgo neutral se cumplen las siguientes ecuaciones para $n$ lo suficientemente grande.
+Se asume que $\sigma^2_n\to \sigma_2>0$ cuando $n\to \infty$. Esto se le llama la volatilidad del precio de la seguridad. 
+
+Es importante aquí recalcar que se puede establecer una relación entre lo que sería $m-q$ y $\sigma$ para poder determinar el drift en términos de estos dos de tal forma que se logra obtener
+\[
+\mu_{RW}=m-q-\frac{\sigma^2}{2}
+\]
+Sin embargo tal y como lo expone Cox(1979) el determinar el valor de $m$ se puede volver un poco engorroso, por lo que tal y como lo propone Cox (1979) se asumir que el drift sea aproximado por la media muestral, así como lo es la volatilidad que puede ser aproximada mediante la volatilidad. Ahora para $n$ lo suficientemente grande se establece que se cumple lo siguiente
+
+\[
+u_n\approx e^{\sigma\sqrt{h_n}},\quad d_n\approx e^{'\sigma\sqrt{h_n}}, \quad p_n\approx \frac{1}{2}+\frac{\mu_{RW}}{\sigma}\sqrt{h_n}
+\]
+
+Ahora los inversores pueden ser más o menos adversos al riesgo. Sin embargo a partir del modelo CRR se puede proponer que los inversores sean neutrales al riesgo, en estos casos se establece como el precio del activo está compuesto continuamente mediante una tasa libre de riesgo $r$ menos la tasa de dividendos $q$. De tal forma que para este caso de inversores con riesgo neutral se obtiene
 \[
 u_n\approx e^{\sigma\sqrt{h_n}},\quad d_n\approx e^{'\sigma\sqrt{h_n}}, \quad p_n\frac{e^{(r-q)h_n}-d_n}{u_n-d_n}
 \]
 
+Note que para la primera lista de ecuaciones se emplea implícitamente el valor de $m$ mientras que para la segunda se ha empleado una tasa libre de riesgo, ahora bajo el modelo de Black y Scholes para la valoración de opciones la tasa libre de riesgo es independiente de $m$. De tal forma que es erroneo pensar que se cumple, al menos en este trabajo
+
+\[
+r=m
+\]
+
+En las siguiente subsección se procede a presentar lo que son las c
 ## Opciones
 
 Las opciones son un contrato entre dos partes, en el cual uno de los involucrados tiene la posibilidad de no ejercer el contrato cuando este no le sea favorable. En este caso al vendedor de la opción se le llama escritor que se dice toma la posición corta, mientras el comprador se dice que toma la posición larga. Las opciones a trabajar son las de compra y las de venta.
@@ -425,10 +464,10 @@ C=\frac{\sum_{i=a}^{n}\left(\frac{n!}{i!(n-i)!}p^{i}(1-p)^{n-i}u^id^{n-i}S_0-K\}
 De forma análoga se puede establecer para el caso de las opciones de venta el precio de la opción de venta $P$ es igual a
 
 \[
-P=\frac{\sum_{i=0}^{a-1}\left(\frac{n!}{i!(n-i)!}p^{i}(1-p)^{n-i}u^id^{n-i}S_0-K\}\right)}{(1+r)^{\tau}}
+P=\frac{\sum_{i=0}^{a-1}\left(\frac{n!}{i!(n-i)!}p^{i}(1-p)^{n-i}u^id^{n-i}S_0-K\}\right)}{(1+r)^{n}}
 \]
 
-Ahora sin embargo hasta este punto se ha trabajado de forma discreta y no se ha dado el salto hacia el caso continuo al menos en esta sección, y es cierto que se ha hablado del árbol 
+
 
 
 
