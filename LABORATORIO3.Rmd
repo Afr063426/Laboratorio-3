@@ -87,20 +87,22 @@ tablaKableConDiaNB<-tablaConDiaNB%>%kbl()%>%kable_material()
 svensson<-function(beta,tiempo){
   beta[1]+beta[2]*((1-exp(-tiempo/beta[5]))/(tiempo/(beta[5])))+beta[3]*((1-exp(-tiempo/beta[5]))/(tiempo/beta[5])-exp(-tiempo/beta[5]))+beta[4]*((1-exp(-tiempo/beta[6]))/(tiempo/beta[6])-exp(-tiempo/beta[6]))
 }
+
 ### Se procede a programar la función que mediante interpolación aproxima las tasas a partir de las
 ## con las que se cuenta
 
 
 fitSvensson<-function(beta,tiempo,tasas){
-  fn<-function(beta,tiempo,tasas){
+  fn<-function(beta){
     sum((tasas-svensson(beta,tiempo))^2) ### Suma de resta de cuadrados
   }
   optim(beta,   ### Se optimizan la suma de resta de cuadrados para tener el menor error posible
         fn,
         method = "L-BFGS-B",
         lower=rep(-20,6),
-        upper = rep(-20,6)
+        upper = rep(20,6)
         )
+  
 }
 
 
@@ -135,6 +137,7 @@ arbolBinarioM<-function(n,hn,volatilidad,S_0){
 ## Estas variables con esta notación se mantiene para las siguientes funciones
 parametros<-function(K,S_0,n,hn,volatilidad,r,q){
   u<-exp(volatilidad*sqrt(hn)) ## Este es el aumento en cada paso
+  d<-1/u
   p<-(exp((r-q)*hn)-d)/(u-d) ## Esta es la probabilidad del aumento
   a<-ceiling(K/(S_0*d^n*log(u^2)))  ## Esta es la cantidad minima de aumentos
   return(c(a,p,u))
@@ -144,8 +147,8 @@ parametros<-function(K,S_0,n,hn,volatilidad,r,q){
 
 ### Se procede a programar la forma en que se calculan los precios de las opciones, caso call europea
 precioC<-function(K,S_0,n,hn,volatilidad,r,q,t,d){
-  parametros<-parametros(K,S_0,n,hn,volatilidad,(1+r)^d-1,q)
-  sum(choose(n,c(parametros[1]:n))*parametros[2]^(c(parametros[1]:n))*(1-parametros[2])^(n-c(parametros[1]:n))*parametros[3]^(c(parametros[1]:n))*(1/parametros[3])^(n-(c(parametros[1]:n)))*S_0-K)/(1+r)^(t) ### Formula para precio de de las opciones de compra
+  parametros<-parametros(K,S_0,n,hn,volatilidad,r,q)
+  sum(choose(n,c(parametros[1]:n))*parametros[2]^(c(parametros[1]:n))*(1-parametros[2])^(n-c(parametros[1]:n))*parametros[3]^(c(parametros[1]:n))*(1/parametros[3])^(n-(c(parametros[1]:n)))*S_0-K)*exp(-t*r) ### Formula para precio de de las opciones de compra
 }
 
 
@@ -250,7 +253,31 @@ Gráficamente un árbol binomial.
     \draw[->] (tree-4-2) -- (tree-5-3) node [midway,below] {$(1-p)^2$};
   \end{tikzpicture}
 ```
-Para poder trabajar con árboles binomiales es necesario hacer algunas asunciones.
+## Aspectos a estadísticos
+
+Es importante tener presentes algunos aspecto estadísticos que posteriormente serán úiles al momento de hablar del árbol binomial, por lo que primeramente se presentan un par de definiciones
+
+\textbf{Media}
+La media se define como 
+\[
+\mu_X=\frac{1}{|\Pi|}\sum_{\pi\in \Pi}X(\pi)
+\]
+\textbf{Desviación estándar}
+
+\[
+\sqrt{\text{Var}(X)}=\sigma_{X}=\frac{1}{|\Pi|}\sqrt{\sum_{\pi\in \Pi}(X(\pi)-\mu_X)^2}
+\]
+
+Donde $\Pi$ son los datos y $X$ es el peso dado a cada dato. En particular media muestral es igual
+\[
+\bar{x}=\frac{1}{n}\sum_{i=1}^{n}x_i
+\]
+Y la desviación estándar muestral es
+
+\[
+\sigma_X=\sqrt{\frac{1}{n-1}\sum_{i=1}^{n}(x_i-\bar{x})^2}
+\]
+Con esto se presente se deben hacer algunas asunciones para poder trabajar con los árboles binomiales.
 
 ## Asunciones para trabajar con árboles binomiales
 * Propiedad de recombinación: Si el precio aumenta en un paso y en el siguiente disminuye entonces se obtiene el precio que se tenía antes de que se hiceran ambos pasos, esto es $S_ju_nd_n=S_jd_nu_n$ con $j\leq n-2$. A partir de esta propiedad se obtiene que la cantidad posible de precios que tiene el activo en el tiempo $t_n$. Se cumple que la forma en que aumenta el precio de una forma totalmente aleatoria cumpliendo
@@ -482,17 +509,11 @@ Los seis parámetros del modelo pueden ser calculados mediante una interpolació
 \[
 \sum_{i=1}^{n}\left(y(t_n)-r_n\right)^2
 \]
-Esto para el plazo de 10 años.
-
-
-
-
-
-
-
-
-
-
+Ahora con lo anteriormente presentado se en la siguiente sección se verá la metología empleada. Ahora una vez se cuenta con la curva de los rendimientos entonces se puede calcular de tasas forward y el factor de descuento continuo
+\[
+\exp\{-Ty(T,\beta,\tau)\}
+\]
+Esto permite componer de forma continua, que es similar a lo que pretenden los agente que suceda con el precio de su acción. Se procede a desarrollar la metología.
 
 # Metodología
 
@@ -541,11 +562,13 @@ Aplicando el modelo de $Sevenson$ (cita del documento), se puede obtener una cur
 
 ```{r}
 #### Se calculan los parametros
-
-
-
-# t<-c(0,0,0,0.05)
-# parametrosCurva<-fitNS(t,c(1,1*30,3*30,6*30,9*30,1*360,2*360,3*360,5*360,7*360,10*360),Curva_soberana$,1000,datosMaximo$CuponSemestral)
+tasasBCCR<-tasasBCCR[1:(ncol(tasasBCCR)-1)]
+tasasBCCR<-tasasBCCR%>%gather("Maduration","TasaRendimiento",1:ncol(tasasBCCR))
+tasasBCCR$Maduration<-(grepl("d",tasasBCCR$Maduration)*1/365+grepl("m",tasasBCCR$Maduration)*1/12+grepl("año",tasasBCCR$Maduration))*as.numeric(substring(tasasBCCR$Maduration,1,2))
+tasasBCCR$TasaRendimiento<-tasasBCCR$TasaRendimiento/100
+b<-c(0,0,0,0,0.005,0.005)
+parametrosFitSvensson<-fitSvensson(b,tasasBCCR$Maduration,tasasBCCR$TasaRendimiento)
+parametrosModelo<-unlist(parametrosFitSvensson[1])
 ```
 
 
@@ -553,41 +576,42 @@ Aplicando el modelo de $Sevenson$ (cita del documento), se puede obtener una cur
 # Análisis del árbol e implementación
 
 # Resultados
-Se presentan obtenidos al aplicar el modelo para el precio de las opciones a 3, 6 meses y a un año empleando como precio de ejercicio el precio con el que se cuenta para el activo subyacente y basado en la cantidad de días bursátiles a partir del día miércoles 30 de junio del 2021.
+Se presentan obtenidos al aplicar el modelo para el precio de las opciones a 3, 6 meses y 1 año empleando como precio de ejercicio el precio del 30 de junio del 2021.
 
 ```{r}
 ## La cantidad de días hábiles se va tomar como la cantidad de pasos que se van a hacer
 ## Recuerde que las opciones que se van a calcular son para el tipo europeo
 ### Cantidad de días bursátiles a partir del 30 de junio hasta el primero de octubre del 2021
 ### En este caso se usará como tasa libre de riesgo la brindada por la curva soberana, note que para que no hayan oportunidades de riesgo se debería cumplir d<1+r<u donde r es la tasa libre de riesgo de un periodo
-nTrimestral<-as.Date("01/10/2021",format="%d/%m/%Y")-as.Date("30/06/2021",format="%d/%m/%Y")-length((tablaConDiaNB%>%filter(Fecha>=as.Date("01/10/2021",format="%d/%m/%Y")))$Fecha)
+nTrimestral<-as.numeric(as.Date("01/10/2021",format="%d/%m/%Y")-as.Date("30/06/2021",format="%d/%m/%Y")-length((tablaConDiaNB%>%filter(Fecha>=as.Date("01/10/2021",format="%d/%m/%Y")))$Fecha))
 ### Cantidad de días bursátiles a partir del 30 de junio hasta el dos de enero del 2021 (Teniendo en cuenta del 1 de enero) 
-nSemestral<-as.Date("02/01/2022",format="%d/%m/%Y")-as.Date("30/06/2021",format="%d/%m/%Y")-length((tablaConDiaNB%>%filter(Fecha>=as.Date("01/10/2021",format="%d/%m/%Y")))$Fecha)-1
+nSemestral<-as.numeric(as.Date("02/01/2022",format="%d/%m/%Y")-as.Date("30/06/2021",format="%d/%m/%Y")-length((tablaConDiaNB%>%filter(Fecha>=as.Date("01/10/2021",format="%d/%m/%Y")))$Fecha)-1)
 ### Cantidad de días bursátiles a partir del 30 de junio hasta el 30 de junio del 2021 (tomando como punto de referencia los días no bursátiles del presente año)
-nAnual<-as.Date("30/06/2022",format="%d/%m/%Y")-as.Date("30/06/2021",format="%d/%m/%Y")-length((tablaConDiaNB%>%filter(Fecha>=as.Date("01/10/2021",format="%d/%m/%Y")))$Fecha)-4
+nAnual<-as.numeric(as.Date("30/06/2022",format="%d/%m/%Y")-as.Date("30/06/2021",format="%d/%m/%Y")-length((tablaConDiaNB%>%filter(Fecha>=as.Date("01/10/2021",format="%d/%m/%Y")))$Fecha)-4)
 ### Anteriormente se determinó la volatilidad diaria entonces se usará esta ya que se está usando la cantidad días como la cantidad de pasos
 sigma<-0.06 ### A la espera
 ### Se trabaja de forma anualizada por lo que se tiene que los valores hn correspondientes son
 ## Tres meses equivalen a un cuarto del año
-hnTrimetral<-0.25/as.numeric(nTrimestral)
+hnTrimetral<-0.4/as.numeric(nTrimestral)
 ## Seis meses equivalen medio año por lo que
 hnSemestral<-0.5/as.numeric(nSemestral)
 ## Un año equivale a 1
 hnAnual<-1/as.numeric(nAnual)
-### Tasas libres de riesgo en cada periodo anualizados
-
 ### El precio de ejercicio con el que vamos a escribir las opciones es el último con el que se cuenta
-#K<-Precios$Último[length(Precios$Último)]
+K<-Precios$Último[length(Precios$Último)]
+
+## Se procede a calcular los valores de u,p, a con la función programa anteriomente y haciendo uso del modelo de Svensson con los parámetros calculados y la volatilidad calculada anteriormente
+valoresTrimestral<-parametros(K,K,nTrimestral,hnTrimetral,sigma,svensson(parametrosModelo,1/4),0)
 
 ### Opciones put y call para el caso de trimestral
-#precioC(K,K,nTrimestral,hnTrimetral,sigma)
-#precioP(K,K,nTrimestral,hnTrimetral,sigma)
+precioC(K,K,nTrimestral,hnTrimetral,sigma)
+precioP(K,K,nTrimestral,hnTrimetral,sigma)
 ### Opciones put y call para el  caso semestral
-#precioC(K,K,nSemestral,hnSemestral,sigma)
-#precioP(K,K,nSemestral,hnSemestral,sigma)
+precioC(K,K,nSemestral,hnSemestral,sigma)
+precioP(K,K,nSemestral,hnSemestral,sigma)
 ### Opciones put y call para el caso anual
-#precioC(K,K,nAnual,hnAnual,sigma)
-#precioP(K,K,nAnual,hnAnual,sigma)
+precioC(K,K,nAnual,hnAnual,sigma)
+precioP(K,K,nAnual,hnAnual,sigma)
 ```
 #Conclusión
 
