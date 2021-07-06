@@ -518,7 +518,7 @@ Esto permite componer de forma continua, que es similar a lo que pretenden los a
 
 # Metodología
 
-Prueba 1
+Para el siguiente trabajo se utiliza el programa RStudio, el cual opera con el lenguaje de programación R.
 
 # Analisis de datos
 
