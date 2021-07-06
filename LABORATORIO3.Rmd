@@ -476,7 +476,7 @@ C=\frac{p^2C_{uu}+2p(1-p)^2C_{ud}+(1-p)^2C_{dd}}{(1+r)^2}
 
 De forma recursiva entonces se puede concluir que para un árbol de $n$ periodos
 \[
-C=\frac{\sum_{i=0}^{n}\left(\frac{n!}{i!(n-i)!}p^{i}(1-p)^{n-i}\max\{0,u^id^{n-i}S_0-K\}\right)}{(1+r)^{\tau}}
+C=\frac{\sum_{i=0}^{n}\left(\frac{n!}{i!(n-i)!}p^{i}(1-p)^{n-i}\max\{0,u^id^{n-i}S_0-K\}\right)}{(1+r)^{n}}
 \]
 
 Ahora el cálculo se puede volver más eficiente encontrando $a\in \{0,1,2,\dots ,n\}$ tal que
@@ -522,7 +522,9 @@ Prueba 1
 
 # Analisis de datos
 
+
 Los datos de los precios del activo subyacente a analizar, en este caso acciones,  son provenientes de la empresa Holcim Costa Rica, suministrados por el sitio web Investing.com y comparados con los suministrados por la misma empresa en los periodos que se registraron, pues los mismos no contaban con un registro tan periódico como los del sitio web. Los mismos se pueden apreciar en el siguiente grafico:
+
 
 ```{r}
 
@@ -539,7 +541,6 @@ ggplot(Precios,aes(x=Fecha, y =Último))+
 
 ```
 
-Cabe destacar que los puntos azules indican la fecha del pago de dividendos o en su defecto la fecha más próxima de la cual se tenga registro del precio de la acción. Como es observable el pago de los dividendos no representan un cambio en el precio de las acciones, teniendo estas un comportamiento de estabilidad durante algunos meses para luego sufrir un cambio brusco.  
 
 Se pueden apreciar su pico de caída a finales del año 2019 he inicios del 2020, esto producto de la especulación en los mercados y la venta de activos, para la obtención de dinero líquido, causado por la pandemia del COVID-19 y su afectación en los mercados. 
 
@@ -561,21 +562,17 @@ Precios %>%ggplot(aes(x=Fecha, y =Último))+
 Promedio<-mean(Precios$Último)
 rendimiento<-Promedio/(Montos$DiviendoPorAcción[5]+Montos$DiviendoPorAcción[4])
 
+diasDiferencia1<-Precios$Último[diff(Precios$Último)==1]
+
 ```
-
-
-
-Los días no busrsatiles en CR, son tales
-
-Banc
-sacar 
 
 Se va a trabajar con los datos de la curva soberana obtenidos de la página del Banco Central de Costa Rica, los mismos son establecidos para la semana del 23 de junio del año 2021 al 29 de junio de año 2021. Se tiene que las observaciones son: 
 
-Agregar titulos fecha de madurancion y tasas 
+Agregar titulos fecha de madurancion y tasas
 
-Se tiene que las acciones se cotizan en la bolsa de valores de Costa Rica, por lo que se tiene que tener presenta los días hábiles con los que se cuentan para las transacciones, teniendo así la siguiente table con los días feriados:\\
+
 ```{r}
+tasasBCCR%>%kbl()%>%kable_material()
 tablaKableConDiaNB
 ```
 
@@ -591,16 +588,47 @@ tasasBCCR$TasaRendimiento<-tasasBCCR$TasaRendimiento/100
 b<-c(0,0,0,0,0.005,0.005)
 parametrosFitSvensson<-fitSvensson(b,tasasBCCR$Maduration,tasasBCCR$TasaRendimiento)
 parametrosModelo<-unlist(parametrosFitSvensson[1])
-
-tasasBCCR%>%kbl()%>%kable_material()
 ```
 
 
 
 # Análisis del árbol e implementación
 
+El árbol binomial como se mostró es útil ya que permite calcular los posibles precios que puede llegar a tener el activo, basado en datos históricos y reduciendo los casos a un aumento o disminución en cada paso. Como se mostró en la sección para el calculo del precio de las opciones este se puede obtener de forma recursiva y este se basa en las mismas probabilidades de que el precio del activo subyacente aumente, cumpliendo que el precio de la opción responde a una distribución binomial.
 
+Cabe recordar que los modelos son un simplificación de la realidad, y no se deben tomar como una verdad completa, estas herramientas permiten tonar decisionces con cierto criterio. Con esto dicho se muestra una representación del precio de una opción de compra en un árbol dedis pasos sería.
 
+```{tikz, fig.cap = "Árbol Binomial de Dos Pasos", fig.ext = 'png'}
+\usetikzlibrary{arrows}
+\usetikzlibrary{trees}
+\usetikzlibrary{matrix}
+  \begin{tikzpicture}[>=stealth,sloped]
+    \matrix (tree) [%
+      matrix of nodes,
+      minimum size=1cm,
+      column sep=3.5cm,
+      row sep=1cm,
+    ]
+    {
+          &   & $P_{uu}=\max\{0,K-S_0u_2^2\}$ \\
+          & $P_u$ &   \\
+      $S_0$ &   & $P_{uu}=\max\{0,K-S_0u_2d_2\}$ \\
+          & $P_d$ &   \\
+          &   & $P_{dd}=\max\{0,K-S_0d^2\}$ \\
+    };
+    \draw[->] (tree-3-1) -- (tree-2-2) node [midway,above] {$p$};
+    \draw[->] (tree-3-1) -- (tree-4-2) node [midway,below] {$(1-p)$};
+    \draw[->] (tree-2-2) -- (tree-1-3) node [midway,above] {$P^2$};
+    \draw[->] (tree-2-2) -- (tree-3-3) node [midway,below] {$(1-p)p$};
+    \draw[->] (tree-4-2) -- (tree-3-3) node [midway,above] {$(1-p)p$};
+    \draw[->] (tree-4-2) -- (tree-5-3) node [midway,below] {$(1-p)^2$};
+  \end{tikzpicture}
+```
+Donde $C_u$ y $C_d$ se calculan como se mostrón en la sección del precio de las acciones. Cabe desctacar que nunca se ha descartado el caso en que el precio de la opción sea 0, esto lo que expresaría es que casi seguramente el precio de la acción al final se va encontrar por debajo del precio de ejercicio $K$ o lo que es lo mismo
+\[
+\mathbb{P}(S_{f}\leq K)=1
+\]
+De forma análoga se tiene que la opción de venta da como origen un árbol de la siguiente forma
 # Resultados
 Se presentan obtenidos al aplicar el modelo para el precio de las opciones a 3, 6 meses y 1 año empleando como precio de ejercicio el precio del 30 de junio del 2021.
 
@@ -642,22 +670,27 @@ precioOpcionCAnual<-precioC(K,K,nTrimestral,hnTrimetral,sigma,svensson(parametro
 precioOpcionPAnual<-precioP(K,K,nTrimestral,hnTrimetral,sigma,svensson(parametrosModelo,1),1,0)
 resultados<-data.frame(Tiempo=rep(c("Tres meses","Seis Meses","Un año"),2),"Opción"=c(rep('Compra',3),rep('Venta',3)),"Precio"=c(precioOpcionCTrimestral,precioOpcionCSemestral,precioOpcionCAnual,precioOpcionPTrimestral,precioOpcionPSemestral,precioOpcionPAnual))
 ```
-Primero los valores obtenidos para $a$, $p$ y $u$ son para el caso a tres meses `r valoresTrimestral`, a seis meses `r valoresSemestral` y a un año `r valoresAnual`. El árbol para el caso trimestral se tiene que el árbol es el siguiente
+Primero los valores obtenidos para $a$, $p$ y $u$ se presentan en la siguiente tabla
 
+
+El árbol con el precio del activo subyacente es el siguiente
 ```{r}
 arbolrTri<-t(arbolBinarioM(nTrimestral,hnTrimetral,sigma,K))
 arbolrTri[is.na(arbolrTri)]=""
 arbolrTri%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)%>%scroll_box(width = "100%",height = "500px")
 ```
 
-Los precios respectivos para las opciones se resument en la siguiente tabla
+\textit{\textbf{El árbol con el precio para la opción de compra del activo subyacente es el siguiente}}
+
+Los precios respectivos para las opciones se resumen en la siguiente tabla
 ```{r}
 resultados%>%kbl(col.names = c("Tiempo","Opción","Precio"))%>%kable_material()
 ```
 
-#Conclusión
+# Conclusión
 
 
+# Bilibliografía
 
 
 Metodologia, periodo y que datos
