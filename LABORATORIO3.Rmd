@@ -17,11 +17,11 @@ library(rmdformats)
 library(kableExtra)
 library(tidyverse)
 library(readxl)
-
 library(ggplot2)
-
+library(interp)
 ##install.packages('magick') para dibujos tikz
 ##install.packages('pdftools')
+
 #tinytex::install_tinytex()
 library(pdftools)
 library(magick)
@@ -563,17 +563,36 @@ Precios %>%ggplot(aes(x=Fecha, y =Último))+
 Promedio<-mean(Precios$Último)
 rendimiento<-Promedio/(Montos$DiviendoPorAcción[5]+Montos$DiviendoPorAcción[4])
 
-diasDiferencia1<-Precios$Último[diff(Precios$Último)==1]
+
 
 ```
 
-Se va a trabajar con los datos de la curva soberana obtenidos de la página del Banco Central de Costa Rica, los mismos son establecidos para la semana del 23 de junio del año 2021 al 29 de junio de año 2021. Se tiene que las observaciones son: 
 
-Agregar titulos fecha de madurancion y tasas
 
 
 ```{r}
+
+
+
+```
+
+
+
+Se va a trabajar con los datos de la curva soberana obtenidos de la página del Banco Central de Costa Rica, los mismos son establecidos para la semana del 23 de junio del año 2021 al 29 de junio de año 2021. Se tiene que las observaciones son: 
+
+```{r}
+tasasBCCR<-tasasBCCR[-12]
+tasasBCCR<-cbind("Fechas de maduración"= c("Tasa"), tasasBCCR)
 tasasBCCR%>%kbl()%>%kable_material()
+tasasBCCR<-tasasBCCR[-1]
+
+```
+A los anteriores datos se les aplico, según la 
+
+
+
+
+```{r}
 tablaKableConDiaNB
 ```
 
@@ -589,8 +608,25 @@ tasasBCCR$TasaRendimiento<-tasasBCCR$TasaRendimiento/100
 b<-c(0,0,0,0,0.005,0.005)
 parametrosFitSvensson<-fitSvensson(b,tasasBCCR$Maduration,tasasBCCR$TasaRendimiento)
 parametrosModelo<-unlist(parametrosFitSvensson[1])
+
 ```
 
+```{r}
+
+CurvaSven<-c(seq(1/4,10,1/4))
+CurvaSven<-cbind("Fecha de maduración"= CurvaSven,"Rendimientos"=svensson(parametrosModelo, seq(1/4,10,1/4)))
+CurvaSven<-as.data.frame(CurvaSven)
+
+
+
+```
+
+```{r}
+  ggplot()+
+  geom_line(aes(x=CurvaSven$`Fecha de maduración`, y = CurvaSven$Rendimientos))+
+  geom_point(aes(x =tasasBCCR$Maduration, y=tasasBCCR$TasaRendimiento), size =1,color="blue" )+
+  labs(y = "Rendimientos",x = "Fecha de maduración" ,caption = "Fuente: Elaboración propia, con datos del ....")+theme_minimal()+theme(legend.position="bottom",plot.caption=element_text(hjust=0))
+```
 
 
 # Análisis del árbol e implementación
