@@ -518,7 +518,7 @@ Esto permite componer de forma continua, que es similar a lo que pretenden los a
 
 # Metodología
 
-Prueba 1
+Para el siguiente trabajo, se utiliza el programa RStudio para generar un documento RMarkdown, los cuales operan con el lenguaje de programación R. Además, mediante distintos sitios web se recuperaron datos de acciones de empresas, así como la curva soberana del Banco Central de Costa Rica. Asimismo, con los datos anteriores se realizaron gráficos para interpretar relacionar los números con el trabajo. También se efectúa un análisis con la información obtenida y el modelo binomial para calcular las opciones de compra y afirmar si habría sido beneficionsa la inversión o no.
 
 # Analisis de datos
 
