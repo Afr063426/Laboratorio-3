@@ -17,11 +17,9 @@ library(rmdformats)
 library(kableExtra)
 library(tidyverse)
 library(readxl)
-<<<<<<< HEAD
-##Importante instalar lo que sigue acontinuacion, que está comentado
-=======
+
 library(ggplot2)
->>>>>>> ef775dd9845e6a9247c0a39ae6fdb8e9e6324b4b
+
 ##install.packages('magick') para dibujos tikz
 ##install.packages('pdftools')
 #tinytex::install_tinytex()
