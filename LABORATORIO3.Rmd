@@ -199,6 +199,7 @@ precioP<-function(K,S_0,n,hn,volatilidad,r,q,t){
 
 
 
+# Introducción
 
 
 
@@ -518,7 +519,7 @@ Esto permite componer de forma continua, que es similar a lo que pretenden los a
 
 # Metodología
 
-Para el siguiente trabajo se utiliza el programa RStudio, el cual opera con el lenguaje de programación R.
+Para el siguiente trabajo, se utiliza el programa RStudio para generar un documento RMarkdown, los cuales operan con el lenguaje de programación R. Además, mediante distintos sitios web se recuperaron datos de acciones de empresas, así como la curva soberana del Banco Central de Costa Rica.
 
 # Analisis de datos
 
