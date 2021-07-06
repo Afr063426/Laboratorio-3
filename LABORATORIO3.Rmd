@@ -123,6 +123,22 @@ arbolBinarioM<-function(n,hn,volatilidad,S_0){
   return(arbol)
 }
 
+### Se procede a programar el árbol binomial, pero de el caso de las opciones de compra
+arbolBinarioC<-function(n,hn,volatilidad,S_0,r,p,K){
+  ### La cantidad de columnas de la matriz es n+1 ya que hay n+1 precios posibles en el paso final
+  ### La cantidad de filas van a ser n+1 ya que son los n pasos y el precio incial
+  arbol<-matrix(nrow=n+1,ncol = 2*n+1)
+  arbol[n+1,]<-(0<(arbolBinarioM(n,hn,volatilidad,S_0)[n+1,]-K))*(arbolBinarioM(n,hn,volatilidad,S_0)[n+1,]-K)
+  for(i in (n+1):2){
+    for(j in 1:(2*n-1)){
+      if(!is.na(arbol[i,j])){
+        arbol[i-1,j+1]<-(arbol[i,j]*(1-p)+arbol[i,j+2]*(p))*exp(-hn*r)
+      }
+    }
+  }
+  return(arbol)
+}
+
 ### Función de parámetros en esta función se programará la probabilidad de aumentos, el aumento por paso, el valor mínimo de aumentos que debe haber para que la opción se ejecute
 ## K es el precio de ejercicio
 ## S_0 el precio actual
@@ -143,17 +159,22 @@ parametros<-function(K,S_0,n,hn,volatilidad,r,q){
 
 
 ### Se procede a programar la forma en que se calculan los precios de las opciones, caso call europea
-precioC<-function(K,S_0,n,hn,volatilidad,r,q,t){
-  parametros<-parametros(K,S_0,n,hn,volatilidad,r,q)
-  sum(choose(n,c(parametros[1]:n))*parametros[2]^(c(parametros[1]:n))*(1-parametros[2])^(n-c(parametros[1]:n))*(parametros[3]^(parametros[1]:n)*(1/parametros[3])^(n-c(parametros[1]:n))*S_0-K))*exp(-t*r) ### Formula para precio de de las opciones de compra
-}
 
+precioC<-function(K,S_0,n,hn,volatilidad,r,q){
+  parametros<-parametros(K,S_0,n,hn,volatilidad,r,q)
+  sum((choose(n,c(parametros[1]:n))*parametros[2]^(c(parametros[1]:n))*(1-parametros[2])^(n-c(parametros[1]:n)))*(parametros[3]^(c(parametros[1]:n))*(1/parametros[3])^(n-c(parametros[1]:n))*S_0-K))/(exp(-n*hn*r))### Formula para precio de de las opciones de compra
+}
 
 ### De forma análoga se programa el precio de una put option europea
 precioP<-function(K,S_0,n,hn,volatilidad,r,q,t){
   parametros<-parametros(K,S_0,n,hn,volatilidad,r,q)
   parametros[1]<-n-parametros[1]
   sum(choose(n,c(0:parametros[1]))*parametros[2]^(0:parametros[1])*(1-parametros[2])^(n-c(0:parametros[1]))*(K-parametros[3]^(0:parametros[1])*(1/parametros[3])^(n-c(0:parametros[1]))*S_0))*exp(-t*r) ### Formula para precio de de las opciones de compra
+}
+
+precioP<-function(K,S_0,n,hn,volatilidad,r,q){
+  parametros<-parametros(K,S_0,n,hn,volatilidad,r,q)
+  -sum((choose(n,c(0:(parametros[1]-1)))*parametros[2]^(c(0:(parametros[1]-1)))*(1-parametros[2])^(n-c(0:(parametros[1]-1))))*(parametros[3]^(c(0:(parametros[1]-1)))*(1/parametros[3])^(n-c(0:(parametros[1]-1)))*S_0-K))/(exp(-n*hn*r))### Formula para precio de de las opciones de venta
 }
 ```
 
@@ -425,7 +446,7 @@ tiempoLongCall<-c("Momento $t_0$","Momento $T$")
 SmenorK<-c("$-C_0$","$0$")
 SmayorK<-c("$-C_0$","$S_T-k$")
 tablaLongCall<-data.frame("Tiempo/Escenario"=tiempoLongCall,"$S_T< K$"=SmenorK,"$S_T \\geq K$"=SmayorK)
-tablaLongCall%>%kbl()%>%kable_material()
+tablaLongCall%>%kbl(col.names = c('Tiempo/Escenario','$S_T$< $K$',"$S_T \\geq K$"))%>%kable_material()
 ```
 
 Las opciones se pueden emplear en distintas circunstancias entre las motivaciones para escribir o comprar una opción están la especulación o el cubrirse algún riesgo. De tal forma que se pueden establecer distintas estrategias de compra y venta de opciones combinado con otros instrumentos de inversión de tal forma que se puedan replicar portafolios. Un aspecto importantes es que se puede concluir que las posibilidades con opciones existen, sin embargo rápidamente los mercados financieros hacen que esa oportunidad que existía hacia algunos instantes desaparezcan. Además existen los distintos tipos de como lo son:
@@ -441,7 +462,7 @@ tiempoLongCall<-c("Momento $t_0$","Momento $T$")
 SmenorK<-c("$-C_0$","$K-S_T$")
 SmayorK<-c("$-C_0$","$0$")
 tablaLongCall<-data.frame("Tiempo/Escenario"=tiempoLongCall,"$S_T\\leq K$"=SmenorK,"$S_T$ > $K$"=SmayorK)
-tablaLongCall%>%kbl()%>%kable_material()
+tablaLongCall%>%kbl(col.names = c("Tiempo/Escenario","$S_T \\leq K$","$S_T$ > $K$"))%>%kable_material()
 ```
 ## Precio de las opciones
 
@@ -644,7 +665,7 @@ sigma<-0.06 ### A la espera
 q<- ## A la espera de dividendos anuales
 ### Se trabaja de forma anualizada por lo que se tiene que los valores hn correspondientes son
 ## Tres meses equivalen a un cuarto del año
-hnTrimetral<-0.4/as.numeric(nTrimestral)
+hnTrimetral<-0.25/as.numeric(nTrimestral)
 ## Seis meses equivalen medio año por lo que
 hnSemestral<-0.5/as.numeric(nSemestral)
 ## Un año equivale a 1
@@ -657,27 +678,44 @@ valoresTrimestral<-parametros(K,K,nTrimestral,hnTrimetral,sigma,svensson(paramet
 valoresSemestral<-parametros(K,K,nSemestral,hnTrimetral,sigma,svensson(parametrosModelo,1/2),0)
 valoresAnual<-parametros(K,K,nAnual,hnTrimetral,sigma,svensson(parametrosModelo,1),0)
 ### Opciones put y call para el caso de trimestral
-precioOpcionCTrimestral<-precioC(K,K,nTrimestral,hnTrimetral,sigma,svensson(parametrosModelo,1/4),1/4,0)
-precioOpcionPTrimestral<-precioP(K,K,nTrimestral,hnTrimetral,sigma,svensson(parametrosModelo,1/4),1/4,0)
+precioOpcionCTrimestral<-precioC(K,K,nTrimestral,hnTrimetral,sigma,svensson(parametrosModelo,1/4),0)
+precioOpcionPTrimestral<-precioP(K,K,nTrimestral,hnTrimetral,sigma,svensson(parametrosModelo,1/4),0)
 ### Opciones put y call para el  caso semestral
-precioOpcionCSemestral<-precioC(K,K,nTrimestral,hnTrimetral,sigma,svensson(parametrosModelo,1/2),1/2,0)
-precioOpcionPSemestral<-precioP(K,K,nTrimestral,hnTrimetral,sigma,svensson(parametrosModelo,1/2),1/2,0)
+precioOpcionCSemestral<-precioC(K,K,nSemestral,hnSemestral,sigma,svensson(parametrosModelo,1/2),0)
+precioOpcionPSemestral<-precioP(K,K,nSemestral,hnSemestral,sigma,svensson(parametrosModelo,1/2),0)
 ### Opciones put y call para el caso anual
-precioOpcionCAnual<-precioC(K,K,nTrimestral,hnTrimetral,sigma,svensson(parametrosModelo,1),1,0)
-precioOpcionPAnual<-precioP(K,K,nTrimestral,hnTrimetral,sigma,svensson(parametrosModelo,1),1,0)
+precioOpcionCAnual<-precioC(K,K,nAnual,hnAnual,sigma,svensson(parametrosModelo,1),0)
+precioOpcionPAnual<-precioP(K,K,nAnual,hnAnual,sigma,svensson(parametrosModelo,1),0)
 resultados<-data.frame(Tiempo=rep(c("Tres meses","Seis Meses","Un año"),2),"Opción"=c(rep('Compra',3),rep('Venta',3)),"Precio"=c(precioOpcionCTrimestral,precioOpcionCSemestral,precioOpcionCAnual,precioOpcionPTrimestral,precioOpcionPSemestral,precioOpcionPAnual))
 ```
 Primero los valores obtenidos para $a$, $p$ y $u$ se presentan en la siguiente tabla
 
+```{r}
+### Se procede a colocar en una tabla los valores obtenido para a, p y u entonces se tiene
+tablaValores<-data.frame('Tiempo'=c('Tres meses','Seis meses','Un año'),'a'=c(valoresTrimestral[1],valoresSemestral[1],valoresAnual[1]),'p'=c(valoresTrimestral[2],valoresSemestral[2],valoresAnual[2]),'u'=c(valoresTrimestral[3],valoresSemestral[3],valoresAnual[3]))
+tablaValores%>%kbl(col.names = c('Tiempo','$a$','$p$','u'))%>%kable_material()
+```
+
 
 El árbol con el precio del activo subyacente es el siguiente
 ```{r}
-arbolrTri<-t(arbolBinarioM(nTrimestral,hnTrimetral,sigma,K))
+arbolrTri<-(arbolBinarioM(nTrimestral,hnTrimetral,sigma,K))
 arbolrTri[is.na(arbolrTri)]=""
+arbolrTri<-t(arbolrTri[,rev(seq_len(ncol(arbolrTri)))])
 arbolrTri%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)%>%scroll_box(width = "100%",height = "500px")
 ```
 
-\textit{\textbf{El árbol con el precio para la opción de compra del activo subyacente es el siguiente}}
+
+
+
+El árbol con el precio para la opción de compra del activo subyacente es el siguiente
+
+```{r}
+arbolCTri<-(arbolBinarioC(nTrimestral,hnTrimetral,sigma,K,svensson(parametrosModelo,1/4),valoresTrimestral[2],K))
+arbolCTri[is.na(arbolCTri)]=""
+arbolCTri<-t(arbolCTri[,rev(seq_len(ncol(arbolCTri)))])
+arbolCTri%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)%>%scroll_box(width = "100%",height = "500px")
+```
 
 Los precios respectivos para las opciones se resumen en la siguiente tabla
 ```{r}
