@@ -194,13 +194,7 @@ precioP<-function(K,S_0,n,hn,volatilidad,r,q,t){
 * Implementar el modelo de árbol binomial para predecir los precios futuros del subyacente.
 * Utilizar la modelación anterior para determinar el precio que debe tener la opción de venta (o compra), utilizando un modelo adecuado de valoración.
 
-# Sugerencia 2
 
-¿Cómo afecta la posibilidad de incumplimiento a la opción de compra de un bono a 10 años de la Compañía ABC que es exigible en cualquier momento después de cinco años? El modelo crediticio y la opción no son separables porque se impactan entre sí. 
-
-# Sugerencia 3
-
-¿Cómo utilizar el árbol binomial para estimar un rango para la inflación a seis meses en Costa Rica?
 
 
 
@@ -525,7 +519,9 @@ Prueba 1
 
 # Analisis de datos
 
-Los datos de los precios del activo subyacente a analizar, en este caso acciones,  son provenientes de la empresa Holcim Costa Rica, suministrados por el sitio web Investing.com y comparados con los suministrados por la misma empresa en los periodos que se registraron, pues los mismos no contaban con un registro tan periódico como los del sitio web.
+
+Los datos de los precios del activo subyacente a analizar, en este caso acciones,  son provenientes de la empresa Holcim Costa Rica, suministrados por el sitio web Investing.com y comparados con los suministrados por la misma empresa en los periodos que se registraron, pues los mismos no contaban con un registro tan periódico como los del sitio web. Los mismos se pueden apreciar en el siguiente grafico:
+
 
 ```{r}
 
