@@ -545,6 +545,30 @@ ggplot(Precios,aes(x=Fecha, y =Último))+
 
 Como se aprecia en el grafico el precio de las acciones se mantiene estable por intervalos de tiempo, para luego sufir un cambio repentino durante los el pediodo de 2019 y gran parte del 2020 
 
+<<<<<<< HEAD
+=======
+Se pueden apreciar su pico de caída a finales del año 2019 he inicios del 2020, esto producto de la especulación en los mercados y la venta de activos, para la obtención de dinero líquido, causado por la pandemia del COVID-19 y su afectación en los mercados. 
+
+
+Para poder realizar un mejor cálculo de la opción se van a utilizar únicamente los dados obtenidos a partir del 2021, puesto que los datos anteriores presentan mucha volatilidad, comportamiento que no se ha presentado en el último año. Se presenta los datos con que se va a trabajar:
+
+```{r}
+
+Precios<-Precios[Precios$Fecha>=as.Date("01.01.2021",format="%d.%m.%Y"),]
+
+Precios %>%ggplot(aes(x=Fecha, y =Último))+
+  geom_line()+
+  geom_point(aes(x =Montos$FechaDePago[5], y=Último[Fecha==Montos$FechaDePago[5]]), size =1,color="blue" )+
+  labs(y = "Precios",x = "Tiempo" ,caption = "Fuente: Elaboración propia, con datos del ....")+theme_minimal()+theme(legend.position="bottom",plot.caption=element_text(hjust=0))
+
+
+
+##
+Promedio<-mean(Precios$Último)
+rendimiento<-Promedio/(Montos$DiviendoPorAcción[5]+Montos$DiviendoPorAcción[4])
+
+```
+>>>>>>> cb4f906dbab934dbe4dc92c2b4df702284d4bb28
 
 
 Para un mejor cálculo de la opción se va a trabajar desde febrero+-
