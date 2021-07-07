@@ -614,12 +614,8 @@ ggplot()+
 
 
 Fechas_semanales <- cut(Precios$Fecha, "week")
-
 Fechas_semanales <- unique(Fechas_semanales)
-
-
 Precios_semanales <- Precios$Último[Fechas_semanales]
-
 
 retornos_brutos_semanales <- Precios_semanales[-length(Precios_semanales)]/Precios_semanales[-1]
 #retornos_brutos_semanales
