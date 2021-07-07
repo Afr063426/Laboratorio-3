@@ -593,7 +593,7 @@ Se va a trabajar con los datos de la curva soberana obtenidos de la página del 
 ```{r}
 tasasBCCR<-tasasBCCR[-12]
 tasasBCCR<-cbind("Fechas de maduración"= c("Tasa"), tasasBCCR)
-tasasBCCR%>%kbl()%>%kable_material()
+tasasBCCR%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)
 tasasBCCR<-tasasBCCR[-1]
 
 ```
@@ -754,7 +754,9 @@ precioOpcionCAnual<-precioC(K,K,nAnual,hnAnual,sigma,svensson(parametrosModelo,1
 precioOpcionPAnual<-precioP(K,K,nAnual,hnAnual,sigma,svensson(parametrosModelo,1),0)
 resultados<-data.frame(Tiempo=rep(c("Tres meses","Seis Meses","Un año"),2),"Opción"=c(rep('Compra',3),rep('Venta',3)),"Precio"=c(precioOpcionCTrimestral,precioOpcionCSemestral,precioOpcionCAnual,precioOpcionPTrimestral,precioOpcionPSemestral,precioOpcionPAnual))
 ```
-Primero los valores obtenidos para $a$, $p$ y $u$ se presentan en la siguiente tabla
+
+Primero los valores obtenidos para $a$, $p$ y $u$ se presentan en la siguiente tabla:
+
 
 ```{r}
 ### Se procede a colocar en una tabla los valores obtenido para a, p y u entonces se tiene
@@ -763,7 +765,7 @@ tablaValores%>%kbl(col.names = c('Tiempo','$a$','$p$','u'))%>%kable_material()
 ```
 
 
-El árbol con el precio del activo subyacente es el siguiente
+El árbol con el precio del activo subyacente es el siguiente:
 ```{r}
 arbolrTri<-(arbolBinarioM(nTrimestral,hnTrimetral,sigma,K))
 arbolrTri[is.na(arbolrTri)]=""
@@ -774,7 +776,7 @@ arbolrTri%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)%>%scroll_bo
 
 
 
-El árbol con el precio para la opción de compra a tres meses del activo subyacente es el siguiente
+El árbol con el precio para la opción de compra a tres meses del activo subyacente es el siguiente:
 
 ```{r}
 arbolCTri<-(arbolBinarioC(nTrimestral,hnTrimetral,sigma,K,svensson(parametrosModelo,1/4),valoresTrimestral[2],K))
@@ -783,7 +785,7 @@ arbolCTri<-t(arbolCTri[,rev(seq_len(ncol(arbolCTri)))])
 arbolCTri%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)%>%scroll_box(width = "100%",height = "500px")
 ```
 
-El árbol con el precio para opción de venta a tres meses del activo subyacente es el siguiente
+El árbol con el precio para opción de venta a tres meses del activo subyacente es el siguiente:
 ```{r}
 arbolPTri<-(arbolBinarioC(nTrimestral,hnTrimetral,sigma,-K,svensson(parametrosModelo,1/4),valoresTrimestral[2],-K))
 arbolPTri[is.na(arbolPTri)]=""
@@ -791,7 +793,8 @@ arbolPTri<-t(arbolPTri[,rev(seq_len(ncol(arbolPTri)))])
 arbolPTri%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)%>%scroll_box(width = "100%",height = "500px")
 ```
 
-Los precios respectivos para las opciones se resumen en la siguiente tabla
+Los precios respectivos para las opciones se resumen en la siguiente tabla:
+
 ```{r}
 resultados%>%kbl(col.names = c("Tiempo","Opción","Precio"))%>%kable_material()
 ```
