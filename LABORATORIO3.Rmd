@@ -540,6 +540,7 @@ Para el siguiente trabajo, se utiliza el programa RStudio para generar un docume
 Los datos de los precios del activo subyacente a analizar, en este caso acciones,  son provenientes de la empresa Holcim Costa Rica, suministrados por el sitio web Investing.com y comparados con los suministrados por la misma empresa en los periodos que se registraron, pues los mismos no contaban con un registro tan periódico como los del sitio web. Los mismos se pueden apreciar en el siguiente grafico:
 
 
+<caption><center><strong>Gráfico 2: Precio de las acciones de Holcim Costa Rica S.A.</strong></center></caption>
 ```{r}
 
 ggplot(Precios,aes(x=Fecha, y =Último))+
@@ -549,8 +550,10 @@ ggplot(Precios,aes(x=Fecha, y =Último))+
   geom_point(aes(x =Montos$FechaDePago[3], y=Último[Fecha==Montos$FechaDePago[3]]), size =1,color="blue" )+
   geom_point(aes(x =Montos$FechaDePago[4], y=Último[Fecha==Montos$FechaDePago[4]]), size =1,color="blue" )+
   geom_point(aes(x =Montos$FechaDePago[5], y=Último[Fecha==Montos$FechaDePago[5]]), size =1,color="blue" )+
-  labs(y = "Precios",x = "Tiempo" ,caption = "Fuente: Elaboración propia, con datos del ....")+theme_minimal()+theme(legend.position="bottom",plot.caption=element_text(hjust=0))
+  labs(y = "Precios",x = "Tiempo")+theme_minimal()+theme(legend.position="bottom",plot.caption=element_text(hjust=0))
 ```
+<subcaption><small>Fuente: Elaboración propia, datos Investing.com y Holcim Costa Rica S.A.</small></subcaption>
+
 
 Cabe destacar que los puntos azules indican la fecha del pago de dividendos o en su defecto la fecha más próxima de la cual se tenga registro del precio de la acción. Como es observable el pago de los dividendos no representan un cambio en el precio de las acciones, teniendo estas un comportamiento de estabilidad durante algunos meses para luego sufrir un cambio brusco.  
 
@@ -559,6 +562,7 @@ Se pueden apreciar su pico de caída a finales del año 2019 he inicios del 2020
 
 Para poder realizar un mejor cálculo de la opción se van a utilizar únicamente los dados obtenidos a partir del 2021, puesto que los datos anteriores presentan mucha volatilidad, comportamiento que no se ha presentado en el último año. Se presenta los datos con que se va a trabajar:
 
+<caption><center><strong>Gráfico 3: Precio de las acciones de Holcim Costa Rica S.A. 01/03/2020-17/06/2021</strong></center></caption>
 ```{r}
 
 Precios<-Precios[Precios$Fecha>=as.Date("01.03.2020",format="%d.%m.%Y"),]
@@ -571,6 +575,8 @@ Precios<-Precios[Precios$Fecha>=as.Date("01.03.2020",format="%d.%m.%Y"),]
 
 
 ```
+<subcaption><small>Fuente: Elaboración propia, datos Investing.com y Holcim Costa Rica S.A.</small></subcaption>
+
 Se tiene que tener presente que la Bolsa Nacional de Valores de Costa Rica únicamente trabaja en días hábiles por lo que se tiene que tener presente los días feriados en Costa Rica, los cuales son:
 
 ```{r}
@@ -586,9 +592,10 @@ tasasBCCR%>%kbl(caption="<center><strong> Tabla 5: Tasas de Rendimiento, Curva S
 tasasBCCR<-tasasBCCR[-1]
 
 ```
-
+<subcaption><small>Fuente: BCCR</small></subcaption>
 A los anteriores datos se les aplico el modelo de paramétrico de Svensson, esto siguiendo la Nota Metodología Curva de Rendimiento Soberana De Costa Rica, emitida por el Banco Central de Costa Rica, obteniendo así la siguiente curva: 
 
+<caption><center><strong>Gráfico 4: Curva de Rendimientos (Anual), _Svensson_ </strong></center></caption>
 ```{r}
 #### Se calculan los parametros
 
@@ -609,10 +616,12 @@ ggplot()+
   geom_point(aes(x =tasasBCCR$Maduration, y=tasasBCCR$TasaRendimiento), size =1,color="blue" )+
   labs(y = "Rendimientos",x = "Fecha de maduración" ,caption = "Fuente: Elaboración propia, con datos del Banco Central de Costa Rica")+theme_minimal()+theme(legend.position="bottom",plot.caption=element_text(hjust=0))
 ```
+<subcaption><small> Fuente: Elaboración propia, datos BCCR</small></subcaption>
+
 
 ```{r}
 
-##Se procede a calcular los retornos logarítmicos de los precios de las acciones. Para esto, primero se calculan los rendimientos brutos semanales, seguidamente del logaritmo de estos
+##Se procede a calcular los retornos logarítmicos de los precios de las accioneshttp://127.0.0.1:32361/rmd_output/4/#conclusi%C3%B3n. Para esto, primero se calculan los rendimientos brutos semanales, seguidamente del logaritmo de estos
 
 
 Fechas_semanales <- cut(Precios$Fecha, "week")
