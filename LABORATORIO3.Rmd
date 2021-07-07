@@ -774,7 +774,7 @@ nSemestral<-as.numeric(as.Date("02/01/2022",format="%d/%m/%Y")-as.Date("30/06/20
 ### Cantidad de días bursátiles a partir del 30 de junio hasta el 30 de junio del 2021 (tomando como punto de referencia los días no bursátiles del presente año)
 nAnual<-as.numeric(as.Date("30/06/2022",format="%d/%m/%Y")-as.Date("30/06/2021",format="%d/%m/%Y")-length((tablaConDiaNB%>%filter(Fecha>=as.Date("01/10/2021",format="%d/%m/%Y")))$Fecha)-4)
 ### Anteriormente se determinó la volatilidad diaria entonces se usará esta ya que se está usando la cantidad días como la cantidad de pasos
-sigma<-0.06 ### A la espera
+sigma<-volatilidad_anual ### A la espera
 q<- ## A la espera de dividendos anuales
 ### Se trabaja de forma anualizada por lo que se tiene que los valores hn correspondientes son
 ## Tres meses equivalen a un cuarto del año
