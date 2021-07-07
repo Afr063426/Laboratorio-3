@@ -177,7 +177,7 @@ precioP<-function(K,S_0,n,hn,volatilidad,r,q){
     
 # Introducción
 
-Las opciones de compra y venta de activos financieros son instrumentos utilizados alrededor del mundo por inversionistas que buscan incrementar su riqueza.  Así que en el presente trabajo se va a exponer el modelo de Cox, Ross y Rubinstein (1979), mismo que se aplicará sobre el activo denominado precio de las acciones de Holcim Costa Rica, para obtener el resultado de las opciones.
+Las opciones de compra y venta de activos financieros son instrumentos utilizados alrededor del mundo por inversionistas que buscan incrementar su riqueza o cubrirse del riesgo.  Así que en el presente trabajo se va a exponer el modelo de Cox, Ross y Rubinstein (1979), mismo que se aplicará sobre el activo denominado acciones de Holcim Costa Rica, para obtener el resultado de las opciones.
 
 El trabajo abarcara un marco teórico detallado, que incluye aspectos relevantes para la aplicación del modelo como lo son la curva de rendimiento soberana, aspectos estadísticos, supuestos para trabajar con árboles binomiales, descripción de las opciones y presiones de las mismas.
 
