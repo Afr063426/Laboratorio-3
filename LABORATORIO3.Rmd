@@ -540,7 +540,7 @@ Para el siguiente trabajo, se utiliza el programa RStudio para generar un docume
 Los datos de los precios del activo subyacente a analizar, en este caso acciones, son provenientes de la empresa Holcim Costa Rica, suministrados por el sitio web Investing.com y comparados con los suministrados por la misma empresa en los periodos de los que se guardaron registro, pues los mismos no contaban con un registro tan periódico como los del sitio web. Los mismos se pueden apreciar en el siguiente gráfico:
 
 
-<caption><center><strong>Gráfico 2: Precio de las acciones de Holcim Costa Rica S.A.</strong></center></caption>
+<caption><center><strong>Figura 2: Precio de las acciones de Holcim Costa Rica S.A.</strong></center></caption>
 ```{r}
 
 ggplot(Precios,aes(x=Fecha, y =Último))+
@@ -564,7 +564,7 @@ Se puede apreciar una caída a finales del año 2019 he inicios del 2020, esto p
 
 Para poder realizar un mejor cálculo de la opción se van a utilizar únicamente los dados obtenidos a partir del 01/03/2020, puesto que los datos anteriores presentan mucha volatilidad, por causas ajenas al compartaiento de la empresa en su activada productiva. Se presentan los datos con que se va a trabajar:
 
-<caption><center><strong>Gráfico 3: Precio de las acciones de Holcim Costa Rica S.A. 01/03/2020-17/06/2021</strong></center></caption>
+<caption><center><strong>Figura 3: Precio de las acciones de Holcim Costa Rica S.A. 01/03/2020-17/06/2021</strong></center></caption>
 ```{r}
 
 Precios<-Precios[Precios$Fecha>=as.Date("01.03.2020",format="%d.%m.%Y"),]
@@ -603,9 +603,8 @@ tasasBCCR<-tasasBCCR[-1]
 <subcaption><small>Fuente: BCCR</small></subcaption>
 
 A los anteriores datos se les aplica el modelo de paramétrico de Svensson, esto siguiendo la _Nota Metodología Curva de Rendimiento Soberana De Costa Rica_, emitida por el Banco Central de Costa Rica, obteniendo así la siguiente curva: 
->>>>>>> 87babd412104406b9adc52540a7b421e059c7f31
 
-<caption><center><strong>Gráfico 4: Curva de Rendimientos (Anual), _Svensson_ </strong></center></caption>
+<caption><center><strong>Figura 4: Curva de Rendimientos (Anual), _Svensson_ </strong></center></caption>
 ```{r}
 #### Se calculan los parametros
 
@@ -664,7 +663,7 @@ El árbol binomial es útil, ya que permite calcular los posibles precios que pu
 Cabe recordar que los modelos son un simplificación de la realidad, y no se deben tomar como una verdad completa, estas herramientas permiten tomar decisionces con cierto criterio. Dicho esto, se muestra una representación del precio de una opción de compra en un árbol de dos pasos.
 
 
-<caption><center><strong>Árbol Binomial de Opción de Compra</strong></center></caption>
+<caption><center><strong>Figura 5: Árbol Binomial de Opción de Compra</strong></center></caption>
 ```{tikz, fig.ext = 'png'}
 \usetikzlibrary{arrows}
 \usetikzlibrary{trees}
@@ -703,7 +702,7 @@ Donde $C_u$ y $C_d$ se calculan como se mostró en la sección del precio de las
 De forma análoga se tiene que la opción de venta da como origen a un árbol de la siguiente forma
 
 
-<caption><center><strong>"Árbol Binomial de Opción de Venta"</strong></center></caption>
+<caption><center><strong>Figura 6: Árbol Binomial de Opción de Venta</strong></center></caption>
 ```{tikz, fig.ext = 'png'}
 \usetikzlibrary{arrows}
 \usetikzlibrary{trees}
@@ -743,10 +742,19 @@ e^{-y(t_f)h_n}
 
 Además, se tiene que las acciones de Holcim Costa Rica S.A. pagan dividendos en fechas establecidas. Sin embargo, estos no se basan en una composición continua de pagos de los mismos y se establecen en un rango de fechas, se conviene que, salvo la opción tenga vencimiento en los rangos de fechas establecidos para el pago de los dividendos $q=0$.
 
+<<<<<<< HEAD
+\[
+q=0
+\]
+
+Y en caso de que la opción se establezca en una fecha donde se pagan dividendos poseedor de la acción hasta fecha es el que tiene el derecho al dividendo. 
+Basado en los registros con los que se cuenta de la empresa se supone los siguientes pagos de dividendos serán oficializados el tanto monto como fecha de pago se harán el 21 de diciembre de 2021 y el 22 de abril del 2022.
+=======
 En el caso de que la opción se establezca en una fecha donde se pagan dividendos, el poseedor de la acción a la fecha es el que tiene el derecho al dividendo. 
 Basado en los registros con los que se cuenta de la empresa se supone que los siguientes pagos de dividendos serán oficializados, tanto el monto como la fecha de pago se harán el 21 de diciembre de 2021 y el 22 de abril del 2022.
 
 Además, la volatilidad ha sido calculada de forma semanal, ya que eran los datos con mayor recurrencia con los que se contaba, con los cuales se calcula la volatilidad anual
+>>>>>>> 7dbb6e6f725a51f29ae2080ac699d4513eec5a99
 
 \[
 \sqrt{52}\cdot\sigma_{\text{Semanal}}=\sigma_{\text{Anual}}
