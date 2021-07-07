@@ -161,13 +161,13 @@ parametros<-function(K,S_0,n,hn,volatilidad,r,q){
 
 precioC<-function(K,S_0,n,hn,volatilidad,r,q){
   parametros<-parametros(K,S_0,n,hn,volatilidad,r,q)
-  sum((choose(n,c(parametros[1]:n))*parametros[2]^(c(parametros[1]:n))*(1-parametros[2])^(n-c(parametros[1]:n)))*(parametros[3]^(c(parametros[1]:n))*(1/parametros[3])^(n-c(parametros[1]:n))*S_0-K))/(exp(-n*hn*(r-q)))### Formula para precio de de las opciones de compra
+  sum((choose(n,c(parametros[1]:n))*parametros[2]^(c(parametros[1]:n))*(1-parametros[2])^(n-c(parametros[1]:n)))*(parametros[3]^(c(parametros[1]:n))*(1/parametros[3])^(n-c(parametros[1]:n))*S_0-K))*(exp(-n*hn*(r-q)))### Formula para precio de de las opciones de compra
 }
 
 ### De forma análoga se programa el precio de una put option europea
 precioP<-function(K,S_0,n,hn,volatilidad,r,q){
   parametros<-parametros(K,S_0,n,hn,volatilidad,r,q)
-  -sum((choose(n,c(0:(parametros[1]-1)))*parametros[2]^(c(0:(parametros[1]-1)))*(1-parametros[2])^(n-c(0:(parametros[1]-1))))*(parametros[3]^(c(0:(parametros[1]-1)))*(1/parametros[3])^(n-c(0:(parametros[1]-1)))*S_0-K))/(exp(-n*hn*(r-q)))### Formula para precio de de las opciones de venta
+  -sum((choose(n,c(0:(parametros[1]-1)))*parametros[2]^(c(0:(parametros[1]-1)))*(1-parametros[2])^(n-c(0:(parametros[1]-1))))*(parametros[3]^(c(0:(parametros[1]-1)))*(1/parametros[3])^(n-c(0:(parametros[1]-1)))*S_0-K))*(exp(-n*hn*(r-q)))### Formula para precio de de las opciones de venta
 }
 ```
 
@@ -204,8 +204,8 @@ Se procede a explicar lo que son los árboles binomiales, así como su construcc
 \]
 Gráficamente un árbol binomial.
 
-
-```{tikz, fig.cap = "Figura 1: Árbol Binomial de Dos Pasos", fig.ext = 'png'}
+<caption><center><strong>Figura 1: Árbol Binomial de Dos Pasos<strong></center></caption>
+```{tikz , fig.ext = 'png'}
 \usetikzlibrary{arrows}
 \usetikzlibrary{trees}
 \usetikzlibrary{matrix}
@@ -231,9 +231,12 @@ Gráficamente un árbol binomial.
     \draw[->] (tree-4-2) -- (tree-5-3) node [midway,below] {$(1-p)^2$};
   \end{tikzpicture}
 ```
+<subcaption><small>Fuente: Elaboración propia, basado en código de user71804 https://tex.stackexchange.com/questions/227414/draw-5-period-binomial-tree</small></subcaption>
+
+
 ## Aspectos estadísticos
 
-Es importante tener presentes algunos aspectos estadísticos que posteriormente serán útiles al momento de hablar del árbol binomial, por lo que primeramente se presentan un par de definiciones.
+Es importante tener presentes algunos aspectos estadísticos que posteriormente serán útiles al momento de hablar del árbol binomial, por lo que primeramente se presentan un par de definiciones, según Evans y Rosenthal (2010).
 
 La media se define como: 
 \[
@@ -544,9 +547,6 @@ ggplot(Precios,aes(x=Fecha, y =Último))+
   geom_point(aes(x =Montos$FechaDePago[4], y=Último[Fecha==Montos$FechaDePago[4]]), size =1,color="blue" )+
   geom_point(aes(x =Montos$FechaDePago[5], y=Último[Fecha==Montos$FechaDePago[5]]), size =1,color="blue" )+
   labs(y = "Precios",x = "Tiempo" ,caption = "Fuente: Elaboración propia, con datos del ....")+theme_minimal()+theme(legend.position="bottom",plot.caption=element_text(hjust=0))
-
-
-
 ```
 
 Cabe destacar que los puntos azules indican la fecha del pago de dividendos o en su defecto la fecha más próxima de la cual se tenga registro del precio de la acción. Como es observable el pago de los dividendos no representan un cambio en el precio de las acciones, teniendo estas un comportamiento de estabilidad durante algunos meses para luego sufrir un cambio brusco.  
@@ -566,9 +566,6 @@ Precios<-Precios[Precios$Fecha>=as.Date("01.03.2020",format="%d.%m.%Y"),]
   labs(y = "Precios",x = "Tiempo" ,caption = "Fuente: Elaboración propia, con datos del ....")+theme_minimal()+theme(legend.position="bottom",plot.caption=element_text(hjust=0))
 
 
-##
-Promedio<-mean(Precios$Último)
-rendimiento<-log((Montos$DiviendoPorAcción[5]+Montos$DiviendoPorAcción[4])/Promedio+1)
 
 ```
 Se tiene que tener presente que la Bolsa Nacional de Valores de Costa Rica únicamente trabaja en días hábiles por lo que se tiene que tener presente los días feriados en Costa Rica, los cuales son:
@@ -650,7 +647,9 @@ El árbol binomial como se mostró es útil ya que permite calcular los posibles
 
 Cabe recordar que los modelos son un simplificación de la realidad, y no se deben tomar como una verdad completa, estas herramientas permiten tonar decisionces con cierto criterio. Con esto dicho se muestra una representación del precio de una opción de compra en un árbol de dos pasos sería.
 
-```{tikz, fig.cap = "Árbol Binomial de Opción de Compra", fig.ext = 'png'}
+
+<caption><center><strong>Árbol Binomial de Opción de Compra<strong></center></caption>
+```{tikz, fig.ext = 'png'}
 \usetikzlibrary{arrows}
 \usetikzlibrary{trees}
 \usetikzlibrary{matrix}
@@ -676,13 +675,18 @@ Cabe recordar que los modelos son un simplificación de la realidad, y no se deb
     \draw[->] (tree-4-2) -- (tree-5-3) node [midway,below] {$(1-p)^2$};
   \end{tikzpicture}
 ```
+<subcaption><small>Fuente: Elaboración propia, basado en código de user71804 https://tex.stackexchange.com/questions/227414/draw-5-period-binomial-tree</small></subcaption>
+
+
 Donde $C_u$ y $C_d$ se calculan como se mostró en la sección del precio de las opciones. Cabe destacar que nunca se ha descartado el caso en que el precio de la opción sea 0, esto lo que expresaría es que casi seguramente el precio de la acción al final se va encontrar por debajo del precio de ejercicio $K$ o lo que es lo mismo
 \[
 \mathbb{P}(S_{f}\leq K)=1
 \]
 De forma análoga se tiene que la opción de venta da como origen un árbol de la siguiente forma
 
-```{tikz, fig.cap = "Árbol Binomial de Opción de Venta", fig.ext = 'png'}
+
+<caption><center><strong>"Árbol Binomial de Opción de Venta"</strong></center></caption>
+```{tikz, fig.ext = 'png'}
 \usetikzlibrary{arrows}
 \usetikzlibrary{trees}
 \usetikzlibrary{matrix}
@@ -708,14 +712,30 @@ De forma análoga se tiene que la opción de venta da como origen un árbol de l
     \draw[->] (tree-4-2) -- (tree-5-3) node [midway,below] {$(1-p)^2$};
   \end{tikzpicture}
 ```
+<subcaption><small>Fuente: Elaboración propia, basado en código de user71804 https://tex.stackexchange.com/questions/227414/draw-5-period-binomial-tree</small></subcaption>
+
 
 Partiendo de esto lo que se ha hecho para la implementación de estos árboles y basado en los precios de las acciones y sus probabilidades, ha sido desarrollar un método de recursivo para el cálculo de un árbol binomial de precios, el cual se ha desarrollado en una matriz basado en las ecuaciones para el caso de los inversores con riesgo neutral, la volatilidad obtenida a partir de los precios históricos con los que se contaba y la cantidad pagada de dividendo de forma anual. 
 
-Es importante destacar que se trabaja de forma anualizada de tal forma que si el tiempo para el vencimiento de una opción es de tres meses entonces $t_f=0.25$, seis meses $t_f=0.5$ y un año $t_f=1$. El riesgo neutral se calcula a través de una interpolación de las tasas (anualizadas) con las que se cuenta y el modelo de Svensson a partir de esto se obtiene los parámetros que pueden ser usados para calcular $y(t)$, a partir de esto se calcula que el factor de decuento para cada paso
+Es importante destacar que se trabaja de forma anualizada de tal forma que si el tiempo para el vencimiento de una opción es de tres meses entonces $t_f=0.25$, seis meses $t_f=0.5$ y un año $t_f=1$. El riesgo neutral se calcula a través de una interpolación de las tasas (anualizadas) con las que se cuenta mediante el modelo de _Svensson_ a partir para el cual se obtiene los parámetros que pueden ser usados para calcular $y(t)$, y así encontrar el factor de descuento
 
 \[
 e^{-y(t_f)h_n}
 \]
+
+Además se tiene que las acciones de Holcim S.A. pagan dividendos en fechas establecidas. Sin embargo estos no se basan en una composición continua de pagos de los mismos y se establece en un rango de fechas, por lo que se conviene que salvo la opción tenga vencimiento en los rangos de fechas establecidos para el pago de los dividendos
+
+\[
+q=0
+\]
+Y en caso de que la opción se establezca en una fecha donde se pagan dividendos poseedor de la acción hasta fecha es el que tiene el derecho al dividendo. 
+Basado en los registros con los que se cuenta de la empresa se supone los siguientes pagos de dividendos serán oficializados el tanto monto como fecha de pago se harán el 21 de diciembre de 2021 y el 22 de abril del 2022.
+
+Además la volatilidad a sido calculada de forma semanal ya que eran los datos con mayore recurrencia con los que se contaba, con esto se calculó la volatilidad anual
+\[
+\sqrt{52}\cdot\sigma_{\text{Semanal}}=\sigma_{\text{Anual}}
+\]
+Donde $\sigma_{\text{Semanal}}$ es calculado mediante el cálculo de los rendimientos logarítmicos en cada semana y la función de desviación _sd_ de $\mathbf{R}$. La cantidad de pasos hasta el vencimiento de la opciónse establecieron de acuerdo a la cantidad de días entre el día que la opción fue escrita y la fecha de vencimiento de la misma, teniendo en cuenta los días no bursátiles según la Bolsa Nacional de Valores de Costa Rica.
 
 Una vez con los datos necesarios se parte de una matriz (sin valores) la cual basada en la cantidad de pasos que se querían hacer y para poder dejar espacios entre los precios y que quedara de una forma más clara el cómo aumentaba, toma las dimensiones $n+1\times2n+1$  y que coloca el precio $S_0$ en la columna $n+1$ y fila 1. 
 
@@ -742,7 +762,7 @@ nSemestral<-as.numeric(as.Date("02/01/2022",format="%d/%m/%Y")-as.Date("30/06/20
 nAnual<-as.numeric(as.Date("30/06/2022",format="%d/%m/%Y")-as.Date("30/06/2021",format="%d/%m/%Y")-length((tablaConDiaNB%>%filter(Fecha>=as.Date("01/10/2021",format="%d/%m/%Y")))$Fecha)-4)
 ### Anteriormente se determinó la volatilidad diaria entonces se usará esta ya que se está usando la cantidad días como la cantidad de pasos
 sigma<-volatilidad_anual ### A la espera
-q<-rendimiento ## A la espera de dividendos anuales
+q<-0 ## A la espera de dividendos anuales
 ### Se trabaja de forma anualizada por lo que se tiene que los valores hn correspondientes son
 ## Tres meses equivalen a un cuarto del año
 hnTrimetral<-0.25/as.numeric(nTrimestral)
@@ -769,51 +789,63 @@ precioOpcionPAnual<-precioP(K,K,nAnual,hnAnual,sigma,svensson(parametrosModelo,1
 resultados<-data.frame(Tiempo=rep(c("Tres meses","Seis Meses","Un año"),2),"Opción"=c(rep('Compra',3),rep('Venta',3)),"Precio"=c(precioOpcionCTrimestral,precioOpcionCSemestral,precioOpcionCAnual,precioOpcionPTrimestral,precioOpcionPSemestral,precioOpcionPAnual))
 ```
 
+
 Primero los valores obtenidos para $a$, $p$ y $u$ se presentan en la siguiente tabla:
 
 
 ```{r}
 ### Se procede a colocar en una tabla los valores obtenido para a, p y u entonces se tiene
 tablaValores<-data.frame('Tiempo'=c('Tres meses','Seis meses','Un año'),'a'=c(valoresTrimestral[1],valoresSemestral[1],valoresAnual[1]),'p'=c(valoresTrimestral[2],valoresSemestral[2],valoresAnual[2]),'u'=c(valoresTrimestral[3],valoresSemestral[3],valoresAnual[3]))
-tablaValores%>%kbl(col.names = c('Tiempo','$a$','$p$','u'))%>%kable_material()
+tablaValores%>%kbl(col.names = c('Tiempo','$a$','$p$','u'),caption="<center><strong>Tabla 6: Resultados de $a,p$ y $u$ </strong></center>")%>%kable_material()
 ```
+<subcaption><small> Fuente: Elaboración propia, datos de Investing.com, Holcim Costa Rica S.A. y BCCR</small></subcaption>
+
+A continuación se presenta una tabla en la que se presenta la matriz, que representa el árbol binomial para el caso de los precios a tres meses con `r nTrimestral` pasos.
 
 
-El árbol con el precio del activo subyacente es el siguiente:
+<caption><center><strong>Tabla 7: Árbol binomial de precios de activo subyacente a tres meses </strong></center></caption>
 ```{r}
 arbolrTri<-(arbolBinarioM(nTrimestral,hnTrimetral,sigma,K))
 arbolrTri[is.na(arbolrTri)]=""
 arbolrTri<-t(arbolrTri[,rev(seq_len(ncol(arbolrTri)))])
 arbolrTri%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)%>%scroll_box(width = "100%",height = "500px")
 ```
+<subcaption><small> Fuente: Elaboración propia, datos de Investing.com, Holcim Costa Rica S.A. y BCCR</small></subcaption>
 
 
 
+Basado en la tabla 7 (árbol), se presenta una tabla donde se encuentra la matriz de los posibles precios en cada uno de los pasos de una opción de compra a tres meses.
 
-El árbol con el precio para la opción de compra a tres meses del activo subyacente es el siguiente:
 
+<caption><center><strong>Tabla 8: Árbol binomial de precios opción de compra a tres meses </strong></center></caption>
 ```{r}
-arbolCTri<-(arbolBinarioC(nTrimestral,hnTrimetral,sigma,K,svensson(parametrosModelo,1/4),valoresTrimestral[2],K))
+arbolCTri<-(arbolBinarioC(nTrimestral,hnTrimetral,sigma,K,svensson(parametrosModelo,1/4),valoresTrimestral[2],K,q))
 arbolCTri[is.na(arbolCTri)]=""
 arbolCTri<-t(arbolCTri[,rev(seq_len(ncol(arbolCTri)))])
 arbolCTri%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)%>%scroll_box(width = "100%",height = "500px")
 ```
+<subcaption><small> Fuente: Elaboración propia, datos de Investing.com, Holcim Costa Rica S.A. y BCCR</small></subcaption>
 
 
-El árbol con el precio para opción de venta a tres meses del activo subyacente es el siguiente:
+Y de forma similar a la tabla 8 se presenta el caso, pero de una opción de venta igualmente a tres meses.
+
+<caption><center><strong>Tabla 7: Árbol binomial de precios de activo subyacente a tres meses </strong></center></caption>
 ```{r}
 arbolPTri<-(arbolBinarioC(nTrimestral,hnTrimetral,sigma,-K,svensson(parametrosModelo,1/4),valoresTrimestral[2],-K,q))
 arbolPTri[is.na(arbolPTri)]=""
 arbolPTri<-t(arbolPTri[,rev(seq_len(ncol(arbolPTri)))])
 arbolPTri%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)%>%scroll_box(width = "100%",height = "500px")
 ```
+<subcaption><small> Fuente: Elaboración propia, datos de Investing.com, Holcim Costa Rica S.A. y BCCR</small></subcaption>
 
-Los precios respectivos para las opciones se resumen en la siguiente tabla:
+
+Se presentan los precios de las opciones a tres meses, seis meses y un año se presentan en la siguiente.
+
 
 ```{r}
-resultados%>%kbl(col.names = c("Tiempo","Opción","Precio"))%>%kable_material()
+resultados%>%kbl(col.names = c("Tiempo","Opción","Precio"),caption="<center><strong>Tabla 9: Precio de las distintas opciones</strong></center>")%>%kable_material()
 ```
-
+<subcaption><small> Fuente: Elaboración propia, datos de Investing.com, Holcim Costa Rica S.A. y BCCR</small></subcaption>
 
 # Conclusión
 
