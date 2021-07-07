@@ -579,13 +579,12 @@ Precios<-Precios[Precios$Fecha>=as.Date("01.03.2020",format="%d.%m.%Y"),]
 
 
 ```
-<<<<<<< HEAD
+
 <subcaption><small>Fuente: Elaboración propia, datos Investing.com y Holcim Costa Rica S.A.</small></subcaption>
 
-Se tiene que tener presente que la Bolsa Nacional de Valores de Costa Rica únicamente trabaja en días hábiles por lo que se tiene que tener presente los días feriados en Costa Rica, los cuales son:
-=======
+
 Se debe tener presente que la Bolsa Nacional de Valores de Costa Rica únicamente trabaja en días hábiles, por lo que se tiene que tener presente los días no bursátiles en Costa Rica, los cuales son:
->>>>>>> 87babd412104406b9adc52540a7b421e059c7f31
+
 
 ```{r}
 tablaKableConDiaNB
@@ -600,10 +599,8 @@ tasasBCCR%>%kbl(caption="<center><strong> Tabla 5: Tasas de Rendimiento, Curva S
 tasasBCCR<-tasasBCCR[-1]
 
 ```
-<<<<<<< HEAD
+
 <subcaption><small>Fuente: BCCR</small></subcaption>
-A los anteriores datos se les aplico el modelo de paramétrico de Svensson, esto siguiendo la Nota Metodología Curva de Rendimiento Soberana De Costa Rica, emitida por el Banco Central de Costa Rica, obteniendo así la siguiente curva: 
-=======
 
 A los anteriores datos se les aplica el modelo de paramétrico de Svensson, esto siguiendo la _Nota Metodología Curva de Rendimiento Soberana De Costa Rica_, emitida por el Banco Central de Costa Rica, obteniendo así la siguiente curva: 
 >>>>>>> 87babd412104406b9adc52540a7b421e059c7f31
