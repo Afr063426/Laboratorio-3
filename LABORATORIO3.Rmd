@@ -451,22 +451,22 @@ tablaLongCall%>%kbl(col.names = c("Tiempo/Escenario","$S_T$ < $K$","$S_T \\geq K
 Tabla 3: Flujos Opción de Venta, Posición Larga</strong></center>
 ")%>%kable_material()
 ```
+
 ## Precio de las opciones
 
-Ahora surge la duda cuál debería ser el precio que debería tener una opción. Las opciones tienen una larga historias, pero el cómo establecer el precio tuvo un gran cambio en el año 1973 cuando Black y Scholes presentaron un modelo con el cuál se lograba obtener un precio de equilibrio para las opciones. Esta subsección se centrará en el cómo se estable el precio de una opción, sin embargo con una matemática menos avanzada que con el modelo establecido por Black y Scholes, y basado en el uso de árboles binomiales presentados en una de las subsecciones anteriores.
+Ahora surge la duda, cuál debería ser el precio de adquirir una opción. Las opciones tienen una larga historia, pero el cómo establecer el precio tuvo un gran cambio en el año 1973 cuando Black y Scholes presentaron un modelo con el cual se lograba obtener un precio de equilibrio para las opciones. Esta subsección se centrará en el cómo se estable el precio de una opción, sin embargo, con una matemática menos avanzada que con el modelo establecido por Black y Scholes, y basado en el uso de árboles binomiales presentados en una de las subsecciones anteriores.
 
-El precio que tendrán la opción será establecido de acuerdo a los distintos precios que puede llegar a tener el activo subyacente después de $n$ pasos de tiempo, de tal forma que no haya una oportunidad de arbitraje con esta. Para el caso de una opción de compra a la europea tal y como lo establece Cox (1979) se tiene que su valor se basará en la diferencia que habrá entre el precio del activo subyacente y el precio de ejercicio. Así para el caso de un árbol binomial de un periodo se cumple que en el caso de que el precio aumente $C_u=\max\{0,uS_0-K\}$ y en el caso de que dismuya $C_d=\max\{0,dS_0-K\}$, ya que si el precio del activo es menor que el precio de ejercicio la opción está fuera del dinero. 
+El precio que tendrán la opción será establecido de acuerdo a los distintos precios que puede llegar a tener el activo subyacente después de $n$ pasos de tiempo, de tal forma que no haya una oportunidad de arbitraje con esta. Para el caso de una opción de compra a la europea tal y como lo establecen Cox, Ross y Rubinstein (1979), se tiene que su valor se basará en la diferencia que habrá entre el precio del activo subyacente y el precio de ejercicio. Así, para el caso de un árbol binomial de un periodo se tiene que si el precio aumenta, el precio de la opción es $C_u=\max\{0,uS_0-K\}$ y si el precio dismuye $C_d=\max\{0,dS_0-K\}$.
 
-Se nota entonces que la probalidad de que el valor de la opción sea $C_u$ dentro de un paso es $p$ que coincide con la probabilidad de que el precio del activo subyacente aumente, mientras que la probailidad de que sea $C_d$ es igual a $1-p$ que es la probabilidad de que el precio disminuya, de acuerdo a Cox basado en que se tiene un portafolio en el cual se encuentra el activo subyacente y una seguridad libre de riesgo el precio de la opción para evitar cualquier oportunidad de arbitraje es
+Se nota entonces que la probalidad de que el valor de la opción sea $C_u$ dentro de un paso es $p$ que coincide con la probabilidad de que el precio del activo subyacente aumente. Mientras que la probailidad de que sea $C_d$ es igual a $1-p$. De acuerdo a Cox, Ross y Rubinstein (1979), basado en que se tiene un portafolio en el cual se encuentra el activo subyacente y una seguridad libre de riesgo, el precio de la opción para evitar cualquier oportunidad de arbitraje es:
 
 \[
 C=\frac{pC_u+(1-p)C_d}{1+r}
 \]
 
-Ahora para el caso de se tenga un árbol binomial de dos periodos entonces el valor de la opción después de dos pasos es si el activo subyacente aumenta dos veces su precio entonces $C_{uu}=\max\{0,u^2S-k\}$, en el caso de dos disminuciones $C_{dd}=\max\{0,d^2S-k\}$ y por la propiedad de recombinación el precio del activo subyacente es igual si aumenta y posteriormente disminuye o si primeramente dismuye y posteriormente aumenta entonces $C_{du}=C_{ud}=\max\{0,udS-k\}$. 
-\textbf{grafico}
+Ahora para el caso de se tenga un árbol binomial de dos periodos, entonces el valor de la opción después de dos pasos, si el activo subyacente aumenta dos veces su precio, es entonces $C_{uu}=\max\{0,u^2S-k\}$. Para el caso de dos disminuciones $C_{dd}=\max\{0,d^2S-k\}$. Además, por la propiedad de recombinación, el precio del activo subyacente es igual si este aumenta y posteriormente disminuye, o si primeramente dismuye y posteriormente aumenta, entonces: $C_{du}=C_{ud}=\max\{0,udS-k\}$. 
 
-Bajo esto se tiene que en el periodo $t_1$ la opción tiene los siguientes precios 
+Bajo esto, en el periodo $t_1$ la opción tiene los siguientes precios:
 
 \[
 \begin{split}
@@ -474,27 +474,31 @@ Bajo esto se tiene que en el periodo $t_1$ la opción tiene los siguientes preci
 &C_d=\frac{(1-p)C_{dd}+pC_{du}}{1+r}\\
 \end{split}
 \]
-Ahora entonces basado en lo visto para el caso de un periodo y esto se cumple que 
+
+Ahora entonces basado en lo visto para el caso de un periodo, se cumple que: 
+
 \[
 C=\frac{p^2C_{uu}+2p(1-p)^2C_{ud}+(1-p)^2C_{dd}}{(1+r)^2}
 \]
 
-De forma recursiva entonces se puede concluir que para un árbol de $n$ periodos
+De forma recursiva entonces se puede concluir que para un árbol de $n$ periodos:
+
 \[
 C=\frac{\sum_{i=0}^{n}\left(\frac{n!}{i!(n-i)!}p^{i}(1-p)^{n-i}\max\{0,u^id^{n-i}S_0-K\}\right)}{(1+r)^{n}}
 \]
 
-Ahora el cálculo se puede volver más eficiente encontrando $a\in \{0,1,2,\dots ,n\}$ tal que
+Ahora el cálculo se puede volver más eficiente encontrando $a\in \{0,1,2,\dots ,n\}$, tal que:
+
 \[
 u^{a}d^{n-a}S_0-K>0
 \]
 
-Que manipulando algebraicamente da como resultado $a>\frac{K}{S_0d^n\ln{\frac{u}{d}}}$. Entonces encontrando $a$ que cumpla con estas dos condiciones se puede establecer
+Que manipulando algebraicamente da como resultado $a>\frac{K}{S_0d^n\ln{\frac{u}{d}}}$. Entonces encontrando $a$ que cumpla con estas dos condiciones, se puede establecer:
 \[
-C=\frac{\sum_{i=a}^{n}\left(\frac{n!}{i!(n-i)!}p^{i}(1-p)^{n-i}u^id^{n-i}S_0-K\}\right)}{(1+r)^{\tau}}
+C=\frac{\displaystyle\sum_{i=a}^{n}\left(\frac{n!}{i!(n-i)!}p^{i}(1-p)^{n-i}u^id^{n-i}S_0-K\}\right)}{(1+r)^{\tau}}
 \]
 
-De forma análoga se puede establecer para el caso de las opciones de venta el precio de la opción de venta $P$ es igual a
+De forma análoga, para el caso de las opciones de venta se puede establecer que el precio de la opción de venta $P$ es igual a:
 
 \[
 P=\frac{\sum_{i=0}^{a-1}\left(\frac{n!}{i!(n-i)!}p^{i}(1-p)^{n-i}u^id^{n-i}S_0-K\}\right)}{(1+r)^{n}}
@@ -504,22 +508,27 @@ Ahora se procede a ver lo que es la Curva de Rendimiento Soberana.
 
 ## Curva de Rendimiento Soberana
 
-La curva soberana es una estructura temporal de tasas que se emplea para valorar distintos instrumentos financieros. "Su comportamiento refleja en alguna medida las expectativas futuras del mercado sobre diversas variables económicas y sirve como una herramienta para la valoraciónde instrumentos financieros" (BCCR,s.f.). Esta curva se calcula a partir de distintos instrumentos financieros como bonos y para estos modelos emplean distintas modelos como lo son las curvas paramétricas.
+La curva soberana es una estructura temporal de tasas que se emplea para valorar distintos instrumentos financieros. "Su comportamiento refleja en alguna medida las expectativas futuras del mercado sobre diversas variables económicas y sirve como una herramienta para la valoración de instrumentos financieros" (BCCR,s.f.). Esta curva se calcula a partir de distintos instrumentos financieros como bonos y para esto se emplean distintos modelos como lo son las curvas paramétricas.
 
-La curva soberana del Banco Central de Costa Rica (BBCR) es determinada mediante el modelo de Svensson o el de Nelson y Siegel. Según el BCCR la curva paramétrica para el rendimiento es
+La curva soberana del Banco Central de Costa Rica (BBCR) es determinada mediante el modelo de Svensson o el de Nelson y Siegel. Según el BCCR la curva paramétrica para el rendimiento es:
+
 \[
 y(t)=\beta_{0}+\beta_{1}\left(\frac{1-e^{\frac{-t}{\tau_1}}}{\frac{t}{\tau_1}}\right)+\beta_2\left(\frac{1-e^{\frac{-t}{\tau_1}}}{\frac{t}{\tau_1}}-e^{\frac{-t}{\tau_1}}\right)+\beta_3\left(\frac{1-e^{\frac{-t}{\tau_2}}}{\frac{t}{\tau_2}}-e^{\frac{-t}{\tau_2}}\right)
 \]
 
-Los seis parámetros del modelo pueden ser calculados mediante una interpolación, de tal forma que se toman los datos que brinda el BCCR a una fecha y se minimiza
+Los seis parámetros del modelo pueden ser calculados mediante una interpolación, de tal forma que se toman los datos que brinda el BCCR a una fecha y se minimiza:
+
 \[
 \sum_{i=1}^{n}\left(y(t_n)-r_n\right)^2
 \]
-Ahora con lo anteriormente presentado se en la siguiente sección se verá la metología empleada. Ahora una vez se cuenta con la curva de los rendimientos entonces se puede calcular de tasas forward y el factor de descuento continuo
+
+Ahora una vez se cuenta con la curva de los rendimientos, entonces se puede calcular el factor de descuento continuo:
+
 \[
 \exp\{-Ty(T,\beta,\tau)\}
 \]
-Esto permite componer de forma continua, que es similar a lo que pretenden los agente que suceda con el precio de su acción. Se procede a desarrollar la metología.
+
+Esto permite componer de forma continua, que es similar a lo que pretenden los agentes que suceda con el precio de su acción. Se procede a desarrollar la metología.
 
 # Metodología
 
@@ -574,8 +583,6 @@ Se tiene que tener presente que la Bolsa Nacional de Valores de Costa Rica únic
 tablaKableConDiaNB
 ```
 
-
-
 Se va a trabajar con los datos de la curva soberana obtenidos de la página del Banco Central de Costa Rica, los mismos son establecidos para la semana del 23 de junio del año 2021 al 29 de junio de año 2021. Se tiene que las observaciones son: 
 
 ```{r}
@@ -585,6 +592,7 @@ tasasBCCR%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)
 tasasBCCR<-tasasBCCR[-1]
 
 ```
+
 A los anteriores datos se les aplico el modelo de paramétrico de Svensson, esto siguiendo la Nota Metodología Curva de Rendimiento Soberana De Costa Rica, emitida por el Banco Central de Costa Rica, obteniendo así la siguiente curva: 
 
 ```{r}
