@@ -2,7 +2,7 @@
 title: "Laboratorio 3"
 date: "`r Sys.Date()`"
 output:
-  rmdformats::downcute:
+  rmdformats::readthedown:
     highlight: kate
     toc_depth: 3
     embed_fonts: true
