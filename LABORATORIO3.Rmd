@@ -620,7 +620,11 @@ volatilidad_semanal <- sd(retornos_logaritmicos_semanales)
 volatilidad_anual<- volatilidad_semanal * sqrt(52)
 #volatilidad_logaritmica_semanal
 
+
+
 ```
+
+Siendo así un total de `r length(Precios$Fecha)` observaciones no diarias, sin embargo, se cuenta con `r length(Precios_semanales)` observaciones semanales. Se procede a calcular la volatilidad semanal, teniendo como resultado `r volatilidad_semanal` y multiplicando por la raíz cuadrada de la cantidad de semanas que tiene un año (52), se obtienen una volatilidad anual de `r volatilidad_anual`.
 
 Se debe tener presente que la Bolsa Nacional de Valores de Costa Rica únicamente trabaja en días hábiles, por lo que se tiene que tener presente los días no bursátiles en Costa Rica, los cuales son:
 
@@ -900,7 +904,9 @@ resultados%>%kbl(col.names = c("Tiempo","Opción","Precio"),caption="<center><st
 
 Con base en los resultados obtenidos y a partir de los análisis mostrados, se concluye que es posible calcular las opciones de compra y venta del activo subyacente utilizado con la teoría y los modelos implementados. Se logra examinar e interpretar los datos recopilados, así como aplicar los modelos de Cox, Ross y Rubinstein y el de Svensson para estimar los posibles precios futuros de las acciones y sus respectivas variables aleatorias.
 
-Además, se infiere que las opciones de compra y venta de las acciones analizadas son relativamente bajas, esto debido a que en el año estudiado la volatilidad y los rendimientos fueron relativamente bajos. Lo anterior repercute directamente en la probabilidad de que el valor de la acción suba o baje, y esto mismo incide en el cálculo de las opciones. Por ende, se concluye también que existe una relación positiva entre la volatilidad y probabilidad de variación los activos financieros con los valores de las opciones de compra y venta de estos. Esta afirmación se puede evidenciar mediante la fórmula par calcular estas opciones.
+Además, se infiere que las opciones de compra y venta de las acciones analizadas son relativamente bajas, esto debido a que en el año estudiado la volatilidad y los rendimientos fueron relativamente bajos. Lo anterior repercute directamente en la probabilidad de que el valor de la acción suba o baje, y esto mismo incide en el cálculo de las opciones. 
+
+Por ende, se concluye también que existe una relación positiva entre la volatilidad y probabilidad de variación los activos financieros con los valores de las opciones de compra y venta de estos. Esta afirmación se puede evidenciar mediante la fórmula par calcular estas opciones.
 
 Finalmente, se deduce que el riesgo asociado a este activo financiero es relativamente bajo, por los costes de las opciones obtenidos. Si se analizaran otro tipo de valores como el S&P 500 o criptomonedas, estos tendrían variables sumamente distintas y, por consiguiente, diferentes opciones de compra y venta.
 
