@@ -532,12 +532,12 @@ Esto permite componer de forma continua, que es similar a lo que pretenden los a
 
 # Metodología
 
-Para el siguiente trabajo, se utiliza el programa RStudio para generar un documento RMarkdown, los cuales operan con el lenguaje de programación R. Además, mediante distintos sitios web se recuperaron datos de acciones de empresas, así como la curva soberana del Banco Central de Costa Rica. Asimismo, con los datos anteriores se realizaron gráficos para interpretar relacionar los números con el trabajo. También se efectúa un análisis con la información obtenida y el modelo binomial para calcular las opciones de compra y afirmar si habría sido beneficionsa la inversión o no.
+Para el siguiente trabajo, se utiliza el programa RStudio para generar un documento RMarkdown, los cuales operan con el lenguaje de programación R. Además, mediante distintos sitios web se recuperaron datos de acciones de la empresa Holcim Costa Rica, así como la curva soberana del Banco Central de Costa Rica. Así mismo, con la información anterior se realizaron gráficos para interpretar y aplicar los datos con el trabajo teórico, logrando una aplicacion práctica del mismo. También se efectúa un análisis con la información obtenida y el modelo binomial para calcular las opciones de compra y afirmar si sería beneficionsa la inversión o no.
 
-# Analisis de datos
+# Análisis de datos
 
 
-Los datos de los precios del activo subyacente a analizar, en este caso acciones,  son provenientes de la empresa Holcim Costa Rica, suministrados por el sitio web Investing.com y comparados con los suministrados por la misma empresa en los periodos que se registraron, pues los mismos no contaban con un registro tan periódico como los del sitio web. Los mismos se pueden apreciar en el siguiente grafico:
+Los datos de los precios del activo subyacente a analizar, en este caso acciones, son provenientes de la empresa Holcim Costa Rica, suministrados por el sitio web Investing.com y comparados con los suministrados por la misma empresa en los periodos de los que se guardaron registro, pues los mismos no contaban con un registro tan periódico como los del sitio web. Los mismos se pueden apreciar en el siguiente gráfico:
 
 
 ```{r}
@@ -552,12 +552,14 @@ ggplot(Precios,aes(x=Fecha, y =Último))+
   labs(y = "Precios",x = "Tiempo" ,caption = "Fuente: Elaboración propia, con datos del ....")+theme_minimal()+theme(legend.position="bottom",plot.caption=element_text(hjust=0))
 ```
 
-Cabe destacar que los puntos azules indican la fecha del pago de dividendos o en su defecto la fecha más próxima de la cual se tenga registro del precio de la acción. Como es observable el pago de los dividendos no representan un cambio en el precio de las acciones, teniendo estas un comportamiento de estabilidad durante algunos meses para luego sufrir un cambio brusco.  
-
-Se pueden apreciar su pico de caída a finales del año 2019 he inicios del 2020, esto producto de la especulación en los mercados y la venta de activos, para la obtención de dinero líquido, causado por la pandemia del COVID-19 y su afectación en los mercados. 
+Cabe destacar que los puntos azules indican la fecha del pago de dividendos o en su defecto la fecha más próxima de la cual se tiene registro del precio de la acción. Como es observable, los pagos de dividendos no representan un cambio en el precio de las acciones, el cual tiene un comportamiento de estabilidad durante algunos meses para luego sufrir un cambio brusco.  
 
 
-Para poder realizar un mejor cálculo de la opción se van a utilizar únicamente los dados obtenidos a partir del 2021, puesto que los datos anteriores presentan mucha volatilidad, comportamiento que no se ha presentado en el último año. Se presenta los datos con que se va a trabajar:
+
+Se puede apreciar una caída a finales del año 2019 he inicios del 2020, esto producto de la especulación en los mercados y la venta de activos, para la obtención de dinero líquido, causado por la pandemia del COVID-19 y su afectación en los mercados. 
+
+
+Para poder realizar un mejor cálculo de la opción se van a utilizar únicamente los dados obtenidos a partir del 01/03/2020, puesto que los datos anteriores presentan mucha volatilidad, por causas ajenas al compartaiento de la empresa en su activada productiva. Se presentan los datos con que se va a trabajar:
 
 ```{r}
 
@@ -565,19 +567,21 @@ Precios<-Precios[Precios$Fecha>=as.Date("01.03.2020",format="%d.%m.%Y"),]
 
   ggplot()+
   geom_line(aes(x=Precios$Fecha, y =Precios$`Último`))+
+  geom_point(aes(x =Montos$FechaDePago[3], y=Precios$Último[Precios$Fecha==Montos$FechaDePago[3]]), size =1,color="blue" )+
+  geom_point(aes(x =Montos$FechaDePago[4], y=Precios$Último[Precios$Fecha==Montos$FechaDePago[4]]), size =1,color="blue" )+
   geom_point(aes(x =Montos$FechaDePago[5], y=Precios$Último[Precios$Fecha==Montos$FechaDePago[5]]), size =1,color="blue" )+
-  labs(y = "Precios",x = "Tiempo" ,caption = "Fuente: Elaboración propia, con datos del ....")+theme_minimal()+theme(legend.position="bottom",plot.caption=element_text(hjust=0))
+  labs(y = "Precios",x = "Tiempo") +theme_minimal()+theme(legend.position="bottom",plot.caption=element_text(hjust=0))
 
 
 
 ```
-Se tiene que tener presente que la Bolsa Nacional de Valores de Costa Rica únicamente trabaja en días hábiles por lo que se tiene que tener presente los días feriados en Costa Rica, los cuales son:
+Se debe tener presente que la Bolsa Nacional de Valores de Costa Rica únicamente trabaja en días hábiles, por lo que se tiene que tener presente los días no bursátiles en Costa Rica, los cuales son:
 
 ```{r}
 tablaKableConDiaNB
 ```
 
-Se va a trabajar con los datos de la curva soberana obtenidos de la página del Banco Central de Costa Rica, los mismos son establecidos para la semana del 23 de junio del año 2021 al 29 de junio de año 2021. Se tiene que las observaciones son: 
+Se va a trabajar con los datos de la curva soberana obtenidos de la página del Banco Central de Costa Rica, los mismos son establecidos para la semana del 23 de junio del año 2021 al 29 de junio de año 2021. De los cuales se tienen las siguientes observaciones: 
 
 ```{r}
 tasasBCCR<-tasasBCCR[-12]
@@ -587,7 +591,7 @@ tasasBCCR<-tasasBCCR[-1]
 
 ```
 
-A los anteriores datos se les aplico el modelo de paramétrico de Svensson, esto siguiendo la Nota Metodología Curva de Rendimiento Soberana De Costa Rica, emitida por el Banco Central de Costa Rica, obteniendo así la siguiente curva: 
+A los anteriores datos se les aplica el modelo de paramétrico de Svensson, esto siguiendo la _Nota Metodología Curva de Rendimiento Soberana De Costa Rica_, emitida por el Banco Central de Costa Rica, obteniendo así la siguiente curva: 
 
 ```{r}
 #### Se calculan los parametros
@@ -607,7 +611,7 @@ CurvaSven<-as.data.frame(CurvaSven)
 ggplot()+
   geom_line(aes(x=CurvaSven$`Fecha de maduración`, y = CurvaSven$Rendimientos))+
   geom_point(aes(x =tasasBCCR$Maduration, y=tasasBCCR$TasaRendimiento), size =1,color="blue" )+
-  labs(y = "Rendimientos",x = "Fecha de maduración" ,caption = "Fuente: Elaboración propia, con datos del Banco Central de Costa Rica")+theme_minimal()+theme(legend.position="bottom",plot.caption=element_text(hjust=0))
+  labs(y = "Rendimientos",x = "Fecha de maduración en años" ,caption = "Fuente: Elaboración propia, con datos del Banco Central de Costa Rica")+theme_minimal()+theme(legend.position="bottom",plot.caption=element_text(hjust=0))
 ```
 
 ```{r}
@@ -878,6 +882,9 @@ Recuperado de http://www.gacetafinanciera.com/TEORIARIESGO/VALOREOPCIONES.pdf
 Petters, A. O., & Dong, X. (2016). _An introduction to mathematical finance with applications_. Springer.
 
 Ruppert, D. and Matteson, D. (2015). _Statistics and data analysis for financial engineering_, volumen 13. Springer
+
+Solano, H. (2019). _Fiscalía allana bufete, Holcim y Productos de Concreto en investigación contra abogado_. Recuperado de https://www.nacion.com/sucesos/judiciales/fiscalia-allana-bufete-holcim-y-productos-de/YILACK2KSZFZ7ISZ3UYAG4OAVE/story/ 
+
 </div>
 
 
