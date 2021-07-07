@@ -178,41 +178,11 @@ precioP<-function(K,S_0,n,hn,volatilidad,r,q){
 ```
 
 
-
-
-
-# Instrucciones
-
-
-- El laboratorio consiste en un trabajo en equipo en el cual se implementen los conceptos desarrollados en clase y la profundización de los mismos. 
-- El objetivo general es: Aplicar el método de Árbol binomial en instrumentos financieros de renta variable. 
-- Debe desarrollar el modelo para el cálculo, con una programación eficiente y ordenada en RStudio que incluya lo siguiente: 
-    - El modelo para el árbol binomial. 
-    - El modelo para la valoración del derivado.
-    - Un análisis de resultados obtenidos. 
-    - Debe entregar el código que incluya una breve explicación de la funcionalidad del mismo.
-    
-- En trabajo escrito RMarkdown deberá incluir lo siguiente: 
-    - Párrafo introductorio donde comenta el trabajo realizado. 
-    - Marco teórico que fundamente el laboratorio, según lo visto en clase y profundizaciones de contenidos.
-    - Metodología utilizada en el laboratorio. 
-    - Una sección (o capítulo) de descripción de los datos históricos a utilizar, donde se describan las principales características de las variables relevantes. 
-    - Una sección (o capítulo)  con el análisis del árbol binomial y su implementación para valorar un derivado financiero. 
-    - Una sección (o capítulo)  que incluya resultados. 
-    - Una sección (o capítulo)  en el cual realice conclusiones
-    - Refencias bibliográficas.
-- Para llevar a cabo el ejercicio, se le proponen las siguientes preguntas de investigación. Elija la que más le guste o bien, puede proponer una nueva pregunta de investigación.
     
     
     
-    
-# Sugerencia 1
+# Introducción
 
-¿Cómo el precio de las acciones de alguna empresa nacional observadas con cierta frecuencia se pueden utilizar para determinar el precio que tendrá una opción de venta o de compra en el futuro, si el subyacente es la acción observada?
-
-* Buscar datos el activo subyacente. 
-* Implementar el modelo de árbol binomial para predecir los precios futuros del subyacente.
-* Utilizar la modelación anterior para determinar el precio que debe tener la opción de venta (o compra), utilizando un modelo adecuado de valoración.
 
 
 
@@ -223,24 +193,25 @@ precioP<-function(K,S_0,n,hn,volatilidad,r,q){
 
 # Marco teórico
 
-En primera instancia se mostrará la notación que se mantendrá a los largo del trabajo.
+En primera instancia se muestra la notación que se mantiene a lo largo del trabajo para facilitar su comprensión, teniendo así la siguiente tabla.
 
 ```{r}
 notacion<-c("$t_j$","$t_0$","$t_f$","$\\tau$","$n$","$h_n$","$S(t_j),S_{j}$","$p_n$","$1-p_n$","$u_n$","$d_n$","$q$", "$D(t_j,t_j)=qS_{j-1}h_n$","$r$","$K$","$C_j$","$P_j$")
-significado<-c("Tiempo $j$.","Tiempo inicial.","Tiempo final","$t_f-t_0$.","Cantidad de periodos en el que se divide $[t_f,t_0]$.","Largo de cada periodo en el se divide $[t_f,t_0]$, espeficamente el largo es $\\frac{\\tau}{n}$","Precio de la acción en el tiempo j.","Probabilidad de que el precio de la acción aumente de un periodo a otro.","Probabilidad de que el precio de la acción disminuya de un periodo a otro.","Proporción en que aumenta el precio del activo de un periodo a otro.","Proporción en que disminuye el precio de la activo de un periodo a otro.","Proporcion de dividendo.","Monto pagado de dividen el momento $j$.","Tasa libre de riesgo","Precio de ejercicio.","Precio de la opción de compra en $j$","Precio de la opción de venta en $j$.")
+significado<-c("Tiempo $j$.","Tiempo inicial.","Tiempo final.","$t_f-t_0$.","Cantidad de periodos en el que se divide $[t_0,t_f]$.","Largo de cada periodo en el se divide $[t_0,t_f]$, espeficamente el largo es $\\frac{\\tau}{n}$.","Precio de la acción en el tiempo j.","Probabilidad de que el precio de la acción aumente de un periodo a otro.","Probabilidad de que el precio de la acción disminuya de un periodo a otro.","Proporción en que aumenta el precio del activo de un periodo a otro.","Proporción en que disminuye el precio de la activo de un periodo a otro.","Proporción de dividendo.","Monto pagado de dividendo en el momento $j$.","Tasa libre de riesgo.","Precio de ejercicio.","Precio de la opción de compra en $j$.","Precio de la opción de venta en $j$.")
 tablaNotacion<-data.frame(Notacion=notacion,Significado=significado)
-tablaNotacion%>%kbl(col.names = c("Notación","Significado"),caption="Notación")%>%kable_material()%>%kable_styling(full_width = F)
+tablaNotacion%>%kbl(col.names = c("Notación","Significado"),caption="<center><strong>Tabla 1: Notación</strong></center>
+")%>%kable_material()%>%kable_styling(full_width = F)
 ```
-Existen distintos métodos para la valoración de opciones entre ellos los que se basan en métodos numéricos como lo expone Marín (2009) existen el de Monte Carlo, diferencias finitas, árboles binomiales y trinomiales. A lo largo de este trabajo se trabajará la valoración de las opciones bajo el modelo de árboles binomiales. Los modelos básados en métodos numéricos a diferencia de otros poseen la ventaja de de que su implementación computacionalmente es más simple y eficiente que el desarrollo de soluciones analíticas para la valoración de las opciones basado en el comportamiento del activo subyacente.
+Existen distintos métodos para la valoración de opciones, entre ellos los que se basan en métodos numéricos como lo expone Marín (2009) existen el de Monte Carlo, diferencias finitas, árboles binomiales y trinomiales. A lo largo de este trabajo se implementa la valoración de las opciones bajo el modelo de árboles binomiales. Los modelos basados en métodos numéricos a diferencia de otros poseen la ventaja de que su implementación es computacionalmente más simple y eficiente que el desarrollo de soluciones analíticas para la valoración de las opciones, basado en el comportamiento del activo subyacente.
 
-Se procede a explicar lo que son los árboles binomiales, así como su construcción. De acuerdo al texto _An introduction to Mathematical Finance with Application_, los árboles binomiales muestran los posibles precios futuros de un activo basado en el conocimiento del precio actual del activo subyacente. Para este modelo se parte de un intervalo $[t_0,t_f]$, este intervalo es subdivido en $n$ subintervalos del mismo largo llamados pasos de tiempo, así se obtienen los intervalos $[t_0,t_1],[t_1,t_2],...,[t_{n-1},t_{n}]$ donde
+Se procede a explicar lo que son los árboles binomiales, así como su construcción. De acuerdo con el texto _An introduction to Mathematical Finance with Application_, los árboles binomiales muestran los posibles precios futuros de un activo basado en el conocimiento del precio actual. Para este modelo se parte de un intervalo $[t_0,t_f]$, este intervalo es subdivido en $n$ subintervalos del mismo largo llamados pasos de tiempo, así se obtienen los intervalos $[t_0,t_1],[t_1,t_2],...,[t_{n-1},t_{n}]$ donde
 \[
 0\leq t_0,\quad t_1=t_0+h_n,\quad t_2=t_0+2h_n,\quad...,\quad t_{n-1}=t_0+(n-1)h_n,\quad t_n=t_0+nh_n=t_f
 \]
 Gráficamente un árbol binomial.
 
 
-```{tikz, fig.cap = "Árbol Binomial de Dos Pasos", fig.ext = 'png'}
+```{tikz, fig.cap = "Figura 1: Árbol Binomial de Dos Pasos", fig.ext = 'png'}
 \usetikzlibrary{arrows}
 \usetikzlibrary{trees}
 \usetikzlibrary{matrix}
@@ -260,48 +231,48 @@ Gráficamente un árbol binomial.
     };
     \draw[->] (tree-3-1) -- (tree-2-2) node [midway,above] {$p$};
     \draw[->] (tree-3-1) -- (tree-4-2) node [midway,below] {$(1-p)$};
-    \draw[->] (tree-2-2) -- (tree-1-3) node [midway,above] {$P^2$};
+    \draw[->] (tree-2-2) -- (tree-1-3) node [midway,above] {$p^2$};
     \draw[->] (tree-2-2) -- (tree-3-3) node [midway,below] {$(1-p)p$};
     \draw[->] (tree-4-2) -- (tree-3-3) node [midway,above] {$(1-p)p$};
     \draw[->] (tree-4-2) -- (tree-5-3) node [midway,below] {$(1-p)^2$};
   \end{tikzpicture}
 ```
-## Aspectos a estadísticos
+## Aspectos estadísticos
 
-Es importante tener presentes algunos aspecto estadísticos que posteriormente serán úiles al momento de hablar del árbol binomial, por lo que primeramente se presentan un par de definiciones
+Es importante tener presentes algunos aspectos estadísticos que posteriormente serán útiles al momento de hablar del árbol binomial, por lo que primeramente se presentan un par de definiciones.
 
-\textbf{Media}
-La media se define como 
+La media se define como: 
 \[
 \mu_X=\frac{1}{|\Pi|}\sum_{\pi\in \Pi}X(\pi)
 \]
-\textbf{Desviación estándar}
+Mientras que la desviación estándar:
 
 \[
 \sqrt{\text{Var}(X)}=\sigma_{X}=\frac{1}{|\Pi|}\sqrt{\sum_{\pi\in \Pi}(X(\pi)-\mu_X)^2}
 \]
 
-Donde $\Pi$ son los datos y $X$ es el peso dado a cada dato. En particular media muestral es igual
+Donde $\Pi$ son los datos y $X$ es el peso dado a cada dato. En particular, la media muestral es igual:
 \[
 \bar{x}=\frac{1}{n}\sum_{i=1}^{n}x_i
 \]
-Y la desviación estándar muestral es
+Y la desviación estándar muestral es:
 
 \[
 \sigma_X=\sqrt{\frac{1}{n-1}\sum_{i=1}^{n}(x_i-\bar{x})^2}
 \]
-Con esto se presente se deben hacer algunas asunciones para poder trabajar con los árboles binomiales.
 
-## Asunciones para trabajar con árboles binomiales
-* Propiedad de recombinación: Si el precio aumenta en un paso y en el siguiente disminuye entonces se obtiene el precio que se tenía antes de que se hiceran ambos pasos, esto es $S_ju_nd_n=S_jd_nu_n$ con $j\leq n-2$. A partir de esta propiedad se obtiene que la cantidad posible de precios que tiene el activo en el tiempo $t_n$. Se cumple que la forma en que aumenta el precio de una forma totalmente aleatoria cumpliendo
+Con esto presente se deben asumir algunos supuestos para poder trabajar con los árboles binomiales.
+
+## Supuestos para trabajar con árboles binomiales
+* Propiedad de recombinación: si el precio aumenta en un paso y en el siguiente disminuye, entonces se obtiene el precio que se tenía antes de que se hiceran ambos pasos, esto es $S_ju_nd_n=S_jd_nu_n$ con $j\leq n-2$. A partir de esta propiedad se obtiene que la cantidad posible de precios que tiene el activo en el tiempo $t_n$ son $n+1$. Además, se cumple que la forma en que aumenta el precio es totalmente aleatoria, cumpliendo:
 
 \[
 S(t_j)=S_0u_n^{N_{u,j}}u_n^{1-N_{u,j}}
 \]
 
-Donde $N_{u,j}$ es la variable aletoria cantidad de aumentos hasta el periodo $j$ partiendo del periodo $0$.
+Donde $N_{u,j}$ es la variable aletoria denominada cantidad de aumentos hasta el periodo $j$ partiendo del periodo $0$.
 
-* Retorno bruto, ganancia de capital y retorno logaritmico: Para cada paso de tiempo $[t_{j-1},t_{j}]$, donde $j=1,\dots,n$, el aumento o disminución del precio del activo es el retorno bruto $\frac{S_j}{S_{j-1}}$. Cada uno de estos retornos es asumido independiente e identicamente distribuido (i.i.d.), de hecho se asumen variables aleatorias con distribución de Bernoulli. 
+* Retorno bruto, ganancia de capital y retorno logarítmico: para cada paso de tiempo $[t_{j-1},t_{j}]$, donde $j=1,\dots,n$, el aumento o disminución del precio del activo es el retorno bruto $\frac{S_j}{S_{j-1}}$. Cada uno de estos retornos es asumido independiente e idénticamente distribuido (i.i.d.), de hecho se asumen variables aleatorias con distribución de Bernoulli. 
 
 \[
 \frac{S_j}{S_{j-1}}=\begin{cases}
@@ -310,7 +281,7 @@ d_n & \text{con probabilidad $1-p_n$}
 \end{cases}
 \]
 
-La ganancias de capital son iguales a $\mathbf{R_j}=\frac{S_j}{S_{j-1}}-1$ con $j=1,...,n$, que también son variables aleatorias i.i.d. y son independientes.
+Las ganancias de capital son iguales a $\mathbf{R_j}=\frac{S_j}{S_{j-1}}-1$ con $j=1,...,n$, que también son variables aleatorias i.i.d. y son independientes.
 Así mismo los retornos logarítmicos que son $\ln\frac{ S_j}{ S_{j-1}}$ con $j=1,...,n$.
 
 \[
@@ -320,165 +291,182 @@ Así mismo los retornos logarítmicos que son $\ln\frac{ S_j}{ S_{j-1}}$ con $j=
 \end{cases}
 \]
 
-* La tripleta $p_n,u_n,d_n$: Estas cantidades dependen del tamaño $h_n$, de paso de tiempo.
+* La tripleta $p_n,u_n,d_n$: estas cantidades dependen del tamaño $h_n$.
 
-* Medida de la probabilidad: La probabilidad de que un camino de precios ocurra es obtenido mediante la multiplicación de las probabilidades a lo largo del camino. Esto es si $N_u$ es la variable aleatoria número de aumentos de la seguridad desde $t_0$ hasta $t_f$, está variables binomial. Si $\Omega_n$ es el espacio muestral los caminos de precios desde $t_f$ hasta $t_f$ entonces si $\omega_n$ entonces
+* Medida de la probabilidad: la probabilidad de que un camino de precios ocurra es obtenido mediante la multiplicación de las probabilidades a lo largo del camino. Esto es si $N_u$ es la variable aleatoria número de aumentos de la seguridad desde $t_0$ hasta $t_f$ y $\Omega_n$ es el espacio muestral, entonces:
 
 \[
 \mathbb{P}(w_n)=p_n^{N_u(\omega_n)}(1-p_n)^{N_u(\omega_n)}
 \]
 
-Ahora bajo el supuesto de que de los caminos de precio son independientes, entonces se cumple que la probabilidad de tener un determinado precio en el momento $t_f$
+Ahora bajo el supuesto de que los caminos de precio son independientes, entonces se cumple que la probabilidad de tener un determinado precio en el momento $t_f$ es:
 
 \[
 \mathbb{P}(S(t_n)=S_0u_n^id_n^{n-i})=\binom{n}{i}p^{i}(1-p_n)^{n-i}
 \]
-Lo que muestra que los precios están distribuido de forma binomial.
 
-* Se supone el activo paga un dividendo constante, continuo y proporcional al precio final de todo el tiempo $[t_0,t_f]$, de tal forma que
+Lo que muestra que los precios están distribuidos de forma binomial.
+
+* Se supone que el activo paga un dividendo constante, continuo y proporcional al precio final de todo el tiempo $[t_0,t_f]$, de tal forma que:
 
 \[
 D(t_{j-1},t_{j})=qS_{j-1}h_n, \quad j=1,2,..,n
 \]
 
-* La tasa de retorno total es: Por paso de tiempo 
+* La tasa de retorno total es: 
+
 \[
 R(t_{j-1},t_j)=\frac{S_j-S_{j-1}+D(t_{j-1},t_{j})}{S_{j-1}}=\mathbf{R_j}+qh_n
 \]
-Con estas asunciones, se procede a exponer el modelo de Cox-Ross-Rubinstein (CRR), el cuál puede ser empleado para valorar las opciones de compra y de venta.
+
+Con estos supuestos, se procede a exponer el modelo de Cox-Ross-Rubinstein (CRR), el cual puede ser empleado para valorar las opciones de compra y de venta.
 
 ## Árbol de Cox-Ross-Rubinstein 
 
-El árbol binomial CRR cumple todas las suposiciones que se hicieron en la anterior subsección, este permite determinar $u_n,d_n$ y $p_n$ en términos de periodos de largo $h_n$ para un $n$ suficientemente largo.
+El árbol binomial CRR cumple todas las suposiciones que se hicieron en la anterior subsección, este permite determinar $u_n,d_n$ y $p_n$ en términos de periodos de largo $h_n$ para un $n$ suficientemente grande.
 
-Para este modelo hace falta tomar algunas suposiciones más, aparte de las anteriores.
+Para este modelo hace falta tomar algunas suposiciones aparte de las anteriores.
 
-* Casi seguramente caminos muestrales de precios continuos: Los caminos muestrales de precios son continuos cuando $n\to\infty$.
-* Retornos esperados: Los retornos esperado convergen a una constante $m$
+* Casi seguramente caminos muestrales de precios continuos: los caminos muestrales de precios son continuos cuando $n\to\infty$.
+
+* Retornos esperados: los retornos esperados convergen a una constante $m$
 
 \[
 \frac{\mathbb{E}(R(t_0,t_1))}{h_n}\to m, \qquad n\to \infty
 \]
 
-Ahora se destaca que el retorno se puede obtener mediante la ganancia de capital y la proporción de dividendo $qh_j$ esto es $R(t_0,t_1)=\mathbf{R}_1+qh_n$ entonces
-m
+Ahora se destaca que el retorno se puede obtener mediante la ganancia de capital y la proporción de dividendo $qh_j$ esto es $R(t_0,t_1)=\mathbf{R}_1+qh_n$, entonces:
+
 \[
 \frac{\mathbb{E}(\mathbf{R_1})}{h_n}=\frac{\mathbb{E}(R(t_0,t_1)-q)}{h_n}\to m-q
 \]
 
-$m$ y $q$ se asumen dados y de tal forma que $m$ corresponde al retorno esperado.
+$m$ y $q$ se asumen dados, de tal forma que $m$ corresponde al retorno esperado.
 
-* La constante $\mu_{RW}$:  Se define la $\mu_n$ como el retorno logaritmico de cada paso:
+* Constante $\mu_{RW}$:  se define $\mu_n$ como el retorno logaritmico de cada paso:
 
 \[
 \mu_n=\frac{1}{h_n}\mathbb{E}\left(\ln\left(\frac{S_1}{S_0}\right)\right)
 \]
+
 Que explícitamente por como se asumieron se distribuyen los retornos logarítmicos da como resultado
 \[
 \mu_nh_n=p_n\ln u_n+(1-p_n)\ln{d_n}
 \]
-Como los retornos logarítimicos  en cada paso están identicamente distribuidos, entonces el retorno logarítmicos sobre todo el intervalo $[t_0,t_f]$ es igual a 
+
+Como los retornos logarítimicos en cada paso están identicamente distribuidos, entonces el retorno logarítmicos sobre todo el intervalo $[t_0,t_f]$ es igual a:
 
 \[
 \mathbb{E}\left(\ln\left(\frac{S_n}{S_0}\right)\right)=n\mathbb{E}\left(\ln\left(\frac{S_1}{S_0}\right)\right)=\mu_n\tau
 \]
 
-Ahora se asume que $\mu_n$ converge a una constante
+Ahora se asume que $\mu_n$ converge a una constante:
+
 \[
 \mu_n\to\mu_{RW}, \quad n\to \infty
 \]
-A esta constante se le llama drift.
-* La constante $\sigma$: Si se define $\sigma^2_n$ la varianza de los retornos logarítmicos por cada paso entonces
+
+A esta constante se le llama _drift_.
+* La constante $\sigma$: si se define $\sigma^2_n$ la varianza de los retornos logarítmicos por cada paso, entonces
 
 \[
 \sigma_n^2=\frac{1}{h_n}\text{Var}\left(\ln\frac{S_1}{S_0}\right)
 \]
 
-Donde la varianza por la forma en que se distribuyen los retornos logarítmicos entonces
+Por la forma en que se distribuyen los retornos logarítmicos, entonces:
 
 \[
 \sigma_n^2h_n=p_n(1-p_n)\left[\ln\frac{S_1}{S_0}\right]
 \]
 
-Como los retornos logaritmicos están i.i.d. entonces se cumple que la varianza del retorno en el intervalo $[t_0,t_f]$ es $n$ veces la varianza de cada paso de tiempo
+Como los retornos logaritmicos están i.i.d. entonces, se cumple que la varianza del retorno en el intervalo $[t_0,t_f]$ es $n$ veces la varianza de cada paso de tiempo:
+
 \[
 \text{Var}\left(ln\frac{S_n}{S_0}\right)=n\text{Var}\left(\frac{S_1}{S_0}\right)
 \]
-Se asume que $\sigma^2_n\to \sigma_2>0$ cuando $n\to \infty$. Esto se le llama la volatilidad del precio de la seguridad. 
 
-Es importante aquí recalcar que se puede establecer una relación entre lo que sería $m-q$ y $\sigma$ para poder determinar el drift en términos de estos dos de tal forma que se logra obtener
+Se asume que $\sigma^2_n\to \sigma^2>0$ cuando $n\to \infty$. Esto se le llama la volatilidad del precio del activo. 
+
+Es importante aquí recalcar que se puede establecer una relación entre lo que sería $m-q$ y $\sigma$ para poder determinar el _drift_ en términos de estos dos, de tal forma que se logra obtener:
+
 \[
 \mu_{RW}=m-q-\frac{\sigma^2}{2}
 \]
-Sin embargo tal y como lo expone Cox(1979) el determinar el valor de $m$ se puede volver un poco engorroso, por lo que tal y como lo propone Cox (1979) se asumir que el drift sea aproximado por la media muestral, así como lo es la volatilidad que puede ser aproximada mediante la volatilidad. Ahora para $n$ lo suficientemente grande se establece que se cumple lo siguiente
+
+Sin embargo tal y como lo exponen Cox, Ross y Rubinstein (1979), el determinar el valor de $m$ se puede volver un poco engorroso, por lo que tal y como lo proponen, se puede asumir que el _drift_ sea aproximado por la media muestral, así como la volatilidad puede ser aproximada mediante la desviación estándar. Ahora para $n$ lo suficientemente grande se establece que se cumple lo siguiente:
 
 \[
-u_n\approx e^{\sigma\sqrt{h_n}},\quad d_n\approx e^{'\sigma\sqrt{h_n}}, \quad p_n\approx \frac{1}{2}+\frac{\mu_{RW}}{\sigma}\sqrt{h_n}
+u_n\approx e^{\sigma\sqrt{h_n}},\quad d_n\approx e^{\sigma\sqrt{h_n}}, \quad p_n\approx \frac{1}{2}+\frac{\mu_{RW}}{\sigma}\sqrt{h_n}
 \]
 
-Ahora los inversores pueden ser más o menos adversos al riesgo. Sin embargo a partir del modelo CRR se puede proponer que los inversores sean neutrales al riesgo, en estos casos se establece como el precio del activo está compuesto continuamente mediante una tasa libre de riesgo $r$ menos la tasa de dividendos $q$. De tal forma que para este caso de inversores con riesgo neutral se obtiene
+Ahora los inversores pueden elegir ser más, o menos adversos al riesgo. Sin embargo, a partir del modelo CRR se puede proponer que los inversores sean neutrales al riesgo, en estos casos se establece como el precio del activo está compuesto continuamente mediante una tasa libre de riesgo $r$ menos la tasa de dividendos $q$. De tal forma, para este caso de inversores con riesgo neutral, se obtiene:
+
 \[
 u_n\approx e^{\sigma\sqrt{h_n}},\quad d_n\approx e^{'\sigma\sqrt{h_n}}, \quad p_n\frac{e^{(r-q)h_n}-d_n}{u_n-d_n}
 \]
 
-Note que para la primera lista de ecuaciones se emplea implícitamente el valor de $m$ mientras que para la segunda se ha empleado una tasa libre de riesgo, ahora bajo el modelo de Black y Scholes para la valoración de opciones la tasa libre de riesgo es independiente de $m$. De tal forma que es erroneo pensar que se cumple, al menos en este trabajo
+Note que para la primera lista de ecuaciones se emplea implícitamente el valor de $m$ mientras que para la segunda se ha empleado una tasa libre de riesgo. No obstante, bajo el modelo de Black y Scholes para la valoración de opciones, se puede establecer la tasa libre de riesgo es independiente de $m$. De tal forma que es erróneo pensar que se cumple, al menos en este trabajo:
 
 \[
 r=m
 \]
 
-En las siguiente subsección se procede a presentar lo que son las opciones.
 
 ## Opciones
 
-Las opciones son un contrato entre dos partes, en el cual uno de los involucrados tiene la posibilidad de no ejercer el contrato cuando este no le sea favorable. En este caso al vendedor de la opción se le llama escritor que se dice toma la posición corta, mientras el comprador se dice que toma la posición larga. Las opciones a trabajar son las de compra y las de venta.
+Las opciones son un contrato entre dos partes, en el cual uno de los involucrados tiene la posibilidad de no ejercer el contrato, cuando este no le sea favorable. En este caso al vendedor de la opción se le llama escritor el cual se dice toma la posición corta, mientras el comprador, se dice que toma la posición larga. Las opciones a trabajar son las de compra y las de venta.
 
-Tal y como lo destacan Boudreault y Renaud () una opcion de compra da el derecho de obtener en un momento establecido entre las partes un activo a un precio establecido $K$ llamado precio de ejercicio, al precio $S_T$ donde $T$ es el momento de establecido donde se puede ejercer el derecho hay dos posibilidades.
+Tal y como lo destacan Boudreault y Renaud (2019), una opción de compra da el derecho de obtener en un momento establecido entre las partes un activo a un precio establecido $K$, llamado precio de ejercicio. Al precio $S_T$, donde $T$ es el momento establecido en el cual se puede ejercer el derecho de compra, hay dos posibilidades:
 
-1. $S_T>K$ en este caso se dice que la opción está en el dinero, ya que en este caso es conveniente ejercer el derecho.
-2. $S_T\leq K$ en este caso se dice que la opción está fuera del dinero, ya que no es razonable ejercer el derecho, ya que se estaría comprando algo de menor valor o del mismo valor al establecido como el de ejercicio, en cuyo caso se va establecer el poseedor del derecho decide no ejercer la opción.
+1. $S_T>K$ en este caso se dice que la opción está en el dinero, ya que es conveniente ejercer el derecho.
 
-Los flujos de dinero en el caso de la posición larga vienen dados por 
+2. $S_T\leq K$ en este caso se dice que la opción está fuera del dinero, ya que no es razonable ejercer el derecho, se estaría comprando algo de menor valor o del mismo valor al establecido como el de ejercicio, en cuyo caso se va establecer que el poseedor del derecho decide no ejercer la opción.
+
+Los flujos de dinero en el caso de la posición larga vienen dados por:
 
 ```{r}
 tiempoLongCall<-c("Momento $t_0$","Momento $T$")
 SmenorK<-c("$-C_0$","$0$")
 SmayorK<-c("$-C_0$","$S_T-K$")
 tablaLongCall<-data.frame("Tiempo/Escenario"=tiempoLongCall,"$S_T< K$"=SmenorK,"$S_T \\geq K$"=SmayorK)
-tablaLongCall%>%kbl(col.names = c('Tiempo/Escenario','$S_T \\leq K$',"$S_T$ > $K$"),caption="Flujos Opción de Compra, Posición Larga")%>%kable_material()
+tablaLongCall%>%kbl(col.names = c('Tiempo/Escenario','$S_T \\leq K$',"$S_T$ > $K$"),caption="<center><strong>
+Tabla 2: Flujos Opción de Compra, Posición Larga. </strong></center>
+")%>%kable_material()
 ```
 
-Las opciones se pueden emplear en distintas circunstancias entre las motivaciones para escribir o comprar una opción están la especulación o el cubrirse algún riesgo. De tal forma que se pueden establecer distintas estrategias de compra y venta de opciones combinado con otros instrumentos de inversión de tal forma que se puedan replicar portafolios. Un aspecto importantes es que se puede concluir que las posibilidades con opciones existen, sin embargo rápidamente los mercados financieros hacen que esa oportunidad que existía hacia algunos instantes desaparezcan. Además existen los distintos tipos de como lo son:
+Las opciones se pueden emplear en distintas circunstancias entre las motivaciones para escribir o comprar una opción están la especulación o el cubrirse de algún riesgo. De tal forma que se pueden establecer distintas estrategias de compra y venta de opciones, combinado con otros instrumentos de inversión de tal forma que se puedan replicar portafolios. Un aspecto importante es que se puede concluir que las posibilidades de arbitraje con opciones existen, sin embargo rápidamente los mercados financieros hacen que esa oportunidad que existía hacia algunos instantes desaparezca. Además existen los distintos tipos de opciones como lo son:
 
-* Opción europea: Solo puede ser ejercida en la fecha de vencimiento establecida entre ambas partes
-* Opción americana: Puede ser ejercida durante todo el periodo que tenga el derivado hasta la fecha de maduración.
-* Opciones exóticas: Existen otras opciones como lo son la asiática, opción al pasado y la opción de intercambio.
+* Opción europea: solo puede ser ejercida en la fecha de vencimiento establecida entre ambas partes
+* Opción americana: puede ser ejercida durante todo el periodo que tenga el derivado hasta la fecha de maduración.
+* Opciones exóticas: existen otras opciones como lo son la asiática, opción al pasado y la opción de intercambio.
 
-De una forma análoga se puede establecer que las opciones de venta las cuales son un derecho de poder vender un activo a un precio establecido por ambas partes y que como el caso de las opciones de compra es llamado precio de ejercicio $K$ en este caso contrario al caso de las opciones de compra el derecho es ejercido cuando el precio de $S_T$ es menor que el precio de ejercicio y si es mayor o igual no es ejercido. Los flujo en el caso de la posición larga vienen dados por
+De una forma análoga se puede establecer que las opciones de venta son un derecho de poder vender un activo a un precio establecido por ambas partes llamado precio de ejercicio $K$, en el caso contrario al de las opciones de compra el derecho es ejercido cuando el precio $S_T$ es menor que el precio de ejercicio, y si es mayor o igual, no es ejercido. Los flujos en el caso de la posición larga vienen dados por:
 
 ```{r}
 tiempoLongCall<-c("Momento $t_0$","Momento $T$")
 SmenorK<-c("$-C_0$","$K-S_T$")
 SmayorK<-c("$-C_0$","$0$")
 tablaLongCall<-data.frame("Tiempo/Escenario"=tiempoLongCall,"$S_T\\leq K$"=SmenorK,"$S_T$ > $K$"=SmayorK)
-tablaLongCall%>%kbl(col.names = c("Tiempo/Escenario","$S_T$ < $K$","$S_T \\geq K$"),caption="Flujos Opción de Venta, Posición Larga")%>%kable_material()
+tablaLongCall%>%kbl(col.names = c("Tiempo/Escenario","$S_T$ < $K$","$S_T \\geq K$"),caption="<center><strong>
+Tabla 3: Flujos Opción de Venta, Posición Larga</strong></center>
+")%>%kable_material()
 ```
+
 ## Precio de las opciones
 
-Ahora surge la duda cuál debería ser el precio que debería tener una opción. Las opciones tienen una larga historias, pero el cómo establecer el precio tuvo un gran cambio en el año 1973 cuando Black y Scholes presentaron un modelo con el cuál se lograba obtener un precio de equilibrio para las opciones. Esta subsección se centrará en el cómo se estable el precio de una opción, sin embargo con una matemática menos avanzada que con el modelo establecido por Black y Scholes, y basado en el uso de árboles binomiales presentados en una de las subsecciones anteriores.
+Ahora surge la duda, cuál debería ser el precio de adquirir una opción. Las opciones tienen una larga historia, pero el cómo establecer el precio tuvo un gran cambio en el año 1973 cuando Black y Scholes presentaron un modelo con el cual se lograba obtener un precio de equilibrio para las opciones. Esta subsección se centrará en el cómo se estable el precio de una opción, sin embargo, con una matemática menos avanzada que con el modelo establecido por Black y Scholes, y basado en el uso de árboles binomiales presentados en una de las subsecciones anteriores.
 
-El precio que tendrán la opción será establecido de acuerdo a los distintos precios que puede llegar a tener el activo subyacente después de $n$ pasos de tiempo, de tal forma que no haya una oportunidad de arbitraje con esta. Para el caso de una opción de compra a la europea tal y como lo establece Cox (1979) se tiene que su valor se basará en la diferencia que habrá entre el precio del activo subyacente y el precio de ejercicio. Así para el caso de un árbol binomial de un periodo se cumple que en el caso de que el precio aumente $C_u=\max\{0,uS_0-K\}$ y en el caso de que dismuya $C_d=\max\{0,dS_0-K\}$, ya que si el precio del activo es menor que el precio de ejercicio la opción está fuera del dinero. 
+El precio que tendrán la opción será establecido de acuerdo a los distintos precios que puede llegar a tener el activo subyacente después de $n$ pasos de tiempo, de tal forma que no haya una oportunidad de arbitraje con esta. Para el caso de una opción de compra a la europea tal y como lo establecen Cox, Ross y Rubinstein (1979), se tiene que su valor se basará en la diferencia que habrá entre el precio del activo subyacente y el precio de ejercicio. Así, para el caso de un árbol binomial de un periodo se tiene que si el precio aumenta, el precio de la opción es $C_u=\max\{0,uS_0-K\}$ y si el precio dismuye $C_d=\max\{0,dS_0-K\}$.
 
-Se nota entonces que la probalidad de que el valor de la opción sea $C_u$ dentro de un paso es $p$ que coincide con la probabilidad de que el precio del activo subyacente aumente, mientras que la probailidad de que sea $C_d$ es igual a $1-p$ que es la probabilidad de que el precio disminuya, de acuerdo a Cox basado en que se tiene un portafolio en el cual se encuentra el activo subyacente y una seguridad libre de riesgo el precio de la opción para evitar cualquier oportunidad de arbitraje es
+Se nota entonces que la probalidad de que el valor de la opción sea $C_u$ dentro de un paso es $p$ que coincide con la probabilidad de que el precio del activo subyacente aumente. Mientras que la probailidad de que sea $C_d$ es igual a $1-p$. De acuerdo a Cox, Ross y Rubinstein (1979), basado en que se tiene un portafolio en el cual se encuentra el activo subyacente y una seguridad libre de riesgo, el precio de la opción para evitar cualquier oportunidad de arbitraje es:
 
 \[
 C=\frac{pC_u+(1-p)C_d}{1+r}
 \]
 
-Ahora para el caso de se tenga un árbol binomial de dos periodos entonces el valor de la opción después de dos pasos es si el activo subyacente aumenta dos veces su precio entonces $C_{uu}=\max\{0,u^2S-k\}$, en el caso de dos disminuciones $C_{dd}=\max\{0,d^2S-k\}$ y por la propiedad de recombinación el precio del activo subyacente es igual si aumenta y posteriormente disminuye o si primeramente dismuye y posteriormente aumenta entonces $C_{du}=C_{ud}=\max\{0,udS-k\}$. 
-\textbf{grafico}
+Ahora para el caso de se tenga un árbol binomial de dos periodos, entonces el valor de la opción después de dos pasos, si el activo subyacente aumenta dos veces su precio, es entonces $C_{uu}=\max\{0,u^2S-k\}$. Para el caso de dos disminuciones $C_{dd}=\max\{0,d^2S-k\}$. Además, por la propiedad de recombinación, el precio del activo subyacente es igual si este aumenta y posteriormente disminuye, o si primeramente dismuye y posteriormente aumenta, entonces: $C_{du}=C_{ud}=\max\{0,udS-k\}$. 
 
-Bajo esto se tiene que en el periodo $t_1$ la opción tiene los siguientes precios 
+Bajo esto, en el periodo $t_1$ la opción tiene los siguientes precios:
 
 \[
 \begin{split}
@@ -486,27 +474,31 @@ Bajo esto se tiene que en el periodo $t_1$ la opción tiene los siguientes preci
 &C_d=\frac{(1-p)C_{dd}+pC_{du}}{1+r}\\
 \end{split}
 \]
-Ahora entonces basado en lo visto para el caso de un periodo y esto se cumple que 
+
+Ahora entonces basado en lo visto para el caso de un periodo, se cumple que: 
+
 \[
 C=\frac{p^2C_{uu}+2p(1-p)^2C_{ud}+(1-p)^2C_{dd}}{(1+r)^2}
 \]
 
-De forma recursiva entonces se puede concluir que para un árbol de $n$ periodos
+De forma recursiva entonces se puede concluir que para un árbol de $n$ periodos:
+
 \[
 C=\frac{\sum_{i=0}^{n}\left(\frac{n!}{i!(n-i)!}p^{i}(1-p)^{n-i}\max\{0,u^id^{n-i}S_0-K\}\right)}{(1+r)^{n}}
 \]
 
-Ahora el cálculo se puede volver más eficiente encontrando $a\in \{0,1,2,\dots ,n\}$ tal que
+Ahora el cálculo se puede volver más eficiente encontrando $a\in \{0,1,2,\dots ,n\}$, tal que:
+
 \[
 u^{a}d^{n-a}S_0-K>0
 \]
 
-Que manipulando algebraicamente da como resultado $a>\frac{K}{S_0d^n\ln{\frac{u}{d}}}$. Entonces encontrando $a$ que cumpla con estas dos condiciones se puede establecer
+Que manipulando algebraicamente da como resultado $a>\frac{K}{S_0d^n\ln{\frac{u}{d}}}$. Entonces encontrando $a$ que cumpla con estas dos condiciones, se puede establecer:
 \[
-C=\frac{\sum_{i=a}^{n}\left(\frac{n!}{i!(n-i)!}p^{i}(1-p)^{n-i}u^id^{n-i}S_0-K\}\right)}{(1+r)^{\tau}}
+C=\frac{\displaystyle\sum_{i=a}^{n}\left(\frac{n!}{i!(n-i)!}p^{i}(1-p)^{n-i}u^id^{n-i}S_0-K\}\right)}{(1+r)^{\tau}}
 \]
 
-De forma análoga se puede establecer para el caso de las opciones de venta el precio de la opción de venta $P$ es igual a
+De forma análoga, para el caso de las opciones de venta se puede establecer que el precio de la opción de venta $P$ es igual a:
 
 \[
 P=\frac{\sum_{i=0}^{a-1}\left(\frac{n!}{i!(n-i)!}p^{i}(1-p)^{n-i}u^id^{n-i}S_0-K\}\right)}{(1+r)^{n}}
@@ -516,22 +508,27 @@ Ahora se procede a ver lo que es la Curva de Rendimiento Soberana.
 
 ## Curva de Rendimiento Soberana
 
-La curva soberana es una estructura temporal de tasas que se emplea para valorar distintos instrumentos financieros. "Su comportamiento refleja en alguna medida las expectativas futuras del mercado sobre diversas variables económicas y sirve como una herramienta para la valoraciónde instrumentos financieros" (BCCR,s.f.). Esta curva se calcula a partir de distintos instrumentos financieros como bonos y para estos modelos emplean distintas modelos como lo son las curvas paramétricas.
+La curva soberana es una estructura temporal de tasas que se emplea para valorar distintos instrumentos financieros. "Su comportamiento refleja en alguna medida las expectativas futuras del mercado sobre diversas variables económicas y sirve como una herramienta para la valoración de instrumentos financieros" (BCCR,s.f.). Esta curva se calcula a partir de distintos instrumentos financieros como bonos y para esto se emplean distintos modelos como lo son las curvas paramétricas.
 
-La curva soberana del Banco Central de Costa Rica (BBCR) es determinada mediante el modelo de Svensson o el de Nelson y Siegel. Según el BCCR la curva paramétrica para el rendimiento es
+La curva soberana del Banco Central de Costa Rica (BBCR) es determinada mediante el modelo de Svensson o el de Nelson y Siegel. Según el BCCR la curva paramétrica para el rendimiento es:
+
 \[
 y(t)=\beta_{0}+\beta_{1}\left(\frac{1-e^{\frac{-t}{\tau_1}}}{\frac{t}{\tau_1}}\right)+\beta_2\left(\frac{1-e^{\frac{-t}{\tau_1}}}{\frac{t}{\tau_1}}-e^{\frac{-t}{\tau_1}}\right)+\beta_3\left(\frac{1-e^{\frac{-t}{\tau_2}}}{\frac{t}{\tau_2}}-e^{\frac{-t}{\tau_2}}\right)
 \]
 
-Los seis parámetros del modelo pueden ser calculados mediante una interpolación, de tal forma que se toman los datos que brinda el BCCR a una fecha y se minimiza
+Los seis parámetros del modelo pueden ser calculados mediante una interpolación, de tal forma que se toman los datos que brinda el BCCR a una fecha y se minimiza:
+
 \[
 \sum_{i=1}^{n}\left(y(t_n)-r_n\right)^2
 \]
-Ahora con lo anteriormente presentado se en la siguiente sección se verá la metología empleada. Ahora una vez se cuenta con la curva de los rendimientos entonces se puede calcular de tasas forward y el factor de descuento continuo
+
+Ahora una vez se cuenta con la curva de los rendimientos, entonces se puede calcular el factor de descuento continuo:
+
 \[
 \exp\{-Ty(T,\beta,\tau)\}
 \]
-Esto permite componer de forma continua, que es similar a lo que pretenden los agente que suceda con el precio de su acción. Se procede a desarrollar la metología.
+
+Esto permite componer de forma continua, que es similar a lo que pretenden los agentes que suceda con el precio de su acción. Se procede a desarrollar la metología.
 
 # Metodología
 
@@ -586,8 +583,6 @@ Se tiene que tener presente que la Bolsa Nacional de Valores de Costa Rica únic
 tablaKableConDiaNB
 ```
 
-
-
 Se va a trabajar con los datos de la curva soberana obtenidos de la página del Banco Central de Costa Rica, los mismos son establecidos para la semana del 23 de junio del año 2021 al 29 de junio de año 2021. Se tiene que las observaciones son: 
 
 ```{r}
@@ -597,6 +592,7 @@ tasasBCCR%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)
 tasasBCCR<-tasasBCCR[-1]
 
 ```
+
 A los anteriores datos se les aplico el modelo de paramétrico de Svensson, esto siguiendo la Nota Metodología Curva de Rendimiento Soberana De Costa Rica, emitida por el Banco Central de Costa Rica, obteniendo así la siguiente curva: 
 
 ```{r}
@@ -630,27 +626,7 @@ Fechas_semanales <- cut(Precios$Fecha, "week")
 Fechas_semanales <- unique(Fechas_semanales)
 
 
-Fechas_semanales 
-
 Precios_semanales <- Precios$Último[Fechas_semanales]
-
-Precios_semanales
-
-##Retornos diarios
-
-#retornos_brutos_diarios <- Precios$Último[-length(Precios$Último)]/Precios$Último[-1]
-
-
-#retornos_logaritmicos_diarios <- log(retornos_brutos_diarios)
-
-
-#varianza_retornos_logaritmicos_diarios <- var(retornos_logaritmicos_diarios)
-
-
-#volatilidad_logaritmica_diaria <- 1/length(Precios$Último) * varianza_retornos_logaritmicos_diarios
-
-
-##Retornos diarios
 
 
 retornos_brutos_semanales <- Precios_semanales[-length(Precios_semanales)]/Precios_semanales[-1]
