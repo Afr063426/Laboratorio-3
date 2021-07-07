@@ -902,7 +902,7 @@ Con base en los resultados obtenidos y a partir de los análisis mostrados, se c
 
 Además, se infiere que las opciones de compra y venta de las acciones analizadas son relativamente bajas, esto debido a que en el año estudiado la volatilidad y los rendimientos fueron relativamente bajos. Lo anterior repercute directamente en la probabilidad de que el valor de la acción suba o baje, y esto mismo incide en el cálculo de las opciones. Por ende, se concluye también que existe una relación positiva entre la volatilidad y probabilidad de variación los activos financieros con los valores de las opciones de compra y venta de estos. Esta afirmación se puede evidenciar mediante la fórmula par calcular estas opciones.
 
-Finalmente, se deduce que el riesgo asociado a este activo financiero es relativamente bajo, por los costes de las opciones obtenidos. Si se analizaran otro tipo de valores como el S&P 500 o criptomonedas, estos tendrían variables sumamente distintas y, por consiguiente, diferentes opciones de compra y venta.
+Finalmente, se deduce que el riesgo asociado a este activo financiero es relativamente bajo, por los costes de las opciones obtenidos. Si se analizaran otros tipos de valores como los mercados de divisas extranjeras o criptomonedas, estos tendrían variables sumamente distintas y, por consiguiente, diferentes opciones de compra y venta.
 
 
 # Bilibliografía
