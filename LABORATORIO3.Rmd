@@ -178,6 +178,13 @@ precioP<-function(K,S_0,n,hn,volatilidad,r,q){
     
 # Introducción
 
+Las opciones de compra y venta de activos financieros son instrumentos utilizados alrededor del mundo por inversionistas que buscan incrementar su riqueza o cubrirse del riesgo.  Así que en el presente trabajo se va expone el modelo de Cox, Ross y Rubinstein (1979), mismo que se aplicara sobre el activo denominado acciones de Holcim Costa Rica, para obtener el resultado de las opciones de compra y venta.
+
+El trabajo abarcara un marco teórico detallado, que incluye aspectos relevantes para la aplicación del modelo como lo son la curva de rendimiento soberana, aspectos estadísticos, supuestos para trabajar con árboles binomiales, descripción de las opciones y presiones de las mismas.
+
+También se incluye una sección metodológica y de análisis de los datos implementados. En esta última, se lleva a cabo una presentación de los datos y características importantes de los mismos. Por su parte, se dedica una sección al análisis del árbol y su implementación, para clarificar el proceso seguido para su obtención.
+
+Todo lo anterior se sigue como fin para lograr establecer los resultados de la aplicación del modelo con los datos presentados, teniendo como resultados las opciones de compra y venta a tres meses, seis meses y un año.
 
 
 
@@ -558,9 +565,9 @@ ggplot(Precios,aes(x=Fecha, y =Último))+
 
 Cabe destacar que los puntos azules indican la fecha del pago de dividendos o en su defecto la fecha más próxima de la cual se tiene registro del precio de la acción. Como es observable, los pagos de dividendos no representan un cambio en el precio de las acciones, el cual tiene un comportamiento de estabilidad durante algunos meses para luego sufrir un cambio brusco.  
 
+La primera caída observable se debe una a la investigación judicial llevada a cabo por la fiscalía, donde se allanaron las oficinas de las empresas ,esto debido a un posible tráfico de influencias y enriquecimiento ilícito, como lo establece Solano, H. (2019).
 
-
-Se puede apreciar una caída a finales del año 2019 he inicios del 2020, esto producto de la especulación en los mercados y la venta de activos, para la obtención de dinero líquido, causado por la pandemia del COVID-19 y su afectación en los mercados. 
+Mientras que la caída a finales del año 2019 he inicios del 2020, es producto de la especulación en los mercados y la venta de activos, para la obtención de dinero líquido, causado por la pandemia del COVID-19 y su afectación en los mercados. 
 
 
 Para poder realizar un mejor cálculo de la opción se van a utilizar únicamente los dados obtenidos a partir del 01/03/2020, puesto que los datos anteriores presentan mucha volatilidad, por causas ajenas al compartaiento de la empresa en su activada productiva. Se presentan los datos con que se va a trabajar:
@@ -743,7 +750,10 @@ e^{-y(t_f)h_n}
 
 Además, se tiene que las acciones de Holcim Costa Rica S.A. pagan dividendos en fechas establecidas. Sin embargo, estos no se basan en una composición continua de pagos de los mismos y se establecen en un rango de fechas, se conviene que, salvo la opción tenga vencimiento en los rangos de fechas establecidos para el pago de los dividendos $q=0$.
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 309dd3cca894b2239a78c3dda2dc8849ff920c15
 En el caso de que la opción se establezca en una fecha donde se pagan dividendos, el poseedor de la acción a la fecha es el que tiene el derecho al dividendo. 
 Basado en los registros con los que se cuenta de la empresa se supone que los siguientes pagos de dividendos serán oficializados, tanto el monto como la fecha de pago se harán el 21 de diciembre de 2021 y el 22 de abril del 2022.
 
@@ -836,7 +846,7 @@ tablaValores%>%kbl(col.names = c('Tiempo','$a$','$p$','u'),caption="<center><str
 ```
 <subcaption><small> Fuente: Elaboración propia, datos de Investing.com, Holcim Costa Rica S.A. y BCCR</small></subcaption>
 
-A continuación se presenta una tabla en la que se presenta la matriz, que representa el árbol binomial para el caso de los precios a tres meses con `r nTrimestral` pasos.
+A continuación se presenta una tabla con la matriz, que representa el árbol binomial para el caso de los precios a tres meses con `r nTrimestral` pasos.
 
 
 <caption><center><strong>Tabla 7: Árbol binomial de precios de activo subyacente a tres meses </strong></center></caption>
@@ -850,7 +860,7 @@ arbolrTri%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)%>%scroll_bo
 
 
 
-Basado en la tabla 7 (árbol), se presenta una tabla donde se encuentra la matriz de los posibles precios en cada uno de los pasos de una opción de compra a tres meses.
+Basándose en la tabla 7 (árbol), se presenta una tabla donde se encuentra la matriz de los posibles precios en cada uno de los pasos de una opción de compra a tres meses.
 
 
 <caption><center><strong>Tabla 8: Árbol binomial de precios opción de compra a tres meses </strong></center></caption>
@@ -863,7 +873,7 @@ arbolCTri%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)%>%scroll_bo
 <subcaption><small> Fuente: Elaboración propia, datos de Investing.com, Holcim Costa Rica S.A. y BCCR</small></subcaption>
 
 
-Y de forma similar a la tabla 8 se presenta el caso, pero de una opción de venta igualmente a tres meses.
+Y de forma similar a la tabla 8, se presenta el caso pero de una opción de venta igualmente a tres meses.
 
 <caption><center><strong>Tabla 7: Árbol binomial de precios de activo subyacente a tres meses </strong></center></caption>
 ```{r}
@@ -875,7 +885,7 @@ arbolPTri%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)%>%scroll_bo
 <subcaption><small> Fuente: Elaboración propia, datos de Investing.com, Holcim Costa Rica S.A. y BCCR</small></subcaption>
 
 
-Se presentan los precios de las opciones a tres meses, seis meses y un año se presentan en la siguiente.
+Se presentan los precios de las opciones a tres meses, seis meses y un año, en la siguiente tabla:
 
 
 ```{r}
@@ -884,6 +894,12 @@ resultados%>%kbl(col.names = c("Tiempo","Opción","Precio"),caption="<center><st
 <subcaption><small> Fuente: Elaboración propia, datos de Investing.com, Holcim Costa Rica S.A. y BCCR</small></subcaption>
 
 # Conclusión
+
+Con base en los resultados obtenidos y a partir de los análisis mostrados, se concluye que es posible calcular las opciones de compra y venta del activo subyacente utilizado con la teoría y los modelos implementados. Se logra examinar e interpretar los datos recopilados, así como aplicar los modelos de Cox, Ross y Rubinstein y el de Svensson para estimar los posibles precios futuros de las acciones y sus respectivas variables aleatorias.
+
+Además, se infiere que las opciones de compra y venta de las acciones analizadas son relativamente bajas, esto debido a que en el año estudiado la volatilidad y los rendimientos fueron relativamente bajos. Lo anterior repercute directamente en la probabilidad de que el valor de la acción suba o baje e incide las opciones de adquisición. 
+
+Por lo tanto, se deduce que el riesgo asociado a este activo financiero es relativamente bajo. Si se analizaran otro tipo de valores como el S&P 500 o criptomonedas, estos tendrían variables sumamente distintas y, por consiguiente, diferentes opciones de compra y venta.
 
 
 # Bilibliografía
