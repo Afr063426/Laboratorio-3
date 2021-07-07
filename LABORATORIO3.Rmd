@@ -18,7 +18,6 @@ library(kableExtra)
 library(tidyverse)
 library(readxl)
 library(ggplot2)
-library(interp)
 ##install.packages('magick') para dibujos tikz
 ##install.packages('pdftools')
 
@@ -227,10 +226,10 @@ precioP<-function(K,S_0,n,hn,volatilidad,r,q){
 En primera instancia se mostrará la notación que se mantendrá a los largo del trabajo.
 
 ```{r}
-notacion<-c("$t_j$","$t_0$","$t_f$","$\\tau$","$n$","$h_n$","$S(t_j),S_{j}$","$p_n$","$1-p_n$","$u_n$","$d_n$","$q$", "$D(t_j,t_j)=qS_{j-1}h_n$","$r$","$K$","$C_j$")
-significado<-c("Tiempo $j$","Tiempo inicial","Tiempo final","$t_f-t_0$","Cantidad de periodos en el que se divide $[t_f,t_0]$","Largo de cada periodo en el se divide $[t_f,t_0]$, espeficamente el largo es $\\frac{\\tau}{n}$","Precio de la acci\'on en el tiempo j","Probabilidad de que el precio de la acción aumente de un periodo a otro.","Probabilidad de que el precio de la acción disminuya de un periodo a otro.","Proporción en que aumenta el precio del activo de un periodo a otro","Proporción en que disminuye el precio de la activo de un periodo a otro","Proporcion de dividendo","Monto pagado de dividen el momento $j$","Tasa libre de riesgo","Precio de ejercicio","Precio de la opción en $j$")
+notacion<-c("$t_j$","$t_0$","$t_f$","$\\tau$","$n$","$h_n$","$S(t_j),S_{j}$","$p_n$","$1-p_n$","$u_n$","$d_n$","$q$", "$D(t_j,t_j)=qS_{j-1}h_n$","$r$","$K$","$C_j$","$P_j$")
+significado<-c("Tiempo $j$.","Tiempo inicial.","Tiempo final","$t_f-t_0$.","Cantidad de periodos en el que se divide $[t_f,t_0]$.","Largo de cada periodo en el se divide $[t_f,t_0]$, espeficamente el largo es $\\frac{\\tau}{n}$","Precio de la acción en el tiempo j.","Probabilidad de que el precio de la acción aumente de un periodo a otro.","Probabilidad de que el precio de la acción disminuya de un periodo a otro.","Proporción en que aumenta el precio del activo de un periodo a otro.","Proporción en que disminuye el precio de la activo de un periodo a otro.","Proporcion de dividendo.","Monto pagado de dividen el momento $j$.","Tasa libre de riesgo","Precio de ejercicio.","Precio de la opción de compra en $j$","Precio de la opción de venta en $j$.")
 tablaNotacion<-data.frame(Notacion=notacion,Significado=significado)
-tablaNotacion%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)
+tablaNotacion%>%kbl(col.names = c("Notación","Significado"),caption="Notación")%>%kable_material()%>%kable_styling(full_width = F)
 ```
 Existen distintos métodos para la valoración de opciones entre ellos los que se basan en métodos numéricos como lo expone Marín (2009) existen el de Monte Carlo, diferencias finitas, árboles binomiales y trinomiales. A lo largo de este trabajo se trabajará la valoración de las opciones bajo el modelo de árboles binomiales. Los modelos básados en métodos numéricos a diferencia de otros poseen la ventaja de de que su implementación computacionalmente es más simple y eficiente que el desarrollo de soluciones analíticas para la valoración de las opciones basado en el comportamiento del activo subyacente.
 
@@ -444,9 +443,9 @@ Los flujos de dinero en el caso de la posición larga vienen dados por
 ```{r}
 tiempoLongCall<-c("Momento $t_0$","Momento $T$")
 SmenorK<-c("$-C_0$","$0$")
-SmayorK<-c("$-C_0$","$S_T-k$")
+SmayorK<-c("$-C_0$","$S_T-K$")
 tablaLongCall<-data.frame("Tiempo/Escenario"=tiempoLongCall,"$S_T< K$"=SmenorK,"$S_T \\geq K$"=SmayorK)
-tablaLongCall%>%kbl(col.names = c('Tiempo/Escenario','$S_T$< $K$',"$S_T \\geq K$"))%>%kable_material()
+tablaLongCall%>%kbl(col.names = c('Tiempo/Escenario','$S_T \\leq K$',"$S_T$ > $K$"),caption="Flujos Opción de Compra, Posición Larga")%>%kable_material()
 ```
 
 Las opciones se pueden emplear en distintas circunstancias entre las motivaciones para escribir o comprar una opción están la especulación o el cubrirse algún riesgo. De tal forma que se pueden establecer distintas estrategias de compra y venta de opciones combinado con otros instrumentos de inversión de tal forma que se puedan replicar portafolios. Un aspecto importantes es que se puede concluir que las posibilidades con opciones existen, sin embargo rápidamente los mercados financieros hacen que esa oportunidad que existía hacia algunos instantes desaparezcan. Además existen los distintos tipos de como lo son:
@@ -462,7 +461,7 @@ tiempoLongCall<-c("Momento $t_0$","Momento $T$")
 SmenorK<-c("$-C_0$","$K-S_T$")
 SmayorK<-c("$-C_0$","$0$")
 tablaLongCall<-data.frame("Tiempo/Escenario"=tiempoLongCall,"$S_T\\leq K$"=SmenorK,"$S_T$ > $K$"=SmayorK)
-tablaLongCall%>%kbl(col.names = c("Tiempo/Escenario","$S_T \\leq K$","$S_T$ > $K$"))%>%kable_material()
+tablaLongCall%>%kbl(col.names = c("Tiempo/Escenario","$S_T$ < $K$","$S_T \\geq K$"),caption="Flujos Opción de Venta, Posición Larga")%>%kable_material()
 ```
 ## Precio de las opciones
 
@@ -470,7 +469,7 @@ Ahora surge la duda cuál debería ser el precio que debería tener una opción.
 
 El precio que tendrán la opción será establecido de acuerdo a los distintos precios que puede llegar a tener el activo subyacente después de $n$ pasos de tiempo, de tal forma que no haya una oportunidad de arbitraje con esta. Para el caso de una opción de compra a la europea tal y como lo establece Cox (1979) se tiene que su valor se basará en la diferencia que habrá entre el precio del activo subyacente y el precio de ejercicio. Así para el caso de un árbol binomial de un periodo se cumple que en el caso de que el precio aumente $C_u=\max\{0,uS_0-K\}$ y en el caso de que dismuya $C_d=\max\{0,dS_0-K\}$, ya que si el precio del activo es menor que el precio de ejercicio la opción está fuera del dinero. 
 
-Ahora se cumple que la probalidad de que el precio aumente es igual a $p$ mientras que la probailidad de que este dismuya es igual $1-p$, de acuerdo a Cox basado en que se tiene un portafolio en el cual se encuentra el activo subyacente y una seguridad libre de riesgo el precio de la opción para evitar cualquier oportunidad de arbitraje es
+Se nota entonces que la probalidad de que el valor de la opción sea $C_u$ dentro de un paso es $p$ que coincide con la probabilidad de que el precio del activo subyacente aumente, mientras que la probailidad de que sea $C_d$ es igual a $1-p$ que es la probabilidad de que el precio disminuya, de acuerdo a Cox basado en que se tiene un portafolio en el cual se encuentra el activo subyacente y una seguridad libre de riesgo el precio de la opción para evitar cualquier oportunidad de arbitraje es
 
 \[
 C=\frac{pC_u+(1-p)C_d}{1+r}
@@ -634,11 +633,43 @@ ggplot()+
 
 # Análisis del árbol e implementación
 
-El árbol binomial como se mostró es útil ya que permite calcular los posibles precios que puede llegar a tener el activo, basado en datos históricos y reduciendo los casos a un aumento o disminución en cada paso. Como se mostró en la sección para el calculo del precio de las opciones este se puede obtener de forma recursiva y este se basa en las mismas probabilidades de que el precio del activo subyacente aumente, cumpliendo que el precio de la opción responde a una distribución binomial.
+El árbol binomial como se mostró es útil ya que permite calcular los posibles precios que puede llegar a tener el activo, basado en datos históricos y reduciendo los casos a un aumento o disminución en cada paso. Como se mostró en la sección para el cálculo del precio de las opciones este se puede obtener de forma recursiva y este se basa en las mismas probabilidades de que el precio del activo subyacente aumente, cumpliendo que el precio de la opción responde a una distribución binomial.
 
-Cabe recordar que los modelos son un simplificación de la realidad, y no se deben tomar como una verdad completa, estas herramientas permiten tonar decisionces con cierto criterio. Con esto dicho se muestra una representación del precio de una opción de compra en un árbol dedis pasos sería.
+Cabe recordar que los modelos son un simplificación de la realidad, y no se deben tomar como una verdad completa, estas herramientas permiten tonar decisionces con cierto criterio. Con esto dicho se muestra una representación del precio de una opción de compra en un árbol de dos pasos sería.
 
-```{tikz, fig.cap = "Árbol Binomial de Dos Pasos", fig.ext = 'png'}
+```{tikz, fig.cap = "Árbol Binomial de Opción de Compra", fig.ext = 'png'}
+\usetikzlibrary{arrows}
+\usetikzlibrary{trees}
+\usetikzlibrary{matrix}
+  \begin{tikzpicture}[>=stealth,sloped]
+    \matrix (tree) [%
+      matrix of nodes,
+      minimum size=1cm,
+      column sep=3.5cm,
+      row sep=1cm,
+    ]
+    {
+          &   & $C_{uu}=\max\{0,S_0u_2^2-K\}$ \\
+          & $C_u$ &   \\
+      $C$ &   & $C_{uu}=\max\{0,S_0u_2d_2-K\}$ \\
+          & $C_d$ &   \\
+          &   & $c_{dd}=\max\{0,S_0d^2-K\}$ \\
+    };
+    \draw[->] (tree-3-1) -- (tree-2-2) node [midway,above] {$p$};
+    \draw[->] (tree-3-1) -- (tree-4-2) node [midway,below] {$(1-p)$};
+    \draw[->] (tree-2-2) -- (tree-1-3) node [midway,above] {$P^2$};
+    \draw[->] (tree-2-2) -- (tree-3-3) node [midway,below] {$(1-p)p$};
+    \draw[->] (tree-4-2) -- (tree-3-3) node [midway,above] {$(1-p)p$};
+    \draw[->] (tree-4-2) -- (tree-5-3) node [midway,below] {$(1-p)^2$};
+  \end{tikzpicture}
+```
+Donde $C_u$ y $C_d$ se calculan como se mostró en la sección del precio de las opciones. Cabe destacar que nunca se ha descartado el caso en que el precio de la opción sea 0, esto lo que expresaría es que casi seguramente el precio de la acción al final se va encontrar por debajo del precio de ejercicio $K$ o lo que es lo mismo
+\[
+\mathbb{P}(S_{f}\leq K)=1
+\]
+De forma análoga se tiene que la opción de venta da como origen un árbol de la siguiente forma
+
+```{tikz, fig.cap = "Árbol Binomial de Opción de Venta", fig.ext = 'png'}
 \usetikzlibrary{arrows}
 \usetikzlibrary{trees}
 \usetikzlibrary{matrix}
@@ -664,11 +695,24 @@ Cabe recordar que los modelos son un simplificación de la realidad, y no se deb
     \draw[->] (tree-4-2) -- (tree-5-3) node [midway,below] {$(1-p)^2$};
   \end{tikzpicture}
 ```
-Donde $C_u$ y $C_d$ se calculan como se mostrón en la sección del precio de las acciones. Cabe desctacar que nunca se ha descartado el caso en que el precio de la opción sea 0, esto lo que expresaría es que casi seguramente el precio de la acción al final se va encontrar por debajo del precio de ejercicio $K$ o lo que es lo mismo
+
+Partiendo de esto lo que se ha hecho para la implementación de estos árboles y basado en los precios de las acciones y sus probabilidades, ha sido desarrollar un método de recursivo para el cálculo de un árbol binomial de precios, el cual se ha desarrollado en una matriz basado en las ecuaciones para el caso de los inversores con riesgo neutral, la volatilidad obtenida a partir de los precios históricos con los que se contaba y la cantidad pagada de dividendo de forma anual. 
+
+Es importante destacar que se trabaja de forma anualizada de tal forma que si el tiempo para el vencimiento de una opción es de tres meses entonces $t_f=0.25$, seis meses $t_f=0.5$ y un año $t_f=1$. El riesgo neutral se calcula a través de una interpolación de las tasas (anualizadas) con las que se cuenta y el modelo de Svensson a partir de esto se obtiene los parámetros que pueden ser usados para calcular $y(t)$, a partir de esto se calcula que el factor de decuento para cada paso
+
 \[
-\mathbb{P}(S_{f}\leq K)=1
+e^{-y(t_f)h_n}
 \]
-De forma análoga se tiene que la opción de venta da como origen un árbol de la siguiente forma
+
+Una vez con los datos necesarios se parte de una matriz (sin valores) la cual basada en la cantidad de pasos que se querían hacer y para poder dejar espacios entre los precios y que quedara de una forma más clara el cómo aumentaba, toma las dimensiones $n+1\times2n+1$  y que coloca el precio $S_0$ en la columna $n+1$ y fila 1. 
+
+Apartir de esto se recorre la matriz buscando valores numéricos, para continuar agregando los valores a la matriz, es decir se nota que en la posición que corresponde a la fila 1 con la columna $n+1$ se encuentra el valor $S_0$ entonces basado en el valor $u$ y $d$ se coloca en la posición fila 2 columna $n$ el valor de $S_0d$ y en el caso de la fila 2 columna $n+2$ el valor de $S_0u$, posterior a esto se recorre la segunda fila y basasado en el precio $S_0d$ ubicado en la posición anteriormente establecida se coloca $S_0d^2$ en la fila 3 columna $n-1$ y de forma análoga $S_0ud$ en la fila 3 columna $n+1$ y para el caso de $S_0u$ en la posición establecida anteriormente se coloca $S_0uu$ en la fila 3 columna $n+3$ y el caso de $S_0du$ en la fila 3 columna $n+1$, y se siguen recorriendo las filas de forma recursiva hasta la fila $n$ ya que al llegar a la $n+1$ ya no habrán más pasos que hacer. Posterior a esto para mostrarla en el trabajo se ha hecho un espejo de derecha a izquierda de la matriz y se transpuso para obtener la forma querida que es izquierda a derecha los pasos. Se trabajó de forma vertical por comodidad.
+
+Para calcular de forma recursiva el precio de la opción de compra, se creo una matriz de las mismas dimensiones que la anterior y a partir de esto aprovechando la forma en que trabaja $\mathbf{R}$ se le resta a toda la fila $n+1$ de la matriz de los precios el valor de ejercicio $K$ y si el valor obtenido es mayor que 0 entonces este valor es el que se deja en el vector que se genera en otro caso se coloca el valor de 0 en esa posición del vector, este vector se introduce en la matriz de los precios opciones de compra vacía justamente en la fila $n+1$. 
+
+Usando los valores $p$ y la tasa de curva soberana ajustada para cada paso y ligada a la fecha de maduración de la opción de compra se comienza a rellenar la matriz. Note que a pesar de que en la fila $n+1$ se introdujo el vector anteriormente descrito hay posiciones que no tienen algo, ya que así se había construido la matriz de los precios. La forma en que se hace esto es se empieza de la fila $n+1$ y se consulta que si la entrada de la fila $n+1$ tiene un valor numérico esto para los valores de columna desde $1$ hasta $2n-1$ se hace hasta entrada ya que una vez encontrado un valor numérico en la entrada $j$ se toma este valor se multiplica por $1-p$ a esto se le suma el valor de la entrada $j+2$ que se multiplica por le valor $p$ ya con esto se multiplica por le factor de descuento y se coloca el valor obtenido en la fila $n$ en la columna $j+1$, ahora para la fila $n$ se repite el proceso y así hasta llega a rellenar la fila 1 con el valor actual de la opción.
+
+Ahora también se ha desarrollado simplemente una función para hacer tanto el cálculo de la opción de compra como la opción de venta, basada en la misma idea recursiva mostrada en el marco teórico. Esta puede ser de mayor utilidad ya que retorna el valor de forrma directa.
 # Resultados
 Se presentan obtenidos al aplicar el modelo para el precio de las opciones a 3, 6 meses y 1 año empleando como precio de ejercicio el precio del 30 de junio del 2021.
 
@@ -730,13 +774,21 @@ arbolrTri%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)%>%scroll_bo
 
 
 
-El árbol con el precio para la opción de compra del activo subyacente es el siguiente
+El árbol con el precio para la opción de compra a tres meses del activo subyacente es el siguiente
 
 ```{r}
 arbolCTri<-(arbolBinarioC(nTrimestral,hnTrimetral,sigma,K,svensson(parametrosModelo,1/4),valoresTrimestral[2],K))
 arbolCTri[is.na(arbolCTri)]=""
 arbolCTri<-t(arbolCTri[,rev(seq_len(ncol(arbolCTri)))])
 arbolCTri%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)%>%scroll_box(width = "100%",height = "500px")
+```
+
+El árbol con el precio para opción de venta a tres meses del activo subyacente es el siguiente
+```{r}
+arbolPTri<-(arbolBinarioC(nTrimestral,hnTrimetral,sigma,-K,svensson(parametrosModelo,1/4),valoresTrimestral[2],-K))
+arbolPTri[is.na(arbolPTri)]=""
+arbolPTri<-t(arbolPTri[,rev(seq_len(ncol(arbolPTri)))])
+arbolPTri%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)%>%scroll_box(width = "100%",height = "500px")
 ```
 
 Los precios respectivos para las opciones se resumen en la siguiente tabla
@@ -749,6 +801,72 @@ resultados%>%kbl(col.names = c("Tiempo","Opción","Precio"))%>%kable_material()
 
 # Bilibliografía
 
+
+<head>
+  <meta charset="UTF-8">
+  <title>Hanging paragraph CSS style, for APA-style references</title>
+  <meta name="description" content="A quick template that will allow anyone to copy and apply the CSS needed to hang references in their web publications using correct APA style syntax.">
+  <meta name="author" content="Robert Valencia">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="apa-reference-styles.css">
+  <style type="text/css" media="all">
+    /*  
+    Generic styling for sample, this should not be copied to your design/template.
+    */
+    #main{width: 42em;font: 1em/1.4 "Cambria",Georgia, sans-serif;}
+    h2{font-size: 1.5em;font-weight: bold;margin: .83em 0;}
+    .ref-apa h2 span, .ref-apa dt span {font-size: .76em;font-weight: normal;opacity:.3;}
+  </style>
+</head>
+<body>
+  <div id="container">
+    <header>
+      <h1>CSS for creating a hanging indent <em>—APA style—</em> References list</h1>
+    </header>
+
+    <div id="main" role="main">
+      <p>The following is a quick template that will allow anyone to copy and apply the CSS needed to hang references in their web publications using correct APA style syntax. You may format your references in whatever semantic structure you are using: as list items within an ordered or unordered list, as definition descriptions within a defintion list, or even as paragraphs within a division element.</p>
+      <p>To apply:<br />
+        1. Paste the following code into your CSS file:  the <code>class="ref-apa"</code> css class to the wrapping element in your references, whether it be a <code>div</code>, an <code>ol</code>, <code>ul</code> or <code>dl</code>.<br />
+        <strong>update:</strong> As an alternative to <code>.ref-apa</code>, the following class now work interchangeably too: <code>.refapa</code>, <code>.apa</code>, <code>.aparef</code>, and <code>.apa-ref</code>
+        </p>
+      
+      <div class="ref-apa">
+        <h2>References <span>div style</span></h2>
+        <p>Herbst-Damn, K. L., & Kulik, J. A. (2005). Volunteer support, marital status, and the survival times of terminally ill patients. <em>Health Psychology, 24</em>(1), 225-229. doi:10.1037/0278-6133.24.2.225</p>
+        <p>Angeli, E., Wagner, J., Lawrick, E., Moore, K., Anderson, M., Soderlund, L., & Brizee, A. (2010, May 5). <em>General format.</em> Retrieved from http://owl.english.purdue.edu/owl/resource/560/01/</p>
+        <p>Wegener, D. T., Kerr, N. L., Fleming, M. A., & Petty, R. E. (2000). Flexible corrections of juror judgments: Implications for jury instructions. <em>Psychology, Public Policy, & Law, 6</em>, 629-654.</p>
+        <p>Wegener, D. T., & Petty, R. E. (1994). Mood management across affective states: The hedonic contingency hypothesis. <em>Journal of Personality & Social Psychology, 66</em>, 1034-1048.</p>
+      </div><!-- .ref-apa -->
+        <ul class="ref-apa">
+          <h2>References <span>ul style</span></h2>
+          <li>Herbst-Damn, K. L., & Kulik, J. A. (2005). Volunteer support, marital status, and the survival times of terminally ill patients. <em>Health Psychology, 24</em>(1), 225-229. doi:10.1037/0278-6133.24.2.225</li>
+          <li>Angeli, E., Wagner, J., Lawrick, E., Moore, K., Anderson, M., Soderlund, L., & Brizee, A. (2010, May 5). <em>General format.</em> Retrieved from http://owl.english.purdue.edu/owl/resource/560/01/</li>
+          <li>Wegener, D. T., & Petty, R. E. (1994). Mood management across affective states: The hedonic contingency hypothesis. <em>Journal of Personality & Social Psychology, 66</em>, 1034-1048.</li>
+          <li>Wegener, D. T., Kerr, N. L., Fleming, M. A., & Petty, R. E. (2000). Flexible corrections of juror judgments: Implications for jury instructions. <em>Psychology, Public Policy, & Law, 6</em>, 629-654.</li>
+        </ul>
+        <ol class="ref-apa">
+          <h2>References <span>ol style</span></h2>
+          <li>Herbst-Damn, K. L., & Kulik, J. A. (2005). Volunteer support, marital status, and the survival times of terminally ill patients. <em>Health Psychology, 24</em>(1), 225-229. doi:10.1037/0278-6133.24.2.225</li>
+          <li>Angeli, E., Wagner, J., Lawrick, E., Moore, K., Anderson, M., Soderlund, L., & Brizee, A. (2010, May 5). <em>General format.</em> Retrieved from http://owl.english.purdue.edu/owl/resource/560/01/</li>
+          <li>Wegener, D. T., & Petty, R. E. (1994). Mood management across affective states: The hedonic contingency hypothesis. <em>Journal of Personality & Social Psychology, 66</em>, 1034-1048.</li>
+          <li>Wegener, D. T., Kerr, N. L., Fleming, M. A., & Petty, R. E. (2000). Flexible corrections of juror judgments: Implications for jury instructions. <em>Psychology, Public Policy, & Law, 6</em>, 629-654.</li>
+        </ol>
+        <dl class="ref-apa">
+          <dt>References <span>definition list style</span></dt>
+          <dd>Herbst-Damn, K. L., & Kulik, J. A. (2005). Volunteer support, marital status, and the survival times of terminally ill patients. <em>Health Psychology, 24</em>(1), 225-229. doi:10.1037/0278-6133.24.2.225</dd>
+          <dd>Angeli, E., Wagner, J., Lawrick, E., Moore, K., Anderson, M., Soderlund, L., & Brizee, A. (2010, May 5). <em>General format.</em> Retrieved from http://owl.english.purdue.edu/owl/resource/560/01/</dd>
+          <dd>Wegener, D. T., & Petty, R. E. (1994). Mood management across affective states: The hedonic contingency hypothesis. <em>Journal of Personality & Social Psychology, 66</em>, 1034-1048.</dd>
+          <dd>Wegener, D. T., Kerr, N. L., Fleming, M. A., & Petty, R. E. (2000). Flexible corrections of juror judgments: Implications for jury instructions. <em>Psychology, Public Policy, & Law, 6</em>, 629-654.</dd>
+        </dl>
+    </div>
+
+    <footer>
+      
+    </footer>
+  </div>
+</body>
 
 Metodologia, periodo y que datos
 Conclusiones
