@@ -750,10 +750,7 @@ e^{-y(t_f)h_n}
 
 Además, se tiene que las acciones de Holcim Costa Rica S.A. pagan dividendos en fechas establecidas. Sin embargo, estos no se basan en una composición continua de pagos de los mismos y se establecen en un rango de fechas, se conviene que, salvo la opción tenga vencimiento en los rangos de fechas establecidos para el pago de los dividendos $q=0$.
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 309dd3cca894b2239a78c3dda2dc8849ff920c15
 En el caso de que la opción se establezca en una fecha donde se pagan dividendos, el poseedor de la acción a la fecha es el que tiene el derecho al dividendo. 
 Basado en los registros con los que se cuenta de la empresa se supone que los siguientes pagos de dividendos serán oficializados, tanto el monto como la fecha de pago se harán el 21 de diciembre de 2021 y el 22 de abril del 2022.
 
