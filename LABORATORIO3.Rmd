@@ -178,41 +178,11 @@ precioP<-function(K,S_0,n,hn,volatilidad,r,q){
 ```
 
 
-
-
-
-# Instrucciones
-
-
-- El laboratorio consiste en un trabajo en equipo en el cual se implementen los conceptos desarrollados en clase y la profundización de los mismos. 
-- El objetivo general es: Aplicar el método de Árbol binomial en instrumentos financieros de renta variable. 
-- Debe desarrollar el modelo para el cálculo, con una programación eficiente y ordenada en RStudio que incluya lo siguiente: 
-    - El modelo para el árbol binomial. 
-    - El modelo para la valoración del derivado.
-    - Un análisis de resultados obtenidos. 
-    - Debe entregar el código que incluya una breve explicación de la funcionalidad del mismo.
-    
-- En trabajo escrito RMarkdown deberá incluir lo siguiente: 
-    - Párrafo introductorio donde comenta el trabajo realizado. 
-    - Marco teórico que fundamente el laboratorio, según lo visto en clase y profundizaciones de contenidos.
-    - Metodología utilizada en el laboratorio. 
-    - Una sección (o capítulo) de descripción de los datos históricos a utilizar, donde se describan las principales características de las variables relevantes. 
-    - Una sección (o capítulo)  con el análisis del árbol binomial y su implementación para valorar un derivado financiero. 
-    - Una sección (o capítulo)  que incluya resultados. 
-    - Una sección (o capítulo)  en el cual realice conclusiones
-    - Refencias bibliográficas.
-- Para llevar a cabo el ejercicio, se le proponen las siguientes preguntas de investigación. Elija la que más le guste o bien, puede proponer una nueva pregunta de investigación.
     
     
     
-    
-# Sugerencia 1
+# Introducción
 
-¿Cómo el precio de las acciones de alguna empresa nacional observadas con cierta frecuencia se pueden utilizar para determinar el precio que tendrá una opción de venta o de compra en el futuro, si el subyacente es la acción observada?
-
-* Buscar datos el activo subyacente. 
-* Implementar el modelo de árbol binomial para predecir los precios futuros del subyacente.
-* Utilizar la modelación anterior para determinar el precio que debe tener la opción de venta (o compra), utilizando un modelo adecuado de valoración.
 
 
 
@@ -630,27 +600,7 @@ Fechas_semanales <- cut(Precios$Fecha, "week")
 Fechas_semanales <- unique(Fechas_semanales)
 
 
-Fechas_semanales 
-
 Precios_semanales <- Precios$Último[Fechas_semanales]
-
-Precios_semanales
-
-##Retornos diarios
-
-#retornos_brutos_diarios <- Precios$Último[-length(Precios$Último)]/Precios$Último[-1]
-
-
-#retornos_logaritmicos_diarios <- log(retornos_brutos_diarios)
-
-
-#varianza_retornos_logaritmicos_diarios <- var(retornos_logaritmicos_diarios)
-
-
-#volatilidad_logaritmica_diaria <- 1/length(Precios$Último) * varianza_retornos_logaritmicos_diarios
-
-
-##Retornos diarios
 
 
 retornos_brutos_semanales <- Precios_semanales[-length(Precios_semanales)]/Precios_semanales[-1]
