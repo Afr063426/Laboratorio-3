@@ -196,15 +196,18 @@ tablaNotacion<-data.frame(Notacion=notacion,Significado=significado)
 tablaNotacion%>%kbl(col.names = c("Notación","Significado"),caption="<center><strong>Tabla 1: Notación</strong></center>
 ")%>%kable_material()%>%kable_styling(full_width = F)
 ```
+
 Existen distintos métodos para la valoración de opciones, entre ellos los que se basan en métodos numéricos como lo expone Marín (2009) existen el de Monte Carlo, diferencias finitas, árboles binomiales y trinomiales. A lo largo de este trabajo se implementa la valoración de las opciones bajo el modelo de árboles binomiales. Los modelos basados en métodos numéricos a diferencia de otros poseen la ventaja de que su implementación es computacionalmente más simple y eficiente que el desarrollo de soluciones analíticas para la valoración de las opciones, basado en el comportamiento del activo subyacente.
 
 Se procede a explicar lo que son los árboles binomiales, así como su construcción. De acuerdo con el texto _An introduction to Mathematical Finance with Application_, los árboles binomiales muestran los posibles precios futuros de un activo basado en el conocimiento del precio actual. Para este modelo se parte de un intervalo $[t_0,t_f]$, este intervalo es subdivido en $n$ subintervalos del mismo largo llamados pasos de tiempo, así se obtienen los intervalos $[t_0,t_1],[t_1,t_2],...,[t_{n-1},t_{n}]$ donde
+
 \[
 0\leq t_0,\quad t_1=t_0+h_n,\quad t_2=t_0+2h_n,\quad...,\quad t_{n-1}=t_0+(n-1)h_n,\quad t_n=t_0+nh_n=t_f
 \]
+
 Gráficamente un árbol binomial.
 
-<caption><center><strong>Figura 1: Árbol Binomial de Dos Pasos<strong></center></caption>
+<caption><center><strong>Figura 1: Árbol Binomial de Dos Pasos</strong></center></caption>
 ```{tikz , fig.ext = 'png'}
 \usetikzlibrary{arrows}
 \usetikzlibrary{trees}
@@ -631,12 +634,6 @@ volatilidad_anual<- volatilidad_semanal * sqrt(52)
 #volatilidad_logaritmica_semanal
 
 ```
-
-
-
-
-
-
 
 
 
