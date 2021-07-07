@@ -161,19 +161,13 @@ parametros<-function(K,S_0,n,hn,volatilidad,r,q){
 
 precioC<-function(K,S_0,n,hn,volatilidad,r,q){
   parametros<-parametros(K,S_0,n,hn,volatilidad,r,q)
-  sum((choose(n,c(parametros[1]:n))*parametros[2]^(c(parametros[1]:n))*(1-parametros[2])^(n-c(parametros[1]:n)))*(parametros[3]^(c(parametros[1]:n))*(1/parametros[3])^(n-c(parametros[1]:n))*S_0-K))/(exp(-n*hn*r))### Formula para precio de de las opciones de compra
+  sum((choose(n,c(parametros[1]:n))*parametros[2]^(c(parametros[1]:n))*(1-parametros[2])^(n-c(parametros[1]:n)))*(parametros[3]^(c(parametros[1]:n))*(1/parametros[3])^(n-c(parametros[1]:n))*S_0-K))/(exp(-n*hn*(r-q)))### Formula para precio de de las opciones de compra
 }
 
 ### De forma análoga se programa el precio de una put option europea
-precioP<-function(K,S_0,n,hn,volatilidad,r,q,t){
-  parametros<-parametros(K,S_0,n,hn,volatilidad,r,q)
-  parametros[1]<-n-parametros[1]
-  sum(choose(n,c(0:parametros[1]))*parametros[2]^(0:parametros[1])*(1-parametros[2])^(n-c(0:parametros[1]))*(K-parametros[3]^(0:parametros[1])*(1/parametros[3])^(n-c(0:parametros[1]))*S_0))*exp(-t*r) ### Formula para precio de de las opciones de compra
-}
-
 precioP<-function(K,S_0,n,hn,volatilidad,r,q){
   parametros<-parametros(K,S_0,n,hn,volatilidad,r,q)
-  -sum((choose(n,c(0:(parametros[1]-1)))*parametros[2]^(c(0:(parametros[1]-1)))*(1-parametros[2])^(n-c(0:(parametros[1]-1))))*(parametros[3]^(c(0:(parametros[1]-1)))*(1/parametros[3])^(n-c(0:(parametros[1]-1)))*S_0-K))/(exp(-n*hn*r))### Formula para precio de de las opciones de venta
+  -sum((choose(n,c(0:(parametros[1]-1)))*parametros[2]^(c(0:(parametros[1]-1)))*(1-parametros[2])^(n-c(0:(parametros[1]-1))))*(parametros[3]^(c(0:(parametros[1]-1)))*(1/parametros[3])^(n-c(0:(parametros[1]-1)))*S_0-K))/(exp(-n*hn*(r-q)))### Formula para precio de de las opciones de venta
 }
 ```
 
@@ -810,9 +804,10 @@ arbolCTri<-t(arbolCTri[,rev(seq_len(ncol(arbolCTri)))])
 arbolCTri%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)%>%scroll_box(width = "100%",height = "500px")
 ```
 
+
 El árbol con el precio para opción de venta a tres meses del activo subyacente es el siguiente:
-```{r}l
-arbolPTri<-(arbolBinarioC(nTrimestral,hnTrimetral,sigma,-K,svensson(parametrosModelo,1/4),valoresTrimestral[2],-K))
+```{r}
+arbolPTri<-(arbolBinarioC(nTrimestral,hnTrimetral,sigma,-K,svensson(parametrosModelo,1/4),valoresTrimestral[2],-K,q))
 arbolPTri[is.na(arbolPTri)]=""
 arbolPTri<-t(arbolPTri[,rev(seq_len(ncol(arbolPTri)))])
 arbolPTri%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)%>%scroll_box(width = "100%",height = "500px")
