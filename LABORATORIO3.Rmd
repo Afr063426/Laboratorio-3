@@ -177,11 +177,11 @@ precioP<-function(K,S_0,n,hn,volatilidad,r,q){
     
 # Introducción
 
-Las opciones de compra y venta de activos financieros son instrumentos utilizados alrededor del mundo por inversionistas que buscan incrementar su riqueza o cubrirse del riesgo.  Así que en el presente trabajo se va a exponer el modelo de Cox, Ross y Rubinstein (1979), mismo que se aplicará sobre el activo denominado acciones de Holcim Costa Rica, para obtener el resultado de las opciones.
+Las opciones de compra y venta de activos financieros son instrumentos utilizados alrededor del mundo por inversionistas que buscan incrementar su riqueza o cubrirse del riesgo.  Así que en el presente trabajo se va expone el modelo de Cox, Ross y Rubinstein (1979), mismo que se aplicara sobre el activo denominado acciones de Holcim Costa Rica, para obtener el resultado de las opciones de compra y venta.
 
 El trabajo abarcara un marco teórico detallado, que incluye aspectos relevantes para la aplicación del modelo como lo son la curva de rendimiento soberana, aspectos estadísticos, supuestos para trabajar con árboles binomiales, descripción de las opciones y presiones de las mismas.
 
-También se abarcará una sección metodológica y de análisis de los datos implementados. En esta última se llevará acabado una presentación de los datos y características importantes de los mismos. Por su parte se dedicará una sección al análisis del árbol y su implementación, para clarificar el proceso seguido para su obtención.
+También se incluye una sección metodológica y de análisis de los datos implementados. En esta última, se lleva a cabo una presentación de los datos y características importantes de los mismos. Por su parte, se dedica una sección al análisis del árbol y su implementación, para clarificar el proceso seguido para su obtención.
 
 Todo lo anterior se sigue como fin para lograr establecer los resultados de la aplicación del modelo con los datos presentados, teniendo como resultados las opciones de compra y venta a tres meses, seis meses y un año.
 
