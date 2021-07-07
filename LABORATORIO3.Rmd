@@ -582,7 +582,7 @@ Se va a trabajar con los datos de la curva soberana obtenidos de la página del 
 ```{r}
 tasasBCCR<-tasasBCCR[-12]
 tasasBCCR<-cbind("Fechas de maduración"= c("Tasa"), tasasBCCR)
-tasasBCCR%>%kbl(caption="<center><strong> Tabla 5: <strong>Tasas de Rendimiento, Curva Soberana</center>")%>%kable_material()%>%kable_styling(full_width = F)
+tasasBCCR%>%kbl(caption="<center><strong> Tabla 5: Tasas de Rendimiento, Curva Soberana</strong></center>")%>%kable_material()%>%kable_styling(full_width = F)
 tasasBCCR<-tasasBCCR[-1]
 
 ```
@@ -645,7 +645,7 @@ El árbol binomial como se mostró es útil ya que permite calcular los posibles
 Cabe recordar que los modelos son un simplificación de la realidad, y no se deben tomar como una verdad completa, estas herramientas permiten tonar decisionces con cierto criterio. Con esto dicho se muestra una representación del precio de una opción de compra en un árbol de dos pasos sería.
 
 
-<caption><center><strong>Árbol Binomial de Opción de Compra<strong></center></caption>
+<caption><center><strong>Árbol Binomial de Opción de Compra</strong></center></caption>
 ```{tikz, fig.ext = 'png'}
 \usetikzlibrary{arrows}
 \usetikzlibrary{trees}
