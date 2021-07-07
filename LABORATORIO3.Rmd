@@ -1,6 +1,7 @@
 ---
-title: "Laboratorio 3"
+title: "Valoración de opciones para la compra y venta de acciones de Holcim Costa Rica S.A."
 date: "`r Sys.Date()`"
+autor: "Cervantes Artavia Joshua B81952 \\ Gonzalez Alfaro David B93327 \\ Sabater Guzmán Daniel"
 output:
   rmdformats::readthedown:
     highlight: kate
@@ -173,7 +174,13 @@ precioP<-function(K,S_0,n,hn,volatilidad,r,q){
 ```
 
 
-    
+Autores:
+
+Cervantes Artavia Joshua B81952 
+
+Gonzalez Alfaro David B93327
+
+Sabater Guzmán Daniel B87096
     
     
 # Introducción
@@ -590,6 +597,30 @@ Precios<-Precios[Precios$Fecha>=as.Date("01.03.2020",format="%d.%m.%Y"),]
 
 <subcaption><small>Fuente: Elaboración propia, datos Investing.com y Holcim Costa Rica S.A.</small></subcaption>
 
+```{r}
+
+##Se procede a calcular los retornos logarítmicos de los precios de las acciones. Para esto, primero se calculan los rendimientos brutos semanales, seguidamente del logaritmo de estos
+
+
+Fechas_semanales <- cut(Precios$Fecha, "week")
+Fechas_semanales <- unique(Fechas_semanales)
+Precios_semanales <- Precios$Último[Fechas_semanales]
+
+retornos_brutos_semanales <- Precios_semanales[-length(Precios_semanales)]/Precios_semanales[-1]
+#retornos_brutos_semanales
+
+retornos_logaritmicos_semanales <- log(retornos_brutos_semanales)
+#retornos_logaritmicos_semanales
+
+##Luego se calcula la varianza de los resultados anteriores y posteriormente la volatilidad de los datos obtenidos
+
+volatilidad_semanal <- sd(retornos_logaritmicos_semanales)
+#varianza_retornos_logaritmicos_semanales
+
+volatilidad_anual<- volatilidad_semanal * sqrt(52)
+#volatilidad_logaritmica_semanal
+
+```
 
 Se debe tener presente que la Bolsa Nacional de Valores de Costa Rica únicamente trabaja en días hábiles, por lo que se tiene que tener presente los días no bursátiles en Costa Rica, los cuales son:
 
@@ -635,31 +666,6 @@ ggplot()+
 ```
 <subcaption><small> Fuente: Elaboración propia, datos BCCR</small></subcaption>
 
-
-```{r}
-
-##Se procede a calcular los retornos logarítmicos de los precios de las acciones. Para esto, primero se calculan los rendimientos brutos semanales, seguidamente del logaritmo de estos
-
-
-Fechas_semanales <- cut(Precios$Fecha, "week")
-Fechas_semanales <- unique(Fechas_semanales)
-Precios_semanales <- Precios$Último[Fechas_semanales]
-
-retornos_brutos_semanales <- Precios_semanales[-length(Precios_semanales)]/Precios_semanales[-1]
-#retornos_brutos_semanales
-
-retornos_logaritmicos_semanales <- log(retornos_brutos_semanales)
-#retornos_logaritmicos_semanales
-
-##Luego se calcula la varianza de los resultados anteriores y posteriormente la volatilidad de los datos obtenidos
-
-volatilidad_semanal <- sd(retornos_logaritmicos_semanales)
-#varianza_retornos_logaritmicos_semanales
-
-volatilidad_anual<- volatilidad_semanal * sqrt(52)
-#volatilidad_logaritmica_semanal
-
-```
 
 
 
