@@ -67,7 +67,7 @@ tasasBCCR<-read_xlsx("Curva soberana.xlsx")
 fecha<-as.Date(c("01/01/2021","01/04/2021","02/04/2021","03/05/2021","26/07/2021","02/08/2021","13/09/2021","29/11/2021","25/12/2021","31/12/2021"),format="%d/%m/%Y")
 descripcion<-c("Año Nuevo","Jueves Santo", "Viernes Santo","Día del Trabajador","Anexión del partido de Nicoya","Día de la Virgen de Los Ángeles","Independecia","Día de la Abolición del Ejercitos","Día de Navidad","Feriado Banco Central")
 tablaConDiaNB<-data.frame(Fecha=fecha,Descripción=descripcion)
-tablaKableConDiaNB<-tablaConDiaNB%>%kbl()%>%kable_material()
+tablaKableConDiaNB<-tablaConDiaNB%>%kbl(caption="<center><strong>Tabla 4: Días no Bursátiles Costa Rica</center></strong>")%>%kable_material()
 ```
 
 
@@ -123,7 +123,7 @@ arbolBinarioM<-function(n,hn,volatilidad,S_0){
 }
 
 ### Se procede a programar el árbol binomial, pero de el caso de las opciones de compra
-arbolBinarioC<-function(n,hn,volatilidad,S_0,r,p,K){
+arbolBinarioC<-function(n,hn,volatilidad,S_0,r,p,K,q){
   ### La cantidad de columnas de la matriz es n+1 ya que hay n+1 precios posibles en el paso final
   ### La cantidad de filas van a ser n+1 ya que son los n pasos y el precio incial
   arbol<-matrix(nrow=n+1,ncol = 2*n+1)
@@ -131,7 +131,7 @@ arbolBinarioC<-function(n,hn,volatilidad,S_0,r,p,K){
   for(i in (n+1):2){
     for(j in 1:(2*n-1)){
       if(!is.na(arbol[i,j])){
-        arbol[i-1,j+1]<-(arbol[i,j]*(1-p)+arbol[i,j+2]*(p))*exp(-hn*r)
+        arbol[i-1,j+1]<-(arbol[i,j]*(1-p)+arbol[i,j+2]*(p))*exp(-hn*(r-q))
       }
     }
   }
@@ -161,19 +161,13 @@ parametros<-function(K,S_0,n,hn,volatilidad,r,q){
 
 precioC<-function(K,S_0,n,hn,volatilidad,r,q){
   parametros<-parametros(K,S_0,n,hn,volatilidad,r,q)
-  sum((choose(n,c(parametros[1]:n))*parametros[2]^(c(parametros[1]:n))*(1-parametros[2])^(n-c(parametros[1]:n)))*(parametros[3]^(c(parametros[1]:n))*(1/parametros[3])^(n-c(parametros[1]:n))*S_0-K))/(exp(-n*hn*r))### Formula para precio de de las opciones de compra
+  sum((choose(n,c(parametros[1]:n))*parametros[2]^(c(parametros[1]:n))*(1-parametros[2])^(n-c(parametros[1]:n)))*(parametros[3]^(c(parametros[1]:n))*(1/parametros[3])^(n-c(parametros[1]:n))*S_0-K))/(exp(-n*hn*(r-q)))### Formula para precio de de las opciones de compra
 }
 
 ### De forma análoga se programa el precio de una put option europea
-precioP<-function(K,S_0,n,hn,volatilidad,r,q,t){
-  parametros<-parametros(K,S_0,n,hn,volatilidad,r,q)
-  parametros[1]<-n-parametros[1]
-  sum(choose(n,c(0:parametros[1]))*parametros[2]^(0:parametros[1])*(1-parametros[2])^(n-c(0:parametros[1]))*(K-parametros[3]^(0:parametros[1])*(1/parametros[3])^(n-c(0:parametros[1]))*S_0))*exp(-t*r) ### Formula para precio de de las opciones de compra
-}
-
 precioP<-function(K,S_0,n,hn,volatilidad,r,q){
   parametros<-parametros(K,S_0,n,hn,volatilidad,r,q)
-  -sum((choose(n,c(0:(parametros[1]-1)))*parametros[2]^(c(0:(parametros[1]-1)))*(1-parametros[2])^(n-c(0:(parametros[1]-1))))*(parametros[3]^(c(0:(parametros[1]-1)))*(1/parametros[3])^(n-c(0:(parametros[1]-1)))*S_0-K))/(exp(-n*hn*r))### Formula para precio de de las opciones de venta
+  -sum((choose(n,c(0:(parametros[1]-1)))*parametros[2]^(c(0:(parametros[1]-1)))*(1-parametros[2])^(n-c(0:(parametros[1]-1))))*(parametros[3]^(c(0:(parametros[1]-1)))*(1/parametros[3])^(n-c(0:(parametros[1]-1)))*S_0-K))/(exp(-n*hn*(r-q)))### Formula para precio de de las opciones de venta
 }
 ```
 
@@ -575,7 +569,8 @@ Precios<-Precios[Precios$Fecha>=as.Date("01.03.2020",format="%d.%m.%Y"),]
 
 ##
 Promedio<-mean(Precios$Último)
-rendimiento<-Promedio/(Montos$DiviendoPorAcción[5]+Montos$DiviendoPorAcción[4])
+rendimiento<-log((Montos$DiviendoPorAcción[5]+Montos$DiviendoPorAcción[4])/Promedio+1)
+
 ```
 Se tiene que tener presente que la Bolsa Nacional de Valores de Costa Rica únicamente trabaja en días hábiles por lo que se tiene que tener presente los días feriados en Costa Rica, los cuales son:
 
@@ -588,7 +583,7 @@ Se va a trabajar con los datos de la curva soberana obtenidos de la página del 
 ```{r}
 tasasBCCR<-tasasBCCR[-12]
 tasasBCCR<-cbind("Fechas de maduración"= c("Tasa"), tasasBCCR)
-tasasBCCR%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)
+tasasBCCR%>%kbl(caption="<center><strong> Tabla 5: <strong>Tasas de Rendimiento, Curva Soberana</center>")%>%kable_material()%>%kable_styling(full_width = F)
 tasasBCCR<-tasasBCCR[-1]
 
 ```
@@ -732,6 +727,7 @@ Para calcular de forma recursiva el precio de la opción de compra, se creo una 
 Usando los valores $p$ y la tasa de curva soberana ajustada para cada paso y ligada a la fecha de maduración de la opción de compra se comienza a rellenar la matriz. Note que a pesar de que en la fila $n+1$ se introdujo el vector anteriormente descrito hay posiciones que no tienen algo, ya que así se había construido la matriz de los precios. La forma en que se hace esto es se empieza de la fila $n+1$ y se consulta que si la entrada de la fila $n+1$ tiene un valor numérico esto para los valores de columna desde $1$ hasta $2n-1$ se hace hasta entrada ya que una vez encontrado un valor numérico en la entrada $j$ se toma este valor se multiplica por $1-p$ a esto se le suma el valor de la entrada $j+2$ que se multiplica por le valor $p$ ya con esto se multiplica por le factor de descuento y se coloca el valor obtenido en la fila $n$ en la columna $j+1$, ahora para la fila $n$ se repite el proceso y así hasta llega a rellenar la fila 1 con el valor actual de la opción.
 
 Ahora también se ha desarrollado simplemente una función para hacer tanto el cálculo de la opción de compra como la opción de venta, basada en la misma idea recursiva mostrada en el marco teórico. Esta puede ser de mayor utilidad ya que retorna el valor de forrma directa.
+
 # Resultados
 Se presentan obtenidos al aplicar el modelo para el precio de las opciones a 3, 6 meses y 1 año empleando como precio de ejercicio el precio del 30 de junio del 2021.
 
@@ -746,8 +742,8 @@ nSemestral<-as.numeric(as.Date("02/01/2022",format="%d/%m/%Y")-as.Date("30/06/20
 ### Cantidad de días bursátiles a partir del 30 de junio hasta el 30 de junio del 2021 (tomando como punto de referencia los días no bursátiles del presente año)
 nAnual<-as.numeric(as.Date("30/06/2022",format="%d/%m/%Y")-as.Date("30/06/2021",format="%d/%m/%Y")-length((tablaConDiaNB%>%filter(Fecha>=as.Date("01/10/2021",format="%d/%m/%Y")))$Fecha)-4)
 ### Anteriormente se determinó la volatilidad diaria entonces se usará esta ya que se está usando la cantidad días como la cantidad de pasos
-sigma<-0.06 ### A la espera
-q<- ## A la espera de dividendos anuales
+sigma<-volatilidad_anual ### A la espera
+q<-rendimiento ## A la espera de dividendos anuales
 ### Se trabaja de forma anualizada por lo que se tiene que los valores hn correspondientes son
 ## Tres meses equivalen a un cuarto del año
 hnTrimetral<-0.25/as.numeric(nTrimestral)
@@ -759,18 +755,18 @@ hnAnual<-1/as.numeric(nAnual)
 K<-Precios$Último[length(Precios$Último)]
 
 ## Se procede a calcular los valores de u,p, a con la función programa anteriomente y haciendo uso del modelo de Svensson con los parámetros calculados y la volatilidad calculada anteriormente
-valoresTrimestral<-parametros(K,K,nTrimestral,hnTrimetral,sigma,svensson(parametrosModelo,1/4),0)
-valoresSemestral<-parametros(K,K,nSemestral,hnTrimetral,sigma,svensson(parametrosModelo,1/2),0)
-valoresAnual<-parametros(K,K,nAnual,hnTrimetral,sigma,svensson(parametrosModelo,1),0)
+valoresTrimestral<-parametros(K,K,nTrimestral,hnTrimetral,sigma,svensson(parametrosModelo,1/4),q)
+valoresSemestral<-parametros(K,K,nSemestral,hnTrimetral,sigma,svensson(parametrosModelo,1/2),q)
+valoresAnual<-parametros(K,K,nAnual,hnTrimetral,sigma,svensson(parametrosModelo,1),q)
 ### Opciones put y call para el caso de trimestral
-precioOpcionCTrimestral<-precioC(K,K,nTrimestral,hnTrimetral,sigma,svensson(parametrosModelo,1/4),0)
-precioOpcionPTrimestral<-precioP(K,K,nTrimestral,hnTrimetral,sigma,svensson(parametrosModelo,1/4),0)
+precioOpcionCTrimestral<-precioC(K,K,nTrimestral,hnTrimetral,sigma,svensson(parametrosModelo,1/4),q)
+precioOpcionPTrimestral<-precioP(K,K,nTrimestral,hnTrimetral,sigma,svensson(parametrosModelo,1/4),q)
 ### Opciones put y call para el  caso semestral
-precioOpcionCSemestral<-precioC(K,K,nSemestral,hnSemestral,sigma,svensson(parametrosModelo,1/2),0)
-precioOpcionPSemestral<-precioP(K,K,nSemestral,hnSemestral,sigma,svensson(parametrosModelo,1/2),0)
+precioOpcionCSemestral<-precioC(K,K,nSemestral,hnSemestral,sigma,svensson(parametrosModelo,1/2),q)
+precioOpcionPSemestral<-precioP(K,K,nSemestral,hnSemestral,sigma,svensson(parametrosModelo,1/2),q)
 ### Opciones put y call para el caso anual
-precioOpcionCAnual<-precioC(K,K,nAnual,hnAnual,sigma,svensson(parametrosModelo,1),0)
-precioOpcionPAnual<-precioP(K,K,nAnual,hnAnual,sigma,svensson(parametrosModelo,1),0)
+precioOpcionCAnual<-precioC(K,K,nAnual,hnAnual,sigma,svensson(parametrosModelo,1),q)
+precioOpcionPAnual<-precioP(K,K,nAnual,hnAnual,sigma,svensson(parametrosModelo,1),q)
 resultados<-data.frame(Tiempo=rep(c("Tres meses","Seis Meses","Un año"),2),"Opción"=c(rep('Compra',3),rep('Venta',3)),"Precio"=c(precioOpcionCTrimestral,precioOpcionCSemestral,precioOpcionCAnual,precioOpcionPTrimestral,precioOpcionPSemestral,precioOpcionPAnual))
 ```
 
@@ -804,9 +800,10 @@ arbolCTri<-t(arbolCTri[,rev(seq_len(ncol(arbolCTri)))])
 arbolCTri%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)%>%scroll_box(width = "100%",height = "500px")
 ```
 
+
 El árbol con el precio para opción de venta a tres meses del activo subyacente es el siguiente:
 ```{r}
-arbolPTri<-(arbolBinarioC(nTrimestral,hnTrimetral,sigma,-K,svensson(parametrosModelo,1/4),valoresTrimestral[2],-K))
+arbolPTri<-(arbolBinarioC(nTrimestral,hnTrimetral,sigma,-K,svensson(parametrosModelo,1/4),valoresTrimestral[2],-K,q))
 arbolPTri[is.na(arbolPTri)]=""
 arbolPTri<-t(arbolPTri[,rev(seq_len(ncol(arbolPTri)))])
 arbolPTri%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)%>%scroll_box(width = "100%",height = "500px")
@@ -817,6 +814,7 @@ Los precios respectivos para las opciones se resumen en la siguiente tabla:
 ```{r}
 resultados%>%kbl(col.names = c("Tiempo","Opción","Precio"))%>%kable_material()
 ```
+
 
 # Conclusión
 
@@ -830,17 +828,28 @@ resultados%>%kbl(col.names = c("Tiempo","Opción","Precio"))%>%kable_material()
 </style>
 
 <div class="ref-apa" markdown="1">
-Cox, J. C., Ross, S. A., & Rubinstein, M. (1979). Option pricing: A simplified approach. Journal of financial Economics, 7(3), 229-263.
+Banco Central de Costa Rica (30 de junio del 2021). https://gee.bccr.fi.cr/indicadoreseconomicos/Cuadros/frmVerCatCuadro.aspx?idioma=1&CodCuadro=%202786
 
-Mascareñas, J. (2000). El Método binomial de valoración de opciones. Universidad Complutense de Madrid. Recuperado de http://www.gacetafinanciera.com/TEORIARIESGO/VALOREOPCIONES.pdf
+Banco Central de Costa Rica (s.f.). _Nota metológica. Curva de Rendimeinto de Costa Rica_. Recuperado de https://bit.ly/3jNt0eP
 
-Boudreault, M., & Renaud, J. F. (2019). Actuarial Finance: Derivatives, Quantitative Models and Risk Management. John Wiley & Sons.
+Banco Central de Costa Rica (s.f.). _Aspectos metológicos del cálculo de la curva de rendimientos soberana en colones_. https://bit.ly/3hnLFwp
 
-Petters, A. O., & Dong, X. (2016). An introduction to mathematical finance with applications. Springer.
+Boudreault, M., & Renaud, J. F. (2019). _Actuarial Finance: Derivatives, Quantitative Models and Risk Management_. John Wiley & Sons.
 
-Ruppert, D. and Matteson, D. (2015).Statistics and data analysis for financial engineering, volume 13. Springer
+Cox, J. C., Ross, S. A., & Rubinstein, M. (1979). Option pricing: A simplified approach. _Journal of financial Economics_, 7 _(3)_, 229-263.
 
+Evans, M. and Rosenthal, J. (2010)._Probability and statistics. The science of uncertainty_. Freeman, 2da. edición.
 
+Holcim (Costa Rica) S.A. (30 de junio del 2021). http://www.holcimchampions.com/accionistas/
+
+Investing.com (30 de junio del 2021). https://es.investing.com/equities/holcim-de-costa-rica-s.a.-historical-data
+
+Mascareñas, J. (2000). El Método binomial de valoración de opciones. Universidad Complutense de Madrid. 
+Recuperado de http://www.gacetafinanciera.com/TEORIARIESGO/VALOREOPCIONES.pdf
+
+Petters, A. O., & Dong, X. (2016). _An introduction to mathematical finance with applications_. Springer.
+
+Ruppert, D. and Matteson, D. (2015). _Statistics and data analysis for financial engineering_, volumen 13. Springer
 </div>
 
 
