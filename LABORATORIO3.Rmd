@@ -631,7 +631,7 @@ ggplot()+
 
 ```{r}
 
-##Se procede a calcular los retornos logarítmicos de los precios de las accioneshttp://127.0.0.1:32361/rmd_output/4/#conclusi%C3%B3n. Para esto, primero se calculan los rendimientos brutos semanales, seguidamente del logaritmo de estos
+##Se procede a calcular los retornos logarítmicos de los precios de las acciones. Para esto, primero se calculan los rendimientos brutos semanales, seguidamente del logaritmo de estos
 
 
 Fechas_semanales <- cut(Precios$Fecha, "week")
@@ -659,9 +659,9 @@ volatilidad_anual<- volatilidad_semanal * sqrt(52)
 
 # Análisis del árbol e implementación
 
-El árbol binomial como se mostró es útil ya que permite calcular los posibles precios que puede llegar a tener el activo, basado en datos históricos y reduciendo los casos a un aumento o disminución en cada paso. Como se mostró en la sección para el cálculo del precio de las opciones este se puede obtener de forma recursiva y este se basa en las mismas probabilidades de que el precio del activo subyacente aumente, cumpliendo que el precio de la opción responde a una distribución binomial.
+El árbol binomial es útil, ya que permite calcular los posibles precios que puede llegar a tener el activo, basado en datos históricos y reduciendo los casos a un aumento o disminución en cada paso. Como se mostró en la sección para el cálculo del precio de las opciones, este se puede obtener de forma recursiva y se basa en las mismas probabilidades de que el precio del activo subyacente aumente, cumpliendo que el precio de la opción responde a una distribución binomial.
 
-Cabe recordar que los modelos son un simplificación de la realidad, y no se deben tomar como una verdad completa, estas herramientas permiten tonar decisionces con cierto criterio. Con esto dicho se muestra una representación del precio de una opción de compra en un árbol de dos pasos sería.
+Cabe recordar que los modelos son un simplificación de la realidad, y no se deben tomar como una verdad completa, estas herramientas permiten tomar decisionces con cierto criterio. Dicho esto, se muestra una representación del precio de una opción de compra en un árbol de dos pasos.
 
 
 <caption><center><strong>Árbol Binomial de Opción de Compra</strong></center></caption>
@@ -685,7 +685,7 @@ Cabe recordar que los modelos son un simplificación de la realidad, y no se deb
     };
     \draw[->] (tree-3-1) -- (tree-2-2) node [midway,above] {$p$};
     \draw[->] (tree-3-1) -- (tree-4-2) node [midway,below] {$(1-p)$};
-    \draw[->] (tree-2-2) -- (tree-1-3) node [midway,above] {$P^2$};
+    \draw[->] (tree-2-2) -- (tree-1-3) node [midway,above] {$p^2$};
     \draw[->] (tree-2-2) -- (tree-3-3) node [midway,below] {$(1-p)p$};
     \draw[->] (tree-4-2) -- (tree-3-3) node [midway,above] {$(1-p)p$};
     \draw[->] (tree-4-2) -- (tree-5-3) node [midway,below] {$(1-p)^2$};
@@ -694,11 +694,13 @@ Cabe recordar que los modelos son un simplificación de la realidad, y no se deb
 <subcaption><small>Fuente: Elaboración propia, basado en código de user71804 https://tex.stackexchange.com/questions/227414/draw-5-period-binomial-tree</small></subcaption>
 
 
-Donde $C_u$ y $C_d$ se calculan como se mostró en la sección del precio de las opciones. Cabe destacar que nunca se ha descartado el caso en que el precio de la opción sea 0, esto lo que expresaría es que casi seguramente el precio de la acción al final se va encontrar por debajo del precio de ejercicio $K$ o lo que es lo mismo
+Donde $C_u$ y $C_d$ se calculan como se mostró en la sección del precio de las opciones. Cabe destacar que nunca se ha descartado el caso en que el precio de la opción sea 0, esto lo que expresaría es que casi seguramente el precio de la acción al final se va encontrar por debajo del precio de ejercicio $K$, lo que es lo mismo a
+
 \[
 \mathbb{P}(S_{f}\leq K)=1
 \]
-De forma análoga se tiene que la opción de venta da como origen un árbol de la siguiente forma
+
+De forma análoga se tiene que la opción de venta da como origen a un árbol de la siguiente forma
 
 
 <caption><center><strong>"Árbol Binomial de Opción de Venta"</strong></center></caption>
@@ -731,51 +733,56 @@ De forma análoga se tiene que la opción de venta da como origen un árbol de l
 <subcaption><small>Fuente: Elaboración propia, basado en código de user71804 https://tex.stackexchange.com/questions/227414/draw-5-period-binomial-tree</small></subcaption>
 
 
-Partiendo de esto lo que se ha hecho para la implementación de estos árboles y basado en los precios de las acciones y sus probabilidades, ha sido desarrollar un método de recursivo para el cálculo de un árbol binomial de precios, el cual se ha desarrollado en una matriz basado en las ecuaciones para el caso de los inversores con riesgo neutral, la volatilidad obtenida a partir de los precios históricos con los que se contaba y la cantidad pagada de dividendo de forma anual. 
+Partiendo de esto, lo que se ha hecho para la implementación de estos árboles y basado en los precios de las acciones y sus probabilidades, ha sido desarrollar un método de recursivo para el cálculo de un árbol binomial de precios, el cual se ha desarrollado en una matriz basada en las ecuaciones para el caso de los inversores con riesgo neutral. La volatilidad obtenida a partir de los precios históricos con los que se contaba y la cantidad pagada de dividendo de forma anual. 
 
-Es importante destacar que se trabaja de forma anualizada de tal forma que si el tiempo para el vencimiento de una opción es de tres meses entonces $t_f=0.25$, seis meses $t_f=0.5$ y un año $t_f=1$. El riesgo neutral se calcula a través de una interpolación de las tasas (anualizadas) con las que se cuenta mediante el modelo de _Svensson_ a partir para el cual se obtiene los parámetros que pueden ser usados para calcular $y(t)$, y así encontrar el factor de descuento
+Es importante destacar que se trabaja de forma anualizada de tal forma que si el tiempo para el vencimiento de una opción es de tres meses entonces $t_f=0.25$, seis meses $t_f=0.5$ y un año $t_f=1$. El riesgo neutral se calcula a través de una interpolación de las tasas (anualizadas) con las que se cuenta mediante el modelo de _Svensson_, a partir del cual se obtienen los parámetros que pueden ser usados para calcular $y(t)$, y así encontrar el factor de descuento
 
 \[
 e^{-y(t_f)h_n}
 \]
 
-Además se tiene que las acciones de Holcim S.A. pagan dividendos en fechas establecidas. Sin embargo estos no se basan en una composición continua de pagos de los mismos y se establece en un rango de fechas, por lo que se conviene que salvo la opción tenga vencimiento en los rangos de fechas establecidos para el pago de los dividendos
+Además, se tiene que las acciones de Holcim Costa Rica S.A. pagan dividendos en fechas establecidas. Sin embargo, estos no se basan en una composición continua de pagos de los mismos y se establecen en un rango de fechas, se conviene que, salvo la opción tenga vencimiento en los rangos de fechas establecidos para el pago de los dividendos $q=0$.
 
-\[
-q=0
-\]
-Y en caso de que la opción se establezca en una fecha donde se pagan dividendos poseedor de la acción hasta fecha es el que tiene el derecho al dividendo. 
-Basado en los registros con los que se cuenta de la empresa se supone los siguientes pagos de dividendos serán oficializados el tanto monto como fecha de pago se harán el 21 de diciembre de 2021 y el 22 de abril del 2022.
+En el caso de que la opción se establezca en una fecha donde se pagan dividendos, el poseedor de la acción a la fecha es el que tiene el derecho al dividendo. 
+Basado en los registros con los que se cuenta de la empresa se supone que los siguientes pagos de dividendos serán oficializados, tanto el monto como la fecha de pago se harán el 21 de diciembre de 2021 y el 22 de abril del 2022.
 
-Además la volatilidad a sido calculada de forma semanal ya que eran los datos con mayore recurrencia con los que se contaba, con esto se calculó la volatilidad anual
+Además, la volatilidad ha sido calculada de forma semanal, ya que eran los datos con mayor recurrencia con los que se contaba, con los cuales se calcula la volatilidad anual
+
 \[
 \sqrt{52}\cdot\sigma_{\text{Semanal}}=\sigma_{\text{Anual}}
 \]
-Donde $\sigma_{\text{Semanal}}$ es calculado mediante el cálculo de los rendimientos logarítmicos en cada semana y la función de desviación _sd_ de $\mathbf{R}$. La cantidad de pasos hasta el vencimiento de la opciónse establecieron de acuerdo a la cantidad de días entre el día que la opción fue escrita y la fecha de vencimiento de la misma, teniendo en cuenta los días no bursátiles según la Bolsa Nacional de Valores de Costa Rica.
 
-Una vez con los datos necesarios se parte de una matriz (sin valores) la cual basada en la cantidad de pasos que se querían hacer y para poder dejar espacios entre los precios y que quedara de una forma más clara el cómo aumentaba, toma las dimensiones $n+1\times2n+1$  y que coloca el precio $S_0$ en la columna $n+1$ y fila 1. 
+Donde $\sigma_{\text{Semanal}}$ es calculado mediante los rendimientos logarítmicos en cada semana y la función de desviación _sd_ de $\mathbf{R}$. La cantidad de pasos hasta el vencimiento de la opción se establecieron de acuerdo con la cantidad de días entre el día que la opción sería escrita y la fecha de vencimiento de la misma, teniendo en cuenta los días no bursátiles según la Bolsa Nacional de Valores de Costa Rica.
 
-Apartir de esto se recorre la matriz buscando valores numéricos, para continuar agregando los valores a la matriz, es decir se nota que en la posición que corresponde a la fila 1 con la columna $n+1$ se encuentra el valor $S_0$ entonces basado en el valor $u$ y $d$ se coloca en la posición fila 2 columna $n$ el valor de $S_0d$ y en el caso de la fila 2 columna $n+2$ el valor de $S_0u$, posterior a esto se recorre la segunda fila y basasado en el precio $S_0d$ ubicado en la posición anteriormente establecida se coloca $S_0d^2$ en la fila 3 columna $n-1$ y de forma análoga $S_0ud$ en la fila 3 columna $n+1$ y para el caso de $S_0u$ en la posición establecida anteriormente se coloca $S_0uu$ en la fila 3 columna $n+3$ y el caso de $S_0du$ en la fila 3 columna $n+1$, y se siguen recorriendo las filas de forma recursiva hasta la fila $n$ ya que al llegar a la $n+1$ ya no habrán más pasos que hacer. Posterior a esto para mostrarla en el trabajo se ha hecho un espejo de derecha a izquierda de la matriz y se transpuso para obtener la forma querida que es izquierda a derecha los pasos. Se trabajó de forma vertical por comodidad.
+Una vez con los datos necesarios, se parte de una matriz (sin valores), la cual está basada en la cantidad de pasos que se querían hacer y en dejar espacios entre los precios, ya que quedará de una forma más clara cómo aumenta, así toma las dimensiones $n+1\times2n+1$ y se coloca el precio $S_0$ en la columna $n+1$ y fila $1$. 
 
-Para calcular de forma recursiva el precio de la opción de compra, se creo una matriz de las mismas dimensiones que la anterior y a partir de esto aprovechando la forma en que trabaja $\mathbf{R}$ se le resta a toda la fila $n+1$ de la matriz de los precios el valor de ejercicio $K$ y si el valor obtenido es mayor que 0 entonces este valor es el que se deja en el vector que se genera en otro caso se coloca el valor de 0 en esa posición del vector, este vector se introduce en la matriz de los precios opciones de compra vacía justamente en la fila $n+1$. 
+A partir de esto, se recorre la matriz buscando valores numéricos, para continuar agregando los valores a la matriz, es decir, se nota que en la posición que corresponde a la fila 1 con la columna $n+1$, se encuentra el valor $S_0$. Entonces basado en el valor $u$ y $d$, se coloca en la posición fila 2 columna $n$ el valor de $S_0d$ y en el caso de la fila 2 columna $n+2$ el valor de $S_0u$. Posterior a esto, se recorre la segunda fila y basado en el precio $S_0d$ ubicado en la posición anteriormente establecida, se coloca $S_0d^2$ en la fila 3 columna $n-1$ y, de forma análoga, $S_0ud$ en la fila 3 columna $n+1$. Para el caso de $S_0u$ en la posición establecida anteriormente, se coloca $S_0u^2$ en la fila 3 columna $n+3$. El caso de $S_0du$ en la fila 3 columna $n+1$, y se siguen recorriendo las filas de forma recursiva hasta la fila $n$, ya que al llegar a la $n+1$ ya no habrá más pasos que hacer. Posterior a esto, para mostrarla en el trabajo, se ha hecho un espejo de derecha a izquierda de la matriz y se transpuso para obtener la forma querida que son los pasos de izquierda a derecha. Se trabajó de forma vertical por comodidad.
 
-Usando los valores $p$ y la tasa de curva soberana ajustada para cada paso y ligada a la fecha de maduración de la opción de compra se comienza a rellenar la matriz. Note que a pesar de que en la fila $n+1$ se introdujo el vector anteriormente descrito hay posiciones que no tienen algo, ya que así se había construido la matriz de los precios. La forma en que se hace esto es se empieza de la fila $n+1$ y se consulta que si la entrada de la fila $n+1$ tiene un valor numérico esto para los valores de columna desde $1$ hasta $2n-1$ se hace hasta entrada ya que una vez encontrado un valor numérico en la entrada $j$ se toma este valor se multiplica por $1-p$ a esto se le suma el valor de la entrada $j+2$ que se multiplica por le valor $p$ ya con esto se multiplica por le factor de descuento y se coloca el valor obtenido en la fila $n$ en la columna $j+1$, ahora para la fila $n$ se repite el proceso y así hasta llega a rellenar la fila 1 con el valor actual de la opción.
+Para calcular de forma recursiva el precio de la opción de compra, se creo una matriz de las mismas dimensiones que la anterior y a partir de esto, aprovechando la forma en que trabaja $\mathbf{R}$, se le resta a toda la fila $n+1$ de la matriz de los precios el valor de ejercicio $K$. Si el valor obtenido es mayor que 0, entonces este valor es el que se deja en el vector que se genera. En otro caso, se coloca el valor de 0 en esa posición del vector, este vector se introduce en la matriz vacía de los precios de las opciones de compra justamente en la fila $n+1$. 
 
-Ahora también se ha desarrollado simplemente una función para hacer tanto el cálculo de la opción de compra como la opción de venta, basada en la misma idea recursiva mostrada en el marco teórico. Esta puede ser de mayor utilidad ya que retorna el valor de forrma directa.
+Usando los valores $p$ y la tasa de curva soberana ajustada para cada paso y ligada a la fecha de maduración de la opción de compra, se comienza a rellenar la matriz. Note que a pesar de que en la fila $n+1$ se introdujo el vector anteriormente descrito, hay posiciones que no tienen elementos, ya que así se había construido la matriz de los precios. 
+
+La forma de realizar este procedimiento es empezar en la fila $n+1$ y se consulta si la entrada de la fila $n+1$ tiene un valor numérico, esto para los valores de columna desde $1$ hasta $2n-1$, se hace hasta esta entrada, ya que una vez encontrado un valor numérico en la entrada $j$, se toma este valor y se multiplica por $1-p$. A lo obtenido se le suma el valor de la entrada $j+2$, que se multiplica por le valor $p$. Ya con esto se multiplica por el factor de descuento, y se coloca el valor obtenido en la fila $n$ en la columna $j+1$. Ahora para la fila $n$ se repite el proceso y así hasta llegar a rellenar la fila 1 con el valor actual de la opción.
+
+Para el caso de la opción de venta, se puede emplear la función del árbol de la opción de compra, basta introducir el precio de ejercicio y el precio de actual de forma negativa.
+
+Ahora también se ha desarrollado una función para efectuar tanto el cálculo de la opción de compra como la opción de venta, basada en la misma idea recursiva mostrada en el marco teórico. Esta puede ser de mayor utilidad, ya que retorna el valor de forma directa.
 
 # Resultados
-Se presentan obtenidos al aplicar el modelo para el precio de las opciones a 3, 6 meses y 1 año empleando como precio de ejercicio el precio del 30 de junio del 2021.
+
+Se presentan los resultados obtenidos al aplicar el modelo para el precio de las opciones a 3, 6 meses y 1 año, empleando como precio de ejercicio el precio del 17 de junio del 2021.
 
 ```{r}
 ## La cantidad de días hábiles se va tomar como la cantidad de pasos que se van a hacer
 ## Recuerde que las opciones que se van a calcular son para el tipo europeo
 ### Cantidad de días bursátiles a partir del 30 de junio hasta el primero de octubre del 2021
 ### En este caso se usará como tasa libre de riesgo la brindada por la curva soberana, note que para que no hayan oportunidades de riesgo se debería cumplir d<1+r<u donde r es la tasa libre de riesgo de un periodo
-nTrimestral<-as.numeric(as.Date("01/10/2021",format="%d/%m/%Y")-as.Date("30/06/2021",format="%d/%m/%Y")-length((tablaConDiaNB%>%filter(Fecha>=as.Date("01/10/2021",format="%d/%m/%Y")))$Fecha))
+
+nTrimestral<-as.numeric(as.Date("18/09/2021",format="%d/%m/%Y")-as.Date("17/06/2021",format="%d/%m/%Y")-length((tablaConDiaNB%>%filter(Fecha>=as.Date("01/10/2021",format="%d/%m/%Y")))$Fecha))
 ### Cantidad de días bursátiles a partir del 30 de junio hasta el dos de enero del 2021 (Teniendo en cuenta del 1 de enero) 
-nSemestral<-as.numeric(as.Date("02/01/2022",format="%d/%m/%Y")-as.Date("30/06/2021",format="%d/%m/%Y")-length((tablaConDiaNB%>%filter(Fecha>=as.Date("01/10/2021",format="%d/%m/%Y")))$Fecha)-1)
+nSemestral<-as.numeric(as.Date("02/01/2022",format="%d/%m/%Y")-as.Date("17/06/2021",format="%d/%m/%Y")-length((tablaConDiaNB%>%filter(Fecha>=as.Date("01/10/2021",format="%d/%m/%Y")))$Fecha)-1)
 ### Cantidad de días bursátiles a partir del 30 de junio hasta el 30 de junio del 2021 (tomando como punto de referencia los días no bursátiles del presente año)
-nAnual<-as.numeric(as.Date("30/06/2022",format="%d/%m/%Y")-as.Date("30/06/2021",format="%d/%m/%Y")-length((tablaConDiaNB%>%filter(Fecha>=as.Date("01/10/2021",format="%d/%m/%Y")))$Fecha)-4)
+nAnual<-as.numeric(as.Date("30/06/2022",format="%d/%m/%Y")-as.Date("17/06/2021",format="%d/%m/%Y")-length((tablaConDiaNB%>%filter(Fecha>=as.Date("01/10/2021",format="%d/%m/%Y")))$Fecha)-4)
 ### Anteriormente se determinó la volatilidad diaria entonces se usará esta ya que se está usando la cantidad días como la cantidad de pasos
 sigma<-volatilidad_anual ### A la espera
 q<-0 ## A la espera de dividendos anuales
