@@ -629,7 +629,8 @@ Fechas_semanales <- cut(Precios$Fecha, "week")
 
 Fechas_semanales <- unique(Fechas_semanales)
 
-Fechas_semanales
+
+Fechas_semanales 
 
 Precios_semanales <- Precios$Último[Fechas_semanales]
 
@@ -660,10 +661,10 @@ retornos_logaritmicos_semanales <- log(retornos_brutos_semanales)
 
 ##Luego se calcula la varianza de los resultados anteriores y posteriormente la volatilidad de los datos obtenidos
 
-varianza_retornos_logaritmicos_semanales <- var(retornos_logaritmicos_semanales)
+volatilidad_semanal <- sd(retornos_logaritmicos_semanales)
 #varianza_retornos_logaritmicos_semanales
 
-volatilidad_logaritmica_semanal <- 1/length(Precios_semanales) * varianza_retornos_logaritmicos_semanales
+volatilidad_anual<- volatilidad_semanal * sqrt(52)
 #volatilidad_logaritmica_semanal
 
 ```
