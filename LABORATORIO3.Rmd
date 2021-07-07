@@ -808,12 +808,17 @@ resultados%>%kbl(col.names = c("Tiempo","Opción","Precio"))%>%kable_material()
 </style>
 
 <div class="ref-apa" markdown="1">
-##References
-1.  Angeli, E., Wagner, J., Lawrick, E., Moore, K., Anderson, M., Soderlund, L., & Brizee, A. (2010, May 5). _General format_. Retrieved from http://owl.english.purdue.edu/owl/resource/560/01/
+Cox, J. C., Ross, S. A., & Rubinstein, M. (1979). Option pricing: A simplified approach. Journal of financial Economics, 7(3), 229-263.
 
-2.  Wegener, D. T., & Petty, R. E. (1994). Mood management across affective states: The hedonic contingency hypothesis. _Journal of Personality & Social Psychology, 66_, 1034-1048.
+Mascareñas, J. (2000). El Método binomial de valoración de opciones. Universidad Complutense de Madrid. Recuperado de http://www.gacetafinanciera.com/TEORIARIESGO/VALOREOPCIONES.pdf
 
-3.  Wegener, D. T., Kerr, N. L., Fleming, M. A., & Petty, R. E. (2000). Flexible corrections of juror judgments: Implications for jury instructions. _Psychology, Public Policy, & Law, 6_, 629-654.
+Boudreault, M., & Renaud, J. F. (2019). Actuarial Finance: Derivatives, Quantitative Models and Risk Management. John Wiley & Sons.
+
+Petters, A. O., & Dong, X. (2016). An introduction to mathematical finance with applications. Springer.
+
+Ruppert, D. and Matteson, D. (2015).Statistics and data analysis for financial engineering, volume 13. Springer
+
+
 </div>
 
 
