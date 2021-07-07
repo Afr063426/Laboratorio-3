@@ -204,7 +204,7 @@ Se procede a explicar lo que son los árboles binomiales, así como su construcc
 \]
 Gráficamente un árbol binomial.
 
-<caption><center><strong>Figura 1: Árbol Binomial de Dos Pasos<strong></center></caption>
+<caption><center><strong>Figura 1: Árbol Binomial de Dos Pasos</strong></center></caption>
 ```{tikz , fig.ext = 'png'}
 \usetikzlibrary{arrows}
 \usetikzlibrary{trees}
