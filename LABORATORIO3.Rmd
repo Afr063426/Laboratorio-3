@@ -823,7 +823,7 @@ tablaValores%>%kbl(col.names = c('Tiempo','$a$','$p$','u'),caption="<center><str
 ```
 <subcaption><small> Fuente: Elaboración propia, datos de Investing.com, Holcim Costa Rica S.A. y BCCR</small></subcaption>
 
-A continuación se presenta una tabla en la que se presenta la matriz, que representa el árbol binomial para el caso de los precios a tres meses con `r nTrimestral` pasos.
+A continuación se presenta una tabla con la matriz, que representa el árbol binomial para el caso de los precios a tres meses con `r nTrimestral` pasos.
 
 
 <caption><center><strong>Tabla 7: Árbol binomial de precios de activo subyacente a tres meses </strong></center></caption>
@@ -837,7 +837,7 @@ arbolrTri%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)%>%scroll_bo
 
 
 
-Basado en la tabla 7 (árbol), se presenta una tabla donde se encuentra la matriz de los posibles precios en cada uno de los pasos de una opción de compra a tres meses.
+Basándose en la tabla 7 (árbol), se presenta una tabla donde se encuentra la matriz de los posibles precios en cada uno de los pasos de una opción de compra a tres meses.
 
 
 <caption><center><strong>Tabla 8: Árbol binomial de precios opción de compra a tres meses </strong></center></caption>
@@ -850,7 +850,7 @@ arbolCTri%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)%>%scroll_bo
 <subcaption><small> Fuente: Elaboración propia, datos de Investing.com, Holcim Costa Rica S.A. y BCCR</small></subcaption>
 
 
-Y de forma similar a la tabla 8 se presenta el caso, pero de una opción de venta igualmente a tres meses.
+Y de forma similar a la tabla 8, se presenta el caso pero de una opción de venta igualmente a tres meses.
 
 <caption><center><strong>Tabla 7: Árbol binomial de precios de activo subyacente a tres meses </strong></center></caption>
 ```{r}
@@ -862,7 +862,7 @@ arbolPTri%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)%>%scroll_bo
 <subcaption><small> Fuente: Elaboración propia, datos de Investing.com, Holcim Costa Rica S.A. y BCCR</small></subcaption>
 
 
-Se presentan los precios de las opciones a tres meses, seis meses y un año se presentan en la siguiente.
+Se presentan los precios de las opciones a tres meses, seis meses y un año, en la siguiente tabla:
 
 
 ```{r}
