@@ -593,7 +593,7 @@ Se va a trabajar con los datos de la curva soberana obtenidos de la página del 
 ```{r}
 tasasBCCR<-tasasBCCR[-12]
 tasasBCCR<-cbind("Fechas de maduración"= c("Tasa"), tasasBCCR)
-tasasBCCR%>%kbl()%>%kable_material()
+tasasBCCR%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)
 tasasBCCR<-tasasBCCR[-1]
 
 ```
@@ -620,7 +620,54 @@ ggplot()+
   labs(y = "Rendimientos",x = "Fecha de maduración" ,caption = "Fuente: Elaboración propia, con datos del Banco Central de Costa Rica")+theme_minimal()+theme(legend.position="bottom",plot.caption=element_text(hjust=0))
 ```
 
+```{r}
 
+##Se procede a calcular los retornos logarítmicos de los precios de las acciones. Para esto, primero se calculan los rendimientos brutos semanales, seguidamente del logaritmo de estos
+
+
+Fechas_semanales <- cut(Precios$Fecha, "week")
+
+Fechas_semanales <- unique(Fechas_semanales)
+
+
+Fechas_semanales 
+
+Precios_semanales <- Precios$Último[Fechas_semanales]
+
+Precios_semanales
+
+##Retornos diarios
+
+#retornos_brutos_diarios <- Precios$Último[-length(Precios$Último)]/Precios$Último[-1]
+
+
+#retornos_logaritmicos_diarios <- log(retornos_brutos_diarios)
+
+
+#varianza_retornos_logaritmicos_diarios <- var(retornos_logaritmicos_diarios)
+
+
+#volatilidad_logaritmica_diaria <- 1/length(Precios$Último) * varianza_retornos_logaritmicos_diarios
+
+
+##Retornos diarios
+
+
+retornos_brutos_semanales <- Precios_semanales[-length(Precios_semanales)]/Precios_semanales[-1]
+#retornos_brutos_semanales
+
+retornos_logaritmicos_semanales <- log(retornos_brutos_semanales)
+#retornos_logaritmicos_semanales
+
+##Luego se calcula la varianza de los resultados anteriores y posteriormente la volatilidad de los datos obtenidos
+
+volatilidad_semanal <- sd(retornos_logaritmicos_semanales)
+#varianza_retornos_logaritmicos_semanales
+
+volatilidad_anual<- volatilidad_semanal * sqrt(52)
+#volatilidad_logaritmica_semanal
+
+```
 
 
 
@@ -754,7 +801,9 @@ precioOpcionCAnual<-precioC(K,K,nAnual,hnAnual,sigma,svensson(parametrosModelo,1
 precioOpcionPAnual<-precioP(K,K,nAnual,hnAnual,sigma,svensson(parametrosModelo,1),0)
 resultados<-data.frame(Tiempo=rep(c("Tres meses","Seis Meses","Un año"),2),"Opción"=c(rep('Compra',3),rep('Venta',3)),"Precio"=c(precioOpcionCTrimestral,precioOpcionCSemestral,precioOpcionCAnual,precioOpcionPTrimestral,precioOpcionPSemestral,precioOpcionPAnual))
 ```
-Primero los valores obtenidos para $a$, $p$ y $u$ se presentan en la siguiente tabla
+
+Primero los valores obtenidos para $a$, $p$ y $u$ se presentan en la siguiente tabla:
+
 
 ```{r}
 ### Se procede a colocar en una tabla los valores obtenido para a, p y u entonces se tiene
@@ -763,7 +812,7 @@ tablaValores%>%kbl(col.names = c('Tiempo','$a$','$p$','u'))%>%kable_material()
 ```
 
 
-El árbol con el precio del activo subyacente es el siguiente
+El árbol con el precio del activo subyacente es el siguiente:
 ```{r}
 arbolrTri<-(arbolBinarioM(nTrimestral,hnTrimetral,sigma,K))
 arbolrTri[is.na(arbolrTri)]=""
@@ -774,7 +823,7 @@ arbolrTri%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)%>%scroll_bo
 
 
 
-El árbol con el precio para la opción de compra a tres meses del activo subyacente es el siguiente
+El árbol con el precio para la opción de compra a tres meses del activo subyacente es el siguiente:
 
 ```{r}
 arbolCTri<-(arbolBinarioC(nTrimestral,hnTrimetral,sigma,K,svensson(parametrosModelo,1/4),valoresTrimestral[2],K))
@@ -783,7 +832,7 @@ arbolCTri<-t(arbolCTri[,rev(seq_len(ncol(arbolCTri)))])
 arbolCTri%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)%>%scroll_box(width = "100%",height = "500px")
 ```
 
-El árbol con el precio para opción de venta a tres meses del activo subyacente es el siguiente
+El árbol con el precio para opción de venta a tres meses del activo subyacente es el siguiente:
 ```{r}
 arbolPTri<-(arbolBinarioC(nTrimestral,hnTrimetral,sigma,-K,svensson(parametrosModelo,1/4),valoresTrimestral[2],-K))
 arbolPTri[is.na(arbolPTri)]=""
@@ -791,7 +840,8 @@ arbolPTri<-t(arbolPTri[,rev(seq_len(ncol(arbolPTri)))])
 arbolPTri%>%kbl()%>%kable_material()%>%kable_styling(full_width = F)%>%scroll_box(width = "100%",height = "500px")
 ```
 
-Los precios respectivos para las opciones se resumen en la siguiente tabla
+Los precios respectivos para las opciones se resumen en la siguiente tabla:
+
 ```{r}
 resultados%>%kbl(col.names = c("Tiempo","Opción","Precio"))%>%kable_material()
 ```
