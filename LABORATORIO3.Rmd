@@ -2,7 +2,7 @@
 title: "Laboratorio 3"
 date: "`r Sys.Date()`"
 output:
-  rmdformats::readthedown:
+  rmdformats::downcute:
     highlight: kate
     toc_depth: 3
     embed_fonts: true
@@ -18,6 +18,7 @@ library(kableExtra)
 library(tidyverse)
 library(readxl)
 library(ggplot2)
+library(lubridate)
 ##install.packages('magick') para dibujos tikz
 ##install.packages('pdftools')
 
@@ -742,19 +743,12 @@ e^{-y(t_f)h_n}
 
 Además, se tiene que las acciones de Holcim Costa Rica S.A. pagan dividendos en fechas establecidas. Sin embargo, estos no se basan en una composición continua de pagos de los mismos y se establecen en un rango de fechas, se conviene que, salvo la opción tenga vencimiento en los rangos de fechas establecidos para el pago de los dividendos $q=0$.
 
-<<<<<<< HEAD
-\[
-q=0
-\]
 
-Y en caso de que la opción se establezca en una fecha donde se pagan dividendos poseedor de la acción hasta fecha es el que tiene el derecho al dividendo. 
-Basado en los registros con los que se cuenta de la empresa se supone los siguientes pagos de dividendos serán oficializados el tanto monto como fecha de pago se harán el 21 de diciembre de 2021 y el 22 de abril del 2022.
-=======
 En el caso de que la opción se establezca en una fecha donde se pagan dividendos, el poseedor de la acción a la fecha es el que tiene el derecho al dividendo. 
 Basado en los registros con los que se cuenta de la empresa se supone que los siguientes pagos de dividendos serán oficializados, tanto el monto como la fecha de pago se harán el 21 de diciembre de 2021 y el 22 de abril del 2022.
 
 Además, la volatilidad ha sido calculada de forma semanal, ya que eran los datos con mayor recurrencia con los que se contaba, con los cuales se calcula la volatilidad anual
->>>>>>> 7dbb6e6f725a51f29ae2080ac699d4513eec5a99
+
 
 \[
 \sqrt{52}\cdot\sigma_{\text{Semanal}}=\sigma_{\text{Anual}}
@@ -786,11 +780,22 @@ Se presentan los resultados obtenidos al aplicar el modelo para el precio de las
 ### Cantidad de días bursátiles a partir del 30 de junio hasta el primero de octubre del 2021
 ### En este caso se usará como tasa libre de riesgo la brindada por la curva soberana, note que para que no hayan oportunidades de riesgo se debería cumplir d<1+r<u donde r es la tasa libre de riesgo de un periodo
 
-nTrimestral<-as.numeric(as.Date("18/09/2021",format="%d/%m/%Y")-as.Date("17/06/2021",format="%d/%m/%Y")-length((tablaConDiaNB%>%filter(Fecha>=as.Date("01/10/2021",format="%d/%m/%Y")))$Fecha))
+funcionFines<-function(a,b){
+numeroDeDias<-seq(as.Date(a,format="%d/%m/%Y"),as.Date(b,format="%d/%m/%Y"),by="days")
+numeroDeDias<-numeroDeDias[(wday(as.Date(numeroDeDias,format="%Y-%m-%d")))<6]
+return(length(numeroDeDias))
+}
+
+
+
+nTrimestral<-funcionFines("17/06/2021","18/09/2021")-length((tablaConDiaNB%>%filter(Fecha>=as.Date("17/06/2021",format="%d/%m/%Y")& Fecha<as.Date("18/09/2021",format="%d/%m/%Y")))$Fecha)
 ### Cantidad de días bursátiles a partir del 30 de junio hasta el dos de enero del 2021 (Teniendo en cuenta del 1 de enero) 
-nSemestral<-as.numeric(as.Date("02/01/2022",format="%d/%m/%Y")-as.Date("17/06/2021",format="%d/%m/%Y")-length((tablaConDiaNB%>%filter(Fecha>=as.Date("01/10/2021",format="%d/%m/%Y")))$Fecha)-1)
+
+
+nSemestral<-funcionFines("17/06/2021","18/12/2021")-length((tablaConDiaNB%>%filter(Fecha>=as.Date("01/10/2021",format="%d/%m/%Y") & Fecha<as.Date("18/12/2021",format="%d/%m/%Y")))$Fecha)
 ### Cantidad de días bursátiles a partir del 30 de junio hasta el 30 de junio del 2021 (tomando como punto de referencia los días no bursátiles del presente año)
-nAnual<-as.numeric(as.Date("30/06/2022",format="%d/%m/%Y")-as.Date("17/06/2021",format="%d/%m/%Y")-length((tablaConDiaNB%>%filter(Fecha>=as.Date("01/10/2021",format="%d/%m/%Y")))$Fecha)-4)
+
+nAnual<-funcionFines("17/06/2021","18/06/2022")-length((tablaConDiaNB%>%filter(Fecha>=as.Date("17/06/2021",format="%d/%m/%Y")))$Fecha)-4
 ### Anteriormente se determinó la volatilidad diaria entonces se usará esta ya que se está usando la cantidad días como la cantidad de pasos
 sigma<-volatilidad_anual ### A la espera
 q<-0 ## A la espera de dividendos anuales
@@ -802,7 +807,7 @@ hnSemestral<-0.5/as.numeric(nSemestral)
 ## Un año equivale a 1
 hnAnual<-1/as.numeric(nAnual)
 ### El precio de ejercicio con el que vamos a escribir las opciones es el último con el que se cuenta
-K<-Precios$Último[length(Precios$Último)]
+K<-Precios$Último[1]
 
 ## Se procede a calcular los valores de u,p, a con la función programa anteriomente y haciendo uso del modelo de Svensson con los parámetros calculados y la volatilidad calculada anteriormente
 valoresTrimestral<-parametros(K,K,nTrimestral,hnTrimetral,sigma,svensson(parametrosModelo,1/4),q)
