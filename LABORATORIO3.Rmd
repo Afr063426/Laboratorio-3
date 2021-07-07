@@ -620,7 +620,53 @@ ggplot()+
   labs(y = "Rendimientos",x = "Fecha de maduración" ,caption = "Fuente: Elaboración propia, con datos del Banco Central de Costa Rica")+theme_minimal()+theme(legend.position="bottom",plot.caption=element_text(hjust=0))
 ```
 
+```{r}
 
+##Se procede a calcular los retornos logarítmicos de los precios de las acciones. Para esto, primero se calculan los rendimientos brutos semanales, seguidamente del logaritmo de estos
+
+
+Fechas_semanales <- cut(Precios$Fecha, "week")
+
+Fechas_semanales <- unique(Fechas_semanales)
+
+Fechas_semanales
+
+Precios_semanales <- Precios$Último[Fechas_semanales]
+
+Precios_semanales
+
+##Retornos diarios
+
+#retornos_brutos_diarios <- Precios$Último[-length(Precios$Último)]/Precios$Último[-1]
+
+
+#retornos_logaritmicos_diarios <- log(retornos_brutos_diarios)
+
+
+#varianza_retornos_logaritmicos_diarios <- var(retornos_logaritmicos_diarios)
+
+
+#volatilidad_logaritmica_diaria <- 1/length(Precios$Último) * varianza_retornos_logaritmicos_diarios
+
+
+##Retornos diarios
+
+
+retornos_brutos_semanales <- Precios_semanales[-length(Precios_semanales)]/Precios_semanales[-1]
+#retornos_brutos_semanales
+
+retornos_logaritmicos_semanales <- log(retornos_brutos_semanales)
+#retornos_logaritmicos_semanales
+
+##Luego se calcula la varianza de los resultados anteriores y posteriormente la volatilidad de los datos obtenidos
+
+varianza_retornos_logaritmicos_semanales <- var(retornos_logaritmicos_semanales)
+#varianza_retornos_logaritmicos_semanales
+
+volatilidad_logaritmica_semanal <- 1/length(Precios_semanales) * varianza_retornos_logaritmicos_semanales
+#volatilidad_logaritmica_semanal
+
+```
 
 
 
